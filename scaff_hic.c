@@ -174,8 +174,8 @@ int col_joints(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, 
 		uint32_t is_l2 = check_left_half(ctgs->seq[ind2].le, ctgs->seq[ind2].rs, a[1].s);
 		if (is_l2 > 1) return 1; //middle won't be added
 		
-		cd_add(&cs[ind1<<1|is_l1], ctgs->seq[ind1].name, is_l2, is_l2?ctgs->seq[ind2].l_snp_n:ctgs->seq[ind2].r_snp_n);		
-		cd_add(&cs[ind2<<1|is_l2], ctgs->seq[ind2].name, is_l1, is_l1?ctgs->seq[ind1].l_snp_n:ctgs->seq[ind1].r_snp_n);		
+		cd_add(&cs[ind1<<1|is_l1], ctgs->seq[ind2].name, is_l2, is_l2?ctgs->seq[ind2].l_snp_n:ctgs->seq[ind2].r_snp_n);		
+		cd_add(&cs[ind2<<1|is_l2], ctgs->seq[ind1].name, is_l1, is_l1?ctgs->seq[ind1].l_snp_n:ctgs->seq[ind1].r_snp_n);		
 		return 0;
 	} else if (f_cnt == 2){
 		uint32_t ind1 = f[0].tid;
@@ -186,8 +186,11 @@ int col_joints(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, 
 		uint32_t is_l2 = check_left_half(ctgs->seq[ind2].le, ctgs->seq[ind2].rs, f[1].s);
 		if (is_l2 > 1) return 1; //middle won't be added
 		
-		cd_add(&cs[ind1<<1|is_l1], ctgs->seq[ind1].name, is_l2, is_l2?ctgs->seq[ind2].l_snp_n:ctgs->seq[ind2].r_snp_n);		
-		cd_add(&cs[ind2<<1|is_l2], ctgs->seq[ind2].name, is_l1, is_l1?ctgs->seq[ind1].l_snp_n:ctgs->seq[ind1].r_snp_n);		
+		cd_add(&cs[ind1<<1|is_l1], ctgs->seq[ind2].name, is_l2, is_l2?ctgs->seq[ind2].l_snp_n:ctgs->seq[ind2].r_snp_n);		
+		cd_add(&cs[ind2<<1|is_l2], ctgs->seq[ind1].name, is_l1, is_l1?ctgs->seq[ind1].l_snp_n:ctgs->seq[ind1].r_snp_n);		
+		
+		/*cd_add(&cs[ind1<<1|is_l1], ctgs->seq[ind1].name, is_l2, is_l2?ctgs->seq[ind2].l_snp_n:ctgs->seq[ind2].r_snp_n);		*/
+		/*cd_add(&cs[ind2<<1|is_l2], ctgs->seq[ind2].name, is_l1, is_l1?ctgs->seq[ind1].l_snp_n:ctgs->seq[ind1].r_snp_n);		*/
 		return 0;	
 	}
 	return 1;
@@ -219,11 +222,14 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t ws, sdict_t *ctgs, cdict_t **cs)
 		lenl = lenr = (len - ws) >> 1;
 		sd_put2(ctgs, name, len, le, rs, lenl, lenr);
 	}
-	if (!*cs) *cs = calloc(ctgs->n_seq << 1, sizeof(cdict_t));	
+	if (!*cs) {
+		*cs = calloc(ctgs->n_seq << 1, sizeof(cdict_t));
+		for ( i = 0; i < ctgs->n_seq << 1; ++i) cd_init(cs[i]);
+	}		
 	/*if (!ns->ct) { //not initiate yet*/
 		/*init_gaps(gap_fn, ns, ctgs, max_ins_len);*/
 	/*}*/
-
+	
 
 	char *cur_qn = NULL;
 	long bam_cnt = 0;

@@ -1,6 +1,6 @@
 CC      =  gcc
 CFLAGS  =  -g -Wall -D VERBOSE -D PRINT_COVERAGE #-O2  
-LDFLAGS = -lz
+LDFLAGS = -lz -lm
 
 #OBJS = gfa.o opt.o paf.o sdict.o eg.o 
 PROG = scaff_10x  scaff_hic

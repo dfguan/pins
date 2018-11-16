@@ -67,7 +67,7 @@ void bc_ary_push(bc_ary_t *l, bc_t *z)
 	l->ary[l->n++] = *z;
 }
 
-void col_bcnt(aln_inf_t  *fal, uint32_t bc, int min_mq, uint32_t max_is, bc_ary_t *l)
+int col_bcnt(aln_inf_t  *fal, uint32_t bc, int min_mq, uint32_t max_is, bc_ary_t *l)
 {
 	if (fal->mq > min_mq) {
 		uint32_t s = fal->s;
@@ -84,6 +84,7 @@ void col_bcnt(aln_inf_t  *fal, uint32_t bc, int min_mq, uint32_t max_is, bc_ary_
 			bc_t t = (bc_t) {s, e, (uint64_t)bc << 32 | fal->tid};
 			
 			bc_ary_push(l, &t);	
+			return 0;
 		}
 		/*}*/
 		/*pos_push(&d->ctg_pos[fal[0].tid], s);*/
@@ -91,6 +92,7 @@ void col_bcnt(aln_inf_t  *fal, uint32_t bc, int min_mq, uint32_t max_is, bc_ary_
 		/*ctg_pos_push(&d[fal[0].tid], s);k*/
 		/*ctg_pos_push(&d[fal[0].tid], e);*/
 	}
+	return 1;
 }
 
 void out_record(cdict_t *cds, sdict_t *ctgs, uint32_t n)
@@ -101,7 +103,7 @@ void out_record(cdict_t *cds, sdict_t *ctgs, uint32_t n)
 		c = cds + i;
 		uint32_t j;
 		for ( j = 0; j < c->n_cnt; ++j) {
-			fprintf(stdout, "%s\t%c\t%s\t%c\t%u\n", ctgs->seq[i>>1].name, i&1?'+':'-', c->cnts[j].name, j&1?'+':'-', c->cnts[j].cnt);				
+			fprintf(stdout, "%s\t%c\t%s\t%c\t%u\t%u\t%u\n", ctgs->seq[i>>1].name, i&1?'+':'-', c->cnts[j].name, j&1?'+':'-', c->cnts[j].cnt, c->cnts[j].snp_n, ctgs->seq[i>>1].l_snp_n);				
 		}	
 	}
 
@@ -159,7 +161,8 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ct
 	char *cur_qn = NULL, *cur_bc = NULL;
 	/*int32_t cur_l = 0;*/
 	sdict_t* bc_n = sd_init();
-	long bam_cnt = 0;
+	long rdp_cnt = 0;
+	long used_rdp_cnt = 0;
 	int is_set = 0;
 	aln_inf_t aln;
 	int aln_cnt = 0;
@@ -169,11 +172,14 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ct
 		if (bam_read1(fp, b) >= 0 ) {
 			if (!cur_qn || strcmp(cur_qn, bam1_qname(b)) != 0) {
 				/*fprintf(stderr, "%d\t%d\t%d\n", aln_cnt, rev, aln.mq);*/
-				if (aln_cnt == 2 && (rev == 1 || rev == 2)) col_bcnt(&aln, sd_put(bc_n, cur_bc), min_mq, max_is, bc_l);
+				if (aln_cnt == 2 && (rev == 1 || rev == 2) && !col_bcnt(&aln, sd_put(bc_n, cur_bc), min_mq, max_is, bc_l)) ++used_rdp_cnt;
 				aln_cnt = 0;	
 				rev = 0;
 				is_set = 0;
-				if (cur_qn) free(cur_qn); 
+				if (cur_qn) {
+					++rdp_cnt, free(cur_qn);
+					if ((rdp_cnt % 1000000) == 0) fprintf(stderr, "[M::%s] processing %ld read pairs\n", __func__, rdp_cnt); 
+				} 
 				cur_qn = strdup(bam1_qname(b));
 				cur_bc = cur_qn + b->core.l_qname - BC_LEN;
 			}
@@ -188,19 +194,17 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ct
 				aln.tid = b->core.tid;
 				/*uint32_t e = get_target_end(bam1_cigar(b), b->core.n_cigar, aln.s);			*/
 				aln.e = aln.s + b->core.isize - 1;	
+				is_set = 1;
 			} 
 			if (opt && b->core.isize < 0) 
 				aln.e = b->core.pos + 1;
-			
-			
-			if ((++bam_cnt % 1000000) == 0) fprintf(stderr, "[M::%s] processing %ld bams\n", __func__, bam_cnt); 
 		} else {
 			/*fprintf(stderr, "%d\t%d\t%d\n", aln_cnt, rev, aln.mq);*/
-			if (aln_cnt == 2 && (rev == 1 || rev == 2)) col_bcnt(&aln, sd_put(bc_n, cur_bc), min_mq, max_is, bc_l);
+			if (aln_cnt == 2 && (rev == 1 || rev == 2) && !col_bcnt(&aln, sd_put(bc_n, cur_bc), min_mq, max_is, bc_l)) ++used_rdp_cnt;
 			break;	
 		}
 	}
-	fprintf(stderr, "[M::%s] finish processing %ld bams\n", __func__, bam_cnt); 
+	fprintf(stderr, "[M::%s] finish processing %ld read pairs, %ld (%.2f) passed\n", __func__, rdp_cnt, used_rdp_cnt, (double)used_rdp_cnt/rdp_cnt); 
 	
 	bam_destroy1(b);
 	bam_header_destroy(h);
@@ -239,8 +243,10 @@ float norm_cdf(int x, float p, int n) {
 
 int col_joints(uint32_t ind1l, uint32_t ind2l, sdict_t *ctgs, cdict_t *cs)
 {
-	cd_add(&cs[ind1l], ctgs->seq[ind1l>>1].name, ind2l & 1, ind2l & 1 ? ctgs->seq[ind2l>>1].l_snp_n:ctgs->seq[ind2l>>1].r_snp_n);		
-	cd_add(&cs[ind2l], ctgs->seq[ind2l>>1].name, ind1l & 1, ind1l & 1 ? ctgs->seq[ind1l>>1].l_snp_n:ctgs->seq[ind1l>>1].r_snp_n);		
+	/*fprintf(stderr, "%u\t%u\t%u\n", ctgs->n_seq << 1, ind1l, ind2l);*/
+	cd_add(&cs[ind1l], ctgs->seq[ind2l>>1].name, ind2l & 1, ind2l & 1 ? ctgs->seq[ind2l>>1].l_snp_n:ctgs->seq[ind2l>>1].r_snp_n);		
+	/*fprintf(stderr, "leave2\n");*/
+	cd_add(&cs[ind2l], ctgs->seq[ind1l>>1].name, ind1l & 1, ind1l & 1 ? ctgs->seq[ind1l>>1].l_snp_n:ctgs->seq[ind1l>>1].r_snp_n);		
 	return 0;
 }
 
@@ -249,17 +255,18 @@ int col_joints(uint32_t ind1l, uint32_t ind2l, sdict_t *ctgs, cdict_t *cs)
 cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_inner_bcn, uint32_t max_span, uint32_t min_mol_len, int n_targets, sdict_t *ctgs)
 {
 
-	int k;
 	/*cord_t *cc = calloc(n_targets, sizeof(cord_t));*/
 	
-	cdict_t *cs = calloc(ctgs->n_seq << 1, sizeof(cdict_t));	
 	radix_sort_bct(bc_l->ary, bc_l->ary + bc_l->n);	
 	uint32_t n = bc_l->n;
 	bc_t *p = bc_l->ary;
 	
 	kvec_t(uint32_t) ctgl;	
 	kv_init(ctgl);
-	uint32_t i = 0;
+	uint32_t i;
+	cdict_t *cs = calloc(ctgs->n_seq << 1, sizeof(cdict_t));	
+	for ( i = 0; i < ctgs->n_seq << 1; ++i) cd_init(&cs[i]);
+	i = 0;
 	while (i < n) {
 		uint32_t z;
 		for ( z = i; z < n && (p[z].bctn >> 32) == (p[i].bctn >> 32); ++z);
@@ -276,10 +283,12 @@ cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_
 			while (j <= z) {
 				if (j == z || p[j].bctn != p[i].bctn) {
 					uint32_t is_l = lt_cnt > re_cnt ? 1 : 0;
+
+					fprintf(stderr, "%u\t%u\n",re_cnt,lt_cnt);
 					if (j - i > min_inner_bcn && lt_cnt != re_cnt && 1 - norm_cdf(is_l ? lt_cnt : re_cnt, 0.5, j - i) < 0.05) 
 						kv_push(uint32_t, ctgl, (p[i].bctn & 0xFFFF) << 1 | is_l);
 					 					
-					if (j == z) break; //otherwise infinate loop
+					if (j == z) break; //without this will lead to infinate loop
 					i = j;
 					lt_cnt = re_cnt = 0;
 					check_left_half(ctgs->seq[p[i].bctn & 0xFFFF].le, ctgs->seq[p[i].bctn & 0xFFFF].rs, p[i].s) ? ++lt_cnt : ++re_cnt;
@@ -290,21 +299,46 @@ cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_
 				}
 			}
 			uint32_t ctgl_s = kv_size(ctgl);
+		/*fprintf(stderr, "enter\n");*/
 			if (ctgl_s > 1) 
 				for (j = 0; j < ctgl_s; ++j) {
 					uint32_t w;
 					for ( w = j + 1; w < ctgl_s; ++w) col_joints(ctgl.a[j], ctgl.a[w], ctgs, cs); 
 				}
+		/*fprintf(stderr, "leave\n");*/
 		}	
 		i = z;	
 	}
 	kv_destroy(ctgl);	
-
 	return cs;
 }
 
+/*int core(char *snps_fn, char *edge_fn)*/
+/*{*/
+	/*sdict_t *ctgs = init_snps(snps_fn);	*/
+	/*if (!ctgs) return 1;*/
+	
+	/*fprintf(stderr, "%u\n", ctgs->n_seq);*/
+	/*cdict_t* cds = calloc(ctgs->n_seq<<1, sizeof(cdict_t)); */
+	/*uint32_t n_cds = ctgs->n_seq<<1;*/
+	
+	/*uint32_t i;*/
+	/*for ( i = 0; i < n_cds; ++i) cd_init(cds+i); */
+	/*get_edge_txt(edge_fn, cds, ctgs);*/
+	/*for ( i = 0; i < n_cds; ++i) cd_sort(cds+i); */
+	/*graph_t *g = gen_graph(cds, ctgs, n_cds);*/
+	/*process_graph(g);*/
+	
+	/*for (i = 0; i < n_cds; ++i)  cd_destroy(cds +i);	*/
+	/*if (cds) free(cds);*/
+	/*graph_destroy(g);*/
+	/*return 0;*/
+
+
+/*}*/
+
 /*int aa_10x(char *srt_bam_fn, int min_as, int min_mq, int min_cov, float min_cov_rat, int max_cov, float max_cov_rat)*/
-int scaff_10x(char *bam_fn[], int n_bam, int min_mq, int min_cov, uint32_t max_span, int max_cov, uint32_t max_is, int min_bc, int max_bc, uint32_t min_inner_bcn, uint32_t min_mol_len, int opt)
+int scaff_10x(char *bam_fn[], int n_bam, int min_mq, uint32_t max_span, uint32_t max_is, int min_bc, int max_bc, uint32_t min_inner_bcn, uint32_t min_mol_len, int opt)
 {
 	sdict_t *ctgs = sd_init();
 
@@ -313,12 +347,10 @@ int scaff_10x(char *bam_fn[], int n_bam, int min_mq, int min_cov, uint32_t max_s
 #endif
 	int i;
 	bc_ary_t *bc_l = calloc(1, sizeof(bc_ary_t));
-	for ( i = 0; i < n_bam; ++i) {
-		if (proc_bam(bam_fn[i], min_mq, max_is, 1024, ctgs, opt, bc_l)) {
+	for ( i = 0; i < n_bam; ++i) 
+		if (proc_bam(bam_fn[i], min_mq, max_is, 1024, ctgs, opt, bc_l)) 
 			return -1;	
-		}	
-	}	
-
+			
 	if (!(bc_l&&bc_l->n)) {
 		fprintf(stderr, "[W::%s] none useful information, quit\n", __func__);
 		return -1;
@@ -332,7 +364,7 @@ int scaff_10x(char *bam_fn[], int n_bam, int min_mq, int min_cov, uint32_t max_s
 	fprintf(stderr, "[M::%s] normalizing joints\n", __func__);
 #endif
 	uint32_t n_cds = ctgs->n_seq << 1;
-	for (i = 0; i < n_cds; ++i)	cd_norm(cds + i);
+	/*for (i = 0; i < n_cds; ++i)	cd_norm(cds + i);*/
 	out_record(cds, ctgs, n_cds);
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] releasing joints\n", __func__);
@@ -340,7 +372,6 @@ int scaff_10x(char *bam_fn[], int n_bam, int min_mq, int min_cov, uint32_t max_s
 	for (i = 0; i < n_cds; ++i)  cd_destroy(cds +i);	
 	if (cds) free(cds);
 	sd_destroy(ctgs);
-	fprintf(stderr, "Program finished successfully\n");
 	return 0;
 
 }
@@ -409,8 +440,9 @@ help:
 	}
 	char **bam_fn = argv+optind;
 	int n_bam = argc - optind;
-	fprintf(stderr, "Program starts\n");	
-	scaff_10x(bam_fn, n_bam, min_mq, min_cov, max_span, max_cov, max_is, min_bc, max_bc, min_inner_bcn,  min_mol_len, option);
+	fprintf(stderr, "[M::%s] Program starts\n", __func__);	
+	scaff_10x(bam_fn, n_bam, min_mq, max_span, max_is, min_bc, max_bc, min_inner_bcn,  min_mol_len, option);
+	fprintf(stderr, "[M::%s] Program finished successfully\n", __func__);
 	return 0;	
 }
 

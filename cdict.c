@@ -122,7 +122,7 @@ void cd_add(cdict_t *c, const char *name, uint32_t is_l, uint32_t snp_n)
 	/*if (h) fprintf(stderr, "cd add");*/
 	k = kh_put(str, h, name, &absent);
 	if (absent) {
-		/*fprintf(stderr, "%u\n", c->n_cnt);*/
+		fprintf(stderr, "%u\n", snp_n);
 		if (c->n_cnt == c->m_cnt) {
 			c->m_cnt = c->m_cnt ? c->m_cnt << 1 : 16;
 			cd_cnt_t *ncnts = calloc(c->m_cnt, sizeof(cd_cnt_t));	

@@ -555,7 +555,7 @@ graph_t  *load_gfa(char *fn)
 
 int get_path(graph_t *g)
 {
-				
+
 
 }
 

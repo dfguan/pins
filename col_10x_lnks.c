@@ -1,9 +1,9 @@
 /*
  * =====================================================================================
  *
- *       Filename:  aa_10x.c
+ *       Filename:  col_10x_lnks.c 
  *
- *    Description:  assembly assessment with 10x 
+ *    Description:  collect links from bam files 
  *
  *        Version:  1.0
  *        Created:  15/09/2018 15:42:59
@@ -275,7 +275,7 @@ float norm_cdf(int x, float p, int n) {
 
 /*ctg_pos_t *col_pos(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_inner_bcn, uint32_t min_mol_len, int n_targets)*/
 	/*cord_t *cc = col_cords(bc_l, min_bc, max_bc, min_inner_bcn, max_span, min_mol_len, ctgs->n_seq, ctgs);	*/
-cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_inner_bcn, uint32_t max_span, uint32_t min_mol_len, int n_targets, sdict_t *ctgs)
+cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_inner_bcn, int n_targets, sdict_t *ctgs)
 {
 	/*cord_t *cc = calloc(n_targets, sizeof(cord_t));*/
 	
@@ -344,7 +344,7 @@ cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_
 }
 
 /*int aa_10x(char *srt_bam_fn, int min_as, int min_mq, int min_cov, float min_cov_rat, int max_cov, float max_cov_rat)*/
-int col_lnks(char *bam_fn[], int n_bam, int min_mq, int min_cov, uint32_t max_span, int max_cov, uint32_t max_is, int min_bc, int max_bc, uint32_t min_inner_bcn, uint32_t min_mol_len, int opt)
+int col_lnks(char *bam_fn[], int n_bam, int min_mq,  uint32_t win_s, uint32_t max_is, int min_bc, int max_bc, uint32_t min_inner_bcn, int opt)
 {
 	sdict_t *ctgs = sd_init();
 
@@ -354,7 +354,7 @@ int col_lnks(char *bam_fn[], int n_bam, int min_mq, int min_cov, uint32_t max_sp
 	int i;
 	bc_ary_t *bc_l = calloc(1, sizeof(bc_ary_t));
 	for ( i = 0; i < n_bam; ++i) {
-		if (proc_bam(bam_fn[i], min_mq, max_is, 1024, ctgs, opt, bc_l)) {
+		if (proc_bam(bam_fn[i], min_mq, max_is, win_s, ctgs, opt, bc_l)) {
 			return -1;	
 		}	
 	}	
@@ -366,7 +366,7 @@ int col_lnks(char *bam_fn[], int n_bam, int min_mq, int min_cov, uint32_t max_sp
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] collecting coordinates\n", __func__);
 #endif
-	cdict_t *cds = col_cds(bc_l, min_bc, max_bc, min_inner_bcn, max_span, min_mol_len, ctgs->n_seq, ctgs);	
+	cdict_t *cds = col_cds(bc_l, min_bc, max_bc, min_inner_bcn, ctgs->n_seq, ctgs);	
 	free(bc_l->ary); free(bc_l);	
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] normalizing joints\n", __func__);
@@ -390,13 +390,16 @@ int col_lnks(char *bam_fn[], int n_bam, int min_mq, int min_cov, uint32_t max_sp
 int main_10x_lnks(int argc, char *argv[])
 {
 	int c;
-	int max_cov = 1000000, min_cov = 10, min_mq = 30;
-	int min_as = 0;
-	uint32_t max_span = 50000, min_inner_bcn = 3, min_mol_len = 1000;
+	int  min_mq = 30;
+	uint32_t win_s = 50000, min_inner_bcn = 3; 
 	uint32_t min_bc = 5, max_bc = 1000000, max_is=1000;
 	char *r;
+	
 	int option = 0; //the way to calculate molecule length //internal parameters not allowed to adjust by users
-	while (~(c=getopt(argc, argv, "b:B:c:C:q:S:a:L:l:h"))) {
+	char *program = argv[0];
+	--argc, ++argv;
+	//optind points at argv[1]
+	while (~(c=getopt(argc, argv, "b:B:q:L:w:a:h"))) {
 		switch (c) {
 			case 'b': 
 				min_bc = strtol(optarg, &r, 10);
@@ -404,40 +407,27 @@ int main_10x_lnks(int argc, char *argv[])
 			case 'B':
 				max_bc = strtol(optarg, &r, 10);
 				break;
-			case 'c':
-				min_cov = atoi(optarg); 
-				break;
-			case 'C':
-				max_cov = atoi(optarg); 
-				break;
 			case 'q':
 				min_mq = atoi(optarg);
 				break;
 			case 'L':
 				max_is = strtol(optarg, &r, 10);
 				break;
-			case 'S':
-				max_span = strtol(optarg, &r, 10);
+			case 'w':
+				win_s = strtol(optarg, &r, 10);
 				break;
 			case 'a':
 				min_inner_bcn = strtol(optarg, &r, 10);
 				break;
-			case 'l':
-				min_mol_len = strtol(optarg, &r, 10);
-				break;
 			default:
 				if (c != 'h') fprintf(stderr, "[E::%s] undefined option %c\n", __func__, c);
 help:	
-				fprintf(stderr, "\nUsage: %s %s [<options>] <BAM_FILE> ...\n", argv[0], argv[1]);
+				fprintf(stderr, "\nUsage: %s %s [<options>] <BAM_FILE> ...\n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
 				fprintf(stderr, "         -b    INT      minimum barcode number for each molecule [5]\n");	
 				fprintf(stderr, "         -B    INT      maximum barcode number for each molecule [1000]\n");
-				fprintf(stderr, "         -c    INT      minimum coverage [20]\n");
-				fprintf(stderr, "         -C    INT      maximum coverage [100]\n");
 				fprintf(stderr, "         -q    INT      minimum alignment quality [0]\n");
-				/*fprintf(stderr, "         -S    INT      minimum aislignment score [0]\n");*/
-				fprintf(stderr, "         -l    INT      minimum molecule length [1000]\n");
-				fprintf(stderr, "         -S    INT      maximum spanning length [30000]\n");
+				fprintf(stderr, "         -w    INT      window size [50000]\n");
 				fprintf(stderr, "         -L    INT      maximum insertion length [10000]\n");
 				fprintf(stderr, "         -a    INT      minimum barcode for contig [1]\n");
 				fprintf(stderr, "         -h             help\n");
@@ -450,7 +440,8 @@ help:
 	char **bam_fn = argv+optind;
 	int n_bam = argc - optind;
 	fprintf(stderr, "Program starts\n");	
-	col_lnks(bam_fn, n_bam, min_mq, min_cov, max_span, max_cov, max_is, min_bc, max_bc, min_inner_bcn,  min_mol_len, option);
+	col_lnks(bam_fn, n_bam, min_mq,  win_s,  max_is, min_bc, max_bc, min_inner_bcn, option);
+	fprintf(stderr, "Program ends\n");	
 	return 0;	
 }
 

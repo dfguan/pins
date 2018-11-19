@@ -451,7 +451,8 @@ int process_graph(graph_t *g)
 // GFA IO
 int add_s(graph_t *g, char *s)
 {	
-	char *name, *seq;
+	char *name = 0;
+	char *seq = 0;
 	char *p, *q;
 	int i;
 	for (i = 0, p = q = s + 2;; ++p) {

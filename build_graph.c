@@ -143,7 +143,9 @@ int main_bldg(int argc, char *argv[])
 {
 	int c;
 	uint32_t min_wt = 5;
-	while (~(c=getopt(argc, argv, "b:B:c:C:q:S:a:L:l:h"))) {
+	char *program = argv[0];
+	--argc, ++argv;
+	while (~(c=getopt(argc, argv, "w:h"))) {
 		switch (c) {
 			case 'w': 
 				min_wt = atoi(optarg);
@@ -151,7 +153,7 @@ int main_bldg(int argc, char *argv[])
 			default:
 				if (c != 'h') fprintf(stderr, "[E::%s] undefined option %c\n", __func__, c);
 help:	
-				fprintf(stderr, "\nUsage: %s %s [<options>] <CONTIG_NUM> <LINKS_MATRIX> \n", argv[0], argv[1]);
+				fprintf(stderr, "\nUsage: %s %s [<options>] <CONTIG_NUM> <LINKS_MATRIX> \n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
 				/*fprintf(stderr, "         -L    INT      maximum insertion length [10000]\n");*/
 				fprintf(stderr, "         -w    INT      minimum weight for links [5]\n");

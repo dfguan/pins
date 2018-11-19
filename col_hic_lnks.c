@@ -1,8 +1,8 @@
 /*
  * =====================================================================================
- * *       Filename:  ld_scaffold.c
+ * *       Filename:  col_hic_lnks.c
  *
- *    Description:  scaffolding ld information
+ *    Description:  collect links from bam files 
  *
  *        Version:  1.0
  *        Created:  21/10/2018 10:04:55
@@ -213,7 +213,6 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t ws, sdict_t *ctgs, cdict_t **cs)
 	if (!*cs) {
 		*cs = calloc(ctgs->n_seq << 1, sizeof(cdict_t));	
 		for ( i = 0; i < ctgs->n_seq << 1; ++i) cd_init(cs[i]);
-	
 	} 
 	/*if (!ns->ct) { //not initiate yet*/
 		/*init_gaps(gap_fn, ns, ctgs, max_ins_len);*/
@@ -268,7 +267,7 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t ws, sdict_t *ctgs, cdict_t **cs)
 			break;	
 		}
 	}
-	fprintf(stderr, "[M::%s] finish processing %ld read pairs %ld (%.2f) passed\n", __func__, rdp_counter, used_rdp_counter, (double)used_rdp_counter/rdp_counter); 
+	fprintf(stderr, "[M::%s] finish processing %lld read pairs %lld (%.2f) passed\n", __func__, rdp_counter, used_rdp_counter, (double)used_rdp_counter/rdp_counter); 
 	bam_destroy1(b);
 	bam_header_destroy(h);
 	bam_close(fp);
@@ -278,7 +277,7 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t ws, sdict_t *ctgs, cdict_t **cs)
 
 /*int aa_10x_hic(char *bam_fn, int min_as, int min_mq, int min_cov, float min_cov_rat, int max_cov, float max_cov_rat)*/
 /*int aa_hic(char *bam_fn, int min_as, int min_mq, int min_cov, int max_cov, uint32_t max_ins_len)*/
-int col_hic_lnks(char **bam_fn, int n_bam, int min_mq)
+int col_hic_lnks(char **bam_fn, int n_bam, int min_mq, uint32_t win_s)
 {
 
 	/*uint32_t n_cds = ctgs->n_seq<<1;*/
@@ -290,9 +289,8 @@ int col_hic_lnks(char **bam_fn, int n_bam, int min_mq)
 	fprintf(stderr, "[M::%s] processing bam file\n", __func__);
 #endif
 	int i;	
-	uint32_t ws = 100;
 	for ( i = 0; i < n_bam; ++i) {
-		if (proc_bam(bam_fn[i], min_mq, ws, ctgs, &cds)) {
+		if (proc_bam(bam_fn[i], min_mq, win_s, ctgs, &cds)) {
 			return -1;	
 		}	
 	}	
@@ -308,34 +306,40 @@ int col_hic_lnks(char **bam_fn, int n_bam, int min_mq)
 int main_hic_lnks(int argc, char *argv[])
 {
 	int c;
-	int max_cov = 10000000, min_cov = 7, min_mq = 30;
-	int min_as = 0;
-	uint32_t max_ins_len = 10000;
+	int  min_mq = 30;
+	/*uint32_t max_ins_len = 10000;*/
 	/*int max_cov = 100, min_cov = 0, min_mq = 0;*/
 	/*int min_as = 0;*/
 	/*uint32_t max_ins_len = 10000;*/
-	while (~(c=getopt(argc, argv, "c:C:q:s:L:h"))) {
+	uint32_t win_s = 50000;
+	char *program = argv[0];
+	--argc, ++argv;
+	while (~(c=getopt(argc, argv, "q:w:h"))) {
 		switch (c) {
 			case 'q':
 				min_mq = atoi(optarg);
 				break;
+			case 'w':
+				win_s = strtol(optarg, NULL, 10);
+				break;
 			default:
 				if (c != 'h') fprintf(stderr, "[E::%s] undefined option %c\n", __func__, c);
 help:	
-				fprintf(stderr, "\nUsage: scaff_hic link [options] <BAM_FILE>\n");
+				fprintf(stderr, "\nUsage: %s %s [options] <BAM_FILE>\n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
 				fprintf(stderr, "         -q    INT      minimum alignment quality [0]\n");
+				fprintf(stderr, "         -w    INT      window size [50000]\n");
 				fprintf(stderr, "         -h             help\n");
 				return 1;	
 		}		
 	}
-	if (optind + 2 > argc) {
+	if (optind + 1 > argc) {
 		fprintf(stderr,"[E::%s] require at least one bam file!\n", __func__); goto help;
 	}
 	char **bam_fn = &argv[optind];
 	int n_bam = argc - optind;
 	fprintf(stderr, "Program starts\n");	
-	col_hic_lnks(bam_fn, n_bam, min_mq);
+	col_hic_lnks(bam_fn, n_bam, min_mq, win_s);
 	fprintf(stderr, "Program ends\n");	
 	return 0;	
 }

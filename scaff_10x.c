@@ -32,8 +32,8 @@ help:
 		fprintf(stderr, "           build       generate graph with links\n");
 		return 1;
 	} else {
-		if (!strcmp(argv[1], "link")) main_10x_lnks(argc - 1, argv + 1);
-	   	else if (!strcmp(argv[1], "build")) main_bldg(argc - 1, argv + 1);	
+		if (!strcmp(argv[1], "link")) main_10x_lnks(argc , argv);
+	   	else if (!strcmp(argv[1], "build")) main_bldg(argc , argv);	
 	   	else if (!strcmp(argv[1], "-h")) goto help;	
 	   	else if (!strcmp(argv[1], "-v")) fprintf(stderr, "version: 0.0.0\n");	
 		else {

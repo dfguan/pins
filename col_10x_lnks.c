@@ -103,10 +103,9 @@ void out_matrix(cdict_t *cds, sdict_t *ctgs, uint32_t n)
 		c = cds + i;
 		uint32_t j;
 		for ( j = 0; j < c->n_cnt; ++j) {
-			fprintf(stdout, "%s\t%c\t%s\t%c\t%u\n", ctgs->seq[i>>1].name, i&1?'+':'-', c->cnts[j].name, j&1?'+':'-', c->cnts[j].cnt);				
+			fprintf(stdout, "%s\t%c\t%s\t%c\t%u\t%u\t%u\n", ctgs->seq[i>>1].name, i&1?'+':'-', c->cnts[j].name, j&1?'+':'-', c->cnts[j].cnt, c->cnts[j].snp_n, ctgs->seq[i>>1].l_snp_n);				
 		}	
 	}
-
 }
 
 uint32_t check_left_half(uint32_t le, uint32_t rs, uint32_t p) // 1 for left half 0 for right half 2 for middle
@@ -140,25 +139,6 @@ uint32_t get_target_end(uint32_t *cigar, int n_cigar, uint32_t s)
 	/*return ctgs;*/
 /*}*/
 
-int anothernorm(cdict_t *cds, sdict_t *ctgs)
-{
-	uint32_t n_cds = ctgs->n_seq << 1;
-	uint32_t i;
-	cdict_t *c ;
-	for ( i = 0; i < n_cds; ++i) {
-		char *name1 = ctgs->seq[i>>1].name;
-		uint32_t snpn = i&1 ? ctgs->seq[i>>1].l_snp_n:ctgs->seq[i>>1].r_snp_n;
-		uint32_t j;
-		c = cds + i;
-		uint32_t icnt;
-		for (j = 0; j < c->n_cnt; ++j) {
-			char *name2 = c->cnts[j].name; 
-			icnt = c->cnts[j].cnt ; 
-			uint32_t snp2 = c->cnts[j].is_l ? ctgs->seq[sd_get(ctgs, name2)].l_snp_n:ctgs->seq[sd_get(ctgs,name2)].r_snp_n;
-			fprintf(stderr, "%s\t%c\t%s\t%c\t%u\t%u\t%u\t%lf\n", name1, i&1?'+':'-', name2, c->cnts[j].is_l?'+':'-', icnt, snpn, snp2, 100000.0*(double)icnt/(snp2*snpn));
-		}
-	}
-}
 
 int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ctgs, int opt, bc_ary_t *bc_l)
 {
@@ -448,7 +428,7 @@ int main_10x_lnks(int argc, char *argv[])
 			default:
 				if (c != 'h') fprintf(stderr, "[E::%s] undefined option %c\n", __func__, c);
 help:	
-				fprintf(stderr, "\nUsage: aa_10x [options] <BAM_FILE> ...\n");
+				fprintf(stderr, "\nUsage: %s %s [<options>] <BAM_FILE> ...\n", argv[0], argv[1]);
 				fprintf(stderr, "Options:\n");
 				fprintf(stderr, "         -b    INT      minimum barcode number for each molecule [5]\n");	
 				fprintf(stderr, "         -B    INT      maximum barcode number for each molecule [1000]\n");

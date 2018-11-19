@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  col_10x_lnks.h
+ *       Filename:  col_hic_lnks.h
  *
- *    Description:  header of col_10x_lnks.c
+ *    Description:  header for col_hic_lnks
  *
  *        Version:  1.0
- *        Created:  19/11/2018 19:37:25
+ *        Created:  19/11/2018 20:52:33
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -15,17 +15,19 @@
  *
  * =====================================================================================
  */
-#ifndef _COL_10X_LNKS_H
-#define _COL_10X_LNKS_H
+
+#ifndef _COL_HIC_LNKS_H
+#define _COL_HIC_LNKS_H
 
 
 #ifdef __cplusplus 
 extern "C" {
 #endif
-int main_10x_lnks(int argc, char *argv[]);
+int main_hic_lnks(int argc, char *argv[]);
 #ifdef __cplusplus
 }
 #endif
 
 
 #endif
+

@@ -51,6 +51,26 @@ int get_links(char *links_fn, cdict_t *cds, sdict_t *ctgs)
 	bed_close(bf);
 	return 0;	
 }
+int anothernorm(cdict_t *cds, sdict_t *ctgs)
+{
+	uint32_t n_cds = ctgs->n_seq << 1;
+	uint32_t i;
+	cdict_t *c ;
+	for ( i = 0; i < n_cds; ++i) {
+		char *name1 = ctgs->seq[i>>1].name;
+		uint32_t snpn = i&1 ? ctgs->seq[i>>1].l_snp_n:ctgs->seq[i>>1].r_snp_n;
+		uint32_t j;
+		c = cds + i;
+		uint32_t icnt;
+		for (j = 0; j < c->n_cnt; ++j) {
+			char *name2 = c->cnts[j].name; 
+			icnt = c->cnts[j].cnt ; 
+			uint32_t snp2 = c->cnts[j].is_l ? ctgs->seq[sd_get(ctgs, name2)].l_snp_n:ctgs->seq[sd_get(ctgs,name2)].r_snp_n;
+			fprintf(stderr, "%s\t%c\t%s\t%c\t%u\t%u\t%u\t%lf\n", name1, i&1?'+':'-', name2, c->cnts[j].is_l?'+':'-', icnt, snpn, snp2, 100000.0*(double)icnt/(snp2*snpn));
+		}
+	}
+	return 0;
+}
 graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)
 {
 	graph_t *g = graph_init();
@@ -131,7 +151,7 @@ int main_bldg(int argc, char *argv[])
 			default:
 				if (c != 'h') fprintf(stderr, "[E::%s] undefined option %c\n", __func__, c);
 help:	
-				fprintf(stderr, "\nUsage:  [options] <CONTIG_NUM> <LINKS_MATRIX> ...\n");
+				fprintf(stderr, "\nUsage: %s %s [<options>] <CONTIG_NUM> <LINKS_MATRIX> \n", argv[0], argv[1]);
 				fprintf(stderr, "Options:\n");
 				/*fprintf(stderr, "         -L    INT      maximum insertion length [10000]\n");*/
 				fprintf(stderr, "         -w    INT      minimum weight for links [5]\n");

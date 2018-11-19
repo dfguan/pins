@@ -9,7 +9,7 @@ PROG = scaff_10x  scaff_hic
 
 all:$(PROG)
 
-scaff_hic: bamlite.o bed.o cdict.o graph.o scaff_hic.o sdict.o 
+scaff_hic: bamlite.o bed.o cdict.o graph.o scaff_hic.o sdict.o col_hic_lnks.o build_graph.o 
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 scaff_10x: bamlite.o bed.o cdict.o graph.o scaff_10x.o sdict.o build_graph.o col_10x_lnks.o 

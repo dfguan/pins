@@ -15,5 +15,16 @@
  *
  * =====================================================================================
  */
+#ifndef BUILD_GRAPH_H
+#define BUILD_GRAPH_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int main_bldg(int argc, char *argv[]);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

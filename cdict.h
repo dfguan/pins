@@ -43,7 +43,8 @@ extern "C" {
 	void cd_norm(cdict_t *c);
 
 	void cd_add(cdict_t *c, const char *name, uint32_t is_l, uint32_t snp_n);
-	void cd_add2(cdict_t *c, const char *name, uint32_t is_l, uint32_t cnt);
+void cd_add2(cdict_t *c, const char *name, uint32_t is_l, uint32_t cnt, uint32_t snp_n);
+void cd_set_lim(cdict_t *c, uint32_t n, uint32_t min_wt);
 	//void cd_add(cdict_t *c, char *name, int is_l);
 	void cd_sort(cdict_t *c);
 #ifdef __cplusplus

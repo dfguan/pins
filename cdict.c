@@ -44,7 +44,7 @@ void cd_destroy(cdict_t *c)
 	}
 }
 
-void cd_set_lim(cdict_t *c, uint32_t n)
+void cd_set_lim(cdict_t *c, uint32_t n, uint32_t min_wt)
 {
 	cdict_t *t;
 	uint32_t i, j;
@@ -53,13 +53,13 @@ void cd_set_lim(cdict_t *c, uint32_t n)
 		//maximum weight
 		t->lim = 0;
 		if (!t->n_cnt)  continue;
-		uint32_t max = 5; 
+		/*uint32_t max = 5; */
 			/*= t->cnts[0].cnt;*/
 		/*fprintf(stderr, "%u\t", max);*/
 		/*if (max <= 2) continue;*/
 		/*max >>= 1;*/
 		for(j = 0; j < t->n_cnt; ++j) {
-			if (t->cnts[j].cnt >= max)
+			if (t->cnts[j].cnt >= min_wt)
 				++t->lim;
 			else
 				break;				
@@ -67,7 +67,7 @@ void cd_set_lim(cdict_t *c, uint32_t n)
 	}
 }
 
-void cd_add2(cdict_t *c, const char *name, uint32_t is_l, uint32_t cnt)
+void cd_add2(cdict_t *c, const char *name, uint32_t is_l, uint32_t cnt, uint32_t snp_n)
 {
 	shash_t *h = (shash_t *)c->h;
 	khint_t k;
@@ -91,13 +91,13 @@ void cd_add2(cdict_t *c, const char *name, uint32_t is_l, uint32_t cnt)
 		c->cnts[c->n_cnt+1].is_l = 1;	
 		
 		c->cnts[c->n_cnt | is_l].cnt = cnt;
-		c->cnts[c->n_cnt | is_l].snp_n = 1;
+		c->cnts[c->n_cnt | is_l].snp_n = snp_n;
 		c->n_cnt += 2;
 	} else {
 		uint32_t ind = kh_val(h, k);
 		/*fprintf(stderr, "%u\t %s exist\n", ind, name);*/
 		c->cnts[ind | is_l].cnt = cnt;
-		c->cnts[ind | is_l].snp_n = 1;
+		c->cnts[ind | is_l].snp_n = snp_n;
 	}
 		
 	/*fprintf(stderr, "%s\t%s\t%d\t%d\n", name, c->cnts[kh_val(h,k)].name, kh_val(h, k), absent);*/
@@ -114,6 +114,38 @@ void cd_add2(cdict_t *c, const char *name, uint32_t is_l, uint32_t cnt)
 	/*} // TODO: test if len is the same;*/
 	/*return kh_val(h, k);*/
 }
+/* 
+void cd_add2(cdict_t *c, const char *name, uint32_t is_l, uint32_t cnt)
+{
+	shash_t *h = (shash_t *)c->h;
+	khint_t k;
+	int absent;
+	k = kh_put(str, h, name, &absent);
+	if (absent) {
+		if (c->n_cnt == c->m_cnt) {
+			c->m_cnt = c->m_cnt ? c->m_cnt << 1 : 16;
+			cd_cnt_t *ncnts = calloc(c->m_cnt, sizeof(cd_cnt_t));	
+			if (c->cnts) memcpy(ncnts, c->cnts, sizeof(cd_cnt_t) * c->n_cnt);
+			if (c->cnts) free(c->cnts);
+			c->cnts = ncnts;
+		}
+		kh_key(h, k) = c->cnts[c->n_cnt].name = strdup(name); //
+		kh_val(h, k) = c->n_cnt;  
+		c->cnts[c->n_cnt].is_l = 0;
+		
+		c->cnts[c->n_cnt+1].name = c->cnts[c->n_cnt].name; // init two 
+		c->cnts[c->n_cnt+1].is_l = 1;	
+		
+		c->cnts[c->n_cnt | is_l].cnt = cnt;
+		c->cnts[c->n_cnt | is_l].snp_n = 1;
+		c->n_cnt += 2;
+	} else {
+		uint32_t ind = kh_val(h, k);
+		c->cnts[ind | is_l].cnt = cnt;
+		c->cnts[ind | is_l].snp_n = 1;
+	}
+} 
+*/
 void cd_add(cdict_t *c, const char *name, uint32_t is_l, uint32_t snp_n)
 {
 	shash_t *h = (shash_t *)c->h;
@@ -122,7 +154,7 @@ void cd_add(cdict_t *c, const char *name, uint32_t is_l, uint32_t snp_n)
 	/*if (h) fprintf(stderr, "cd add");*/
 	k = kh_put(str, h, name, &absent);
 	if (absent) {
-		fprintf(stderr, "%u\n", snp_n);
+		/*fprintf(stderr, "%u\n", c->n_cnt);*/
 		if (c->n_cnt == c->m_cnt) {
 			c->m_cnt = c->m_cnt ? c->m_cnt << 1 : 16;
 			cd_cnt_t *ncnts = calloc(c->m_cnt, sizeof(cd_cnt_t));	
@@ -166,7 +198,7 @@ void cd_norm(cdict_t *c)
 		uint32_t i;
 		cd_cnt_t *t = c->cnts;
 		for ( i = 0; i < c->n_cnt; ++i) 
-			if (t[i].snp_n) t[i].cnt = t[i].cnt / t[i].snp_n;
+			if (t[i].snp_n) t[i].cnt = t[i].cnt * 50000 / t[i].snp_n;
 			else t[i].cnt = 0;	
 		
 	}	

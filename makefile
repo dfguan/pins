@@ -12,7 +12,7 @@ all:$(PROG)
 scaff_hic: bamlite.o bed.o cdict.o graph.o scaff_hic.o sdict.o 
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
-scaff_10x: bamlite.o bed.o cdict.o graph.o scaff_10x.o sdict.o 
+scaff_10x: bamlite.o bed.o cdict.o graph.o scaff_10x.o sdict.o build_graph.o col_10x_lnks.o 
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 .c .o:

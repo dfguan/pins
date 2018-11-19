@@ -425,10 +425,10 @@ int srch_path(graph_t *g)
 			}
 			path_t *pth = &pths->paths[pths->n++];
 			pth->name = 0;
-			pth->ns = malloc(sizeof(uint32_t) * kdq_size(q));	
-			uint32_t k;
-			for ( k = 0; k < kdq_size(q); ++k) pth->ns[k] = kdq_at(q, k);
-			pth->n = kdq_size(q);
+			pth->ns = malloc(sizeof(uint32_t) * (kdq_size(q) >> 1));	
+			uint32_t k, m;
+			for ( k = 0, m = 0; k < kdq_size(q); k += 2, ++m) pth->ns[m] = kdq_at(q, k);
+			pth->n = m;
 			pth->is_circ = is_circ;
 		}
 	}

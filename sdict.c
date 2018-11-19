@@ -63,6 +63,15 @@ int32_t sd_put2(sdict_t *d, const char *name, uint32_t len, uint32_t le, uint32_
 		kh_key(h, k) = s->name = strdup(name);
 		kh_val(h, k) = d->n_seq++;
 	} // TODO: test if len is the same;
+	else {
+		uint32_t ind = kh_val(h, k);
+		sd_seq_t *s = &d->seq[ind];
+		if (len) s->len = len;
+	   	if (l_snp_n) s->l_snp_n = l_snp_n;
+		if (r_snp_n) s->r_snp_n = r_snp_n;	
+		if (rs) s->rs = rs;
+		if (le) s->le = le;	
+	}
 	return kh_val(h, k);
 }
 

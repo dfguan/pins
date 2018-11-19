@@ -77,16 +77,17 @@ graph_t *gen_graph(cdict_t *cds, sdict_t *ctgs)
 }
 
 
-int get_edge_txt(char *links_fn, cdict_t *cds, sdict_t *ctgs)
+int get_edge_from_txt(char *links_fn, cdict_t *cds, sdict_t *ctgs)
 {	
 	bed_file_t *bf = bed_open(links_fn);
 	if (!bf) return 0;
 	lnk_rec_t r;
 	uint32_t line_n = 0;
 	while (lnk_read(bf, &r) >= 0) {
+
 		uint32_t ind1 = sd_get(ctgs, r.ctgn);		
 		line_n += 1;
-		cd_add2(&cds[ind1<<1|r.is_l], r.ctgn2, r.is_l2, r.wt);	//this has been normalized	
+		cd_add2(&cds[ind1<<1|r.is_l], r.ctgn2, r.is_l2, r.wt, r.llen);	//this has been normalized	
 	} 
 	/*fprintf(stderr, "%u links\n", line_n);*/
 	bed_close(bf);
@@ -106,7 +107,6 @@ void out_record(cdict_t *cds, sdict_t *ctgs, uint32_t n)
 			fprintf(stdout, "%s\t%c\t%s\t%c\t%u\n", ctgs->seq[i>>1].name, i&1?'+':'-', c->cnts[j].name, j&1?'+':'-', c->cnts[j].cnt);				
 		}	
 	}
-
 }
 
 int anothernorm(cdict_t *cds, sdict_t *ctgs)
@@ -174,8 +174,8 @@ int col_joints(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, 
 		uint32_t is_l2 = check_left_half(ctgs->seq[ind2].le, ctgs->seq[ind2].rs, a[1].s);
 		if (is_l2 > 1) return 1; //middle won't be added
 		
-		cd_add(&cs[ind1<<1|is_l1], ctgs->seq[ind2].name, is_l2, is_l2?ctgs->seq[ind2].l_snp_n:ctgs->seq[ind2].r_snp_n);		
-		cd_add(&cs[ind2<<1|is_l2], ctgs->seq[ind1].name, is_l1, is_l1?ctgs->seq[ind1].l_snp_n:ctgs->seq[ind1].r_snp_n);		
+		cd_add(&cs[ind1<<1|is_l1], ctgs->seq[ind1].name, is_l2, is_l2?ctgs->seq[ind2].l_snp_n:ctgs->seq[ind2].r_snp_n);		
+		cd_add(&cs[ind2<<1|is_l2], ctgs->seq[ind2].name, is_l1, is_l1?ctgs->seq[ind1].l_snp_n:ctgs->seq[ind1].r_snp_n);		
 		return 0;
 	} else if (f_cnt == 2){
 		uint32_t ind1 = f[0].tid;
@@ -186,11 +186,8 @@ int col_joints(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, 
 		uint32_t is_l2 = check_left_half(ctgs->seq[ind2].le, ctgs->seq[ind2].rs, f[1].s);
 		if (is_l2 > 1) return 1; //middle won't be added
 		
-		cd_add(&cs[ind1<<1|is_l1], ctgs->seq[ind2].name, is_l2, is_l2?ctgs->seq[ind2].l_snp_n:ctgs->seq[ind2].r_snp_n);		
-		cd_add(&cs[ind2<<1|is_l2], ctgs->seq[ind1].name, is_l1, is_l1?ctgs->seq[ind1].l_snp_n:ctgs->seq[ind1].r_snp_n);		
-		
-		/*cd_add(&cs[ind1<<1|is_l1], ctgs->seq[ind1].name, is_l2, is_l2?ctgs->seq[ind2].l_snp_n:ctgs->seq[ind2].r_snp_n);		*/
-		/*cd_add(&cs[ind2<<1|is_l2], ctgs->seq[ind2].name, is_l1, is_l1?ctgs->seq[ind1].l_snp_n:ctgs->seq[ind1].r_snp_n);		*/
+		cd_add(&cs[ind1<<1|is_l1], ctgs->seq[ind1].name, is_l2, is_l2?ctgs->seq[ind2].l_snp_n:ctgs->seq[ind2].r_snp_n);		
+		cd_add(&cs[ind2<<1|is_l2], ctgs->seq[ind2].name, is_l1, is_l1?ctgs->seq[ind1].l_snp_n:ctgs->seq[ind1].r_snp_n);		
 		return 0;	
 	}
 	return 1;
@@ -222,14 +219,11 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t ws, sdict_t *ctgs, cdict_t **cs)
 		lenl = lenr = (len - ws) >> 1;
 		sd_put2(ctgs, name, len, le, rs, lenl, lenr);
 	}
-	if (!*cs) {
-		*cs = calloc(ctgs->n_seq << 1, sizeof(cdict_t));
-		for ( i = 0; i < ctgs->n_seq << 1; ++i) cd_init(cs[i]);
-	}		
+	if (!*cs) *cs = calloc(ctgs->n_seq << 1, sizeof(cdict_t));	
 	/*if (!ns->ct) { //not initiate yet*/
 		/*init_gaps(gap_fn, ns, ctgs, max_ins_len);*/
 	/*}*/
-	
+
 
 	char *cur_qn = NULL;
 	long bam_cnt = 0;

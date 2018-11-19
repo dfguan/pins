@@ -109,6 +109,8 @@ int bed_parse_lnks(int l, char *s, lnk_rec_t *pr) // s must be NULL terminated
 		else if (t == 2) pr->ctgn2 = q;
 		else if (t == 3) pr->is_l2 = *q == '+'?1:0;
 		else if (t == 4) pr->wt = strtol(q, &r, 10);
+		else if (t == 5) pr->llen = strtol(q, &r, 10);
+		else if (t == 6) pr->rlen = strtol(q, &r, 10);
 		++t, q = i < l? &s[i+1] : 0;
 	}
 	if (t < 4) return -1;
@@ -131,7 +133,7 @@ int bed_parse(int l, char *s, bed_rec_t *pr) // s must be NULL terminated
 		else if (t == 5) pr->r_snp_n = strtol(q, &r, 10);
 		++t, q = i < l? &s[i+1] : 0;
 	}
-	if (t < 5) return -1;
+	if (t < 1) return -1;
 	return 0;
 }
 

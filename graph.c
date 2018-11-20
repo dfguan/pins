@@ -25,6 +25,7 @@
 #include "kvec.h"
 
 
+
 KDQ_INIT(uint32_t)
 
 KSTREAM_INIT(gzFile, gzread, gzseek, 0x10000)
@@ -36,10 +37,22 @@ KHASH_MAP_INIT_STR(str, uint32_t)
 
 typedef khash_t(str) shash_t;
 
+uint8_t rc_table[128]={
+	4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+	4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+	4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+	4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
+	4,84,4,71,4,4,4,67,4,4,4,4,4,4,67,4,
+	4,4,4,4,65,4,4,4,4,4,4,4,4,4,4,4,4,
+	84,4,71,4,4,4,67,4,4,4,4,4,4,67,4,4,
+	4,4,4,65,4,4,4,4,4,4,4,4,4,4,4
+};
+
 graph_t *graph_init(void) 
 {	
 	graph_t *g = (graph_t *)calloc(1, sizeof(graph_t));	
 	g->vtx.h = kh_init(str);
+	g->pt.h = kh_init(str);
 	return g;
 }
 
@@ -417,7 +430,7 @@ int srch_path(graph_t *g)
 			}	
 		} else is_circ = 1;
 		//add path
-		if (kdq_size(q) > 2) {
+		if (kdq_size(q) >= 2) {
 			paths_t *pths = &g->pt;
 			if (pths->n == pths->m) {
 				pths->m = pths->m ? pths->m << 1 : 16;
@@ -451,6 +464,7 @@ int process_graph(graph_t *g)
 // GFA IO
 int add_s(graph_t *g, char *s)
 {	
+	fprintf(stderr, "enters\n");
 	char *name = 0;
 	char *seq = 0;
 	char *p, *q;
@@ -470,12 +484,14 @@ int add_s(graph_t *g, char *s)
 	}	
 	uint32_t len = seq == 0 ? 0 : strlen(seq);
 	add_node(g, name, seq, len);
+	fprintf(stderr, "leaves\n");
 	return 0;
 
 }
 
 int add_e(graph_t *g, char *s)
 {
+	fprintf(stderr, "entere\n");
 	char *n1, *n2;
 	char d1, d2;
 	char *p, *q;
@@ -496,6 +512,7 @@ int add_e(graph_t *g, char *s)
 	}	
 
 	add_edge2(g, n1, d1 == '+', n2, d2 == '+', wt);
+	fprintf(stderr, "leavee\n");
 	return 0;
 }
 
@@ -530,7 +547,11 @@ int add_p(graph_t *g, char *s)
 			}
 		}
 	}
+	fprintf(stderr, "enterp %d\n", ns.n);
+	
 	if (ns.n) add_path(g, name, ns.a, ns.n);
+	kv_destroy(ns);
+	fprintf(stderr, "leavep\n");
 	return 0;
 }
 
@@ -554,10 +575,50 @@ graph_t  *load_gfa(char *fn)
 	return g;
 }
 
-int get_path(graph_t *g)
+int cp_seq(char *s, char *t, uint32_t len, int is_rc)
 {
+	if (is_rc) {
+		uint32_t i;
+		for ( i = 0; i < len; ++i) s[i] = rc_table[t[len -i - 1]];	
+	} else 
+		memcpy(s, t, len * sizeof(char));
+	return 0;
+}
 
-
+int get_path(graph_t *g)
+{	
+	paths_t *ps = &g->pt;
+	vertex_t *vs = g->vtx.vertices;
+	uint32_t i, j;
+	for ( i = 0; i < ps->n; ++i) {
+		path_t *p = &ps->paths[i];
+	   	char *ref_nm = p->name;
+		uint32_t ref_len = 0; 	
+		for ( j = 0; j < p->n; ++j) {
+			uint32_t seq_len = vs[p->ns[j] >> 1].len;
+			if (seq_len) {
+				ref_len += vs[p->ns[j]>>1].len;//200 'N' s	
+				if (j != p->n - 1) ref_len += 200;
+			} else {
+				ref_len = 0;
+				break;
+			}
+		}
+		char *ref_seq = NULL;
+		if (ref_len) {
+			ref_seq = malloc(sizeof(char) * (ref_len+i));
+			char *s = ref_seq;
+			for (j = 0; j < p->n; ++j) {
+				cp_seq(s, vs[p->ns[j]>> 1].seq, vs[p->ns[j]>>1].len, p->ns[j] & 1) , s += vs[p->ns[j>>1]].len;
+				if (j != p->n - 1) memset(s,'N', 200), s += 200;
+			}
+			*s = 0;
+		} 	
+		fprintf(stdout, ">%s_%u\n",ref_nm, ref_len);
+		if (ref_seq) fprintf(stdout, "%s\n",ref_seq);
+		if (ref_seq) free(ref_seq);		
+	}
+	return 0;
 }
 
 int dump_gfa(graph_t *g)

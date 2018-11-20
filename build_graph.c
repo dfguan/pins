@@ -142,8 +142,7 @@ int run(int n_ctg, char *edge_fn, int min_wt)
 int main_bldg(int argc, char *argv[])
 {
 	int c;
-	uint32_t min_wt = 5;
-	char *program = argv[0];
+	uint32_t min_wt = 5; char *program = argv[0];
 	--argc, ++argv;
 	while (~(c=getopt(argc, argv, "w:h"))) {
 		switch (c) {
@@ -155,7 +154,6 @@ int main_bldg(int argc, char *argv[])
 help:	
 				fprintf(stderr, "\nUsage: %s %s [<options>] <CONTIG_NUM> <LINKS_MATRIX> \n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
-				/*fprintf(stderr, "         -L    INT      maximum insertion length [10000]\n");*/
 				fprintf(stderr, "         -w    INT      minimum weight for links [5]\n");
 				fprintf(stderr, "         -h             help\n");
 				return 1;	
@@ -168,6 +166,7 @@ help:
 	char *lnk_fn = argv[optind];
 	fprintf(stderr, "Program starts\n");	
 	run(n_ctg, lnk_fn, min_wt);
+	fprintf(stderr, "Program ends\n");	
 	return 0;	
 
 }

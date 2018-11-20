@@ -80,6 +80,9 @@ extern "C" {
 	int process_graph(graph_t *g);
 	uint32_t get_name2id(graph_t *g, char *nm);
 	int chk_edge(uint32_t id1, uint32_t id2);
+//gfa 
+graph_t  *load_gfa(char *fn);
+int get_path(graph_t *g);
 #ifdef __cplusplus
 }
 #endif

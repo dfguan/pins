@@ -103,7 +103,7 @@ void out_matrix(cdict_t *cds, sdict_t *ctgs, uint32_t n)
 		c = cds + i;
 		uint32_t j;
 		for ( j = 0; j < c->n_cnt; ++j) {
-			fprintf(stdout, "%s\t%c\t%s\t%c\t%u\t%u\t%u\n", ctgs->seq[i>>1].name, i&1?'+':'-', c->cnts[j].name, j&1?'+':'-', c->cnts[j].cnt, c->cnts[j].snp_n, ctgs->seq[i>>1].l_snp_n);				
+			if (c->cnts[j].cnt) fprintf(stdout, "%s\t%c\t%s\t%c\t%u\t%u\t%u\n", ctgs->seq[i>>1].name, i&1?'+':'-', c->cnts[j].name, j&1?'+':'-', c->cnts[j].cnt, c->cnts[j].snp_n, ctgs->seq[i>>1].l_snp_n);				
 		}	
 	}
 }
@@ -308,7 +308,7 @@ cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_
 				if (j == z || p[j].bctn != p[i].bctn) {
 					uint32_t is_hd = lt_cnt > re_cnt ? 1 : 0;//is_head
 
-					fprintf(stderr, "%s\t%u\t%u\n",ctgs->seq[p[i].bctn&0xFFFF].name, re_cnt,lt_cnt);
+					fprintf(stderr, "%s\t%u\t%u\n",ctgs->seq[p[i].bctn&0xFFFF].name, lt_cnt,re_cnt);
 					if (j - i > min_inner_bcn && lt_cnt != re_cnt && 1 - norm_cdf(is_hd ? lt_cnt : re_cnt, 0.5, j - i) < 0.05) 
 						kv_push(uint32_t, ctgl, (p[i].bctn & 0xFFFF) << 1 | is_hd);
 					 					
@@ -344,7 +344,7 @@ cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_
 }
 
 /*int aa_10x(char *srt_bam_fn, int min_as, int min_mq, int min_cov, float min_cov_rat, int max_cov, float max_cov_rat)*/
-int col_lnks(char *bam_fn[], int n_bam, int min_mq,  uint32_t win_s, uint32_t max_is, int min_bc, int max_bc, uint32_t min_inner_bcn, int opt)
+int col_10x_lnks(char *bam_fn[], int n_bam, int min_mq,  uint32_t win_s, uint32_t max_is, int min_bc, int max_bc, uint32_t min_inner_bcn, int opt)
 {
 	sdict_t *ctgs = sd_init();
 
@@ -440,7 +440,7 @@ help:
 	char **bam_fn = argv+optind;
 	int n_bam = argc - optind;
 	fprintf(stderr, "Program starts\n");	
-	col_lnks(bam_fn, n_bam, min_mq,  win_s,  max_is, min_bc, max_bc, min_inner_bcn, option);
+	col_10x_lnks(bam_fn, n_bam, min_mq,  win_s,  max_is, min_bc, max_bc, min_inner_bcn, option);
 	fprintf(stderr, "Program ends\n");	
 	return 0;	
 }

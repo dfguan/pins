@@ -27,7 +27,6 @@
 #include "bamlite.h"
 #include "bed.h"
 #include "kvec.h"
-#include "graph.h"
 
 
 typedef struct {
@@ -41,7 +40,7 @@ uint32_t check_left_half(uint32_t le, uint32_t rs, uint32_t p) // 1 for left hal
 	else if (p <= le) return 1;
 	else return 0;	
 }
-
+/*
 graph_t *gen_graph(cdict_t *cds, sdict_t *ctgs)
 {
 	graph_t *g = graph_init();
@@ -55,7 +54,6 @@ graph_t *gen_graph(cdict_t *cds, sdict_t *ctgs)
 			char *name2 = c->cnts[j].name;
 			if (strcmp(name1, name2) == 0) continue;
 			//hsortand shaking
-			/*fprintf(stderr, "try hand shaking\n");*/
 			uint32_t ind = sd_get(ctgs, name2) << 1 | c->cnts[j].is_l;
 			uint32_t k;
 			uint8_t hand_shaking = 0;
@@ -75,8 +73,8 @@ graph_t *gen_graph(cdict_t *cds, sdict_t *ctgs)
 
 	return g;
 }
-
-
+*/
+/*
 int get_edge_from_txt(char *links_fn, cdict_t *cds, sdict_t *ctgs)
 {	
 	bed_file_t *bf = bed_open(links_fn);
@@ -89,11 +87,10 @@ int get_edge_from_txt(char *links_fn, cdict_t *cds, sdict_t *ctgs)
 		line_n += 1;
 		cd_add2(&cds[ind1<<1|r.is_l], r.ctgn2, r.is_l2, r.wt, r.llen);	//this has been normalized	
 	} 
-	/*fprintf(stderr, "%u links\n", line_n);*/
 	bed_close(bf);
 	return 0;	
 }
-
+*/
 
 
 void out_matrix(cdict_t *cds, sdict_t *ctgs, uint32_t n)

@@ -144,7 +144,7 @@ int col_joints(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, 
 {
 	if (a_cnt == 2) {
 		uint32_t ind1 = a[0].tid;
-		uint32_t ind2 = a[1].tid;
+		uint32_t ind2 = a[0].ntid;
 		/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
 		uint32_t is_l1 = check_left_half(ctgs->seq[ind1].le, ctgs->seq[ind1].rs, a[0].s);
 		if (is_l1 > 1) return 1; //middle won't be added
@@ -156,7 +156,7 @@ int col_joints(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, 
 		return 0;
 	} else if (f_cnt == 2){
 		uint32_t ind1 = f[0].tid;
-		uint32_t ind2 = f[1].tid;
+		uint32_t ind2 = f[0].ntid;
 		/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
 		uint32_t is_l1 = check_left_half(ctgs->seq[ind1].le, ctgs->seq[ind1].rs, f[0].s);
 		if (is_l1 > 1) return 1; //middle won't be added
@@ -304,7 +304,7 @@ int col_hic_lnks(char **bam_fn, int n_bam, int min_mq, uint32_t win_s)
 int main_hic_lnks(int argc, char *argv[])
 {
 	int c;
-	int  min_mq = 30;
+	int  min_mq = 10;
 	/*uint32_t max_ins_len = 10000;*/
 	/*int max_cov = 100, min_cov = 0, min_mq = 0;*/
 	/*int min_as = 0;*/

@@ -210,14 +210,15 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t ws, sdict_t *ctgs, cdict_t **cs)
 		lenl = lenr = ws;
 		sd_put2(ctgs, name, len, le, rs, lenl, lenr);
 	}
+	char *ctest = calloc(1,sizeof(char));
+
 	if (!*cs) {
-		*cs = calloc(ctgs->n_seq << 1, sizeof(cdict_t));	
-		for ( i = 0; i < ctgs->n_seq << 1; ++i) cd_init(cs[i]);
+		*cs = calloc(ctgs->n_seq << 1, sizeof(cdict_t));
+		for ( i = 0; i < ctgs->n_seq << 1; ++i) cd_init(&(*cs)[i]); //be careful with the access way
 	} 
 	/*if (!ns->ct) { //not initiate yet*/
 		/*init_gaps(gap_fn, ns, ctgs, max_ins_len);*/
 	/*}*/
-
 
 	char *cur_qn = NULL;
 	long bam_cnt = 0;

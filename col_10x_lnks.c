@@ -296,33 +296,35 @@ cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_
 		if (n_bc > min_bc && n_bc < max_bc) {
 			srt_by_nm_loc(p+i, p+z); //sort by ctg name and locus
 			kv_reset(ctgl);
-			uint32_t lt_cnt;
-			uint32_t re_cnt;	
-			lt_cnt = re_cnt = 0;
+			uint32_t lt_cnt, re_cnt, mid_cnt;	
+			lt_cnt = re_cnt = mid_cnt = 0;
 			uint32_t is_l = check_left_half(ctgs->seq[p[i].bctn & 0xFFFF].le, ctgs->seq[p[i].bctn & 0xFFFF].rs, p[i].s); 
 			if (is_l == 1) ++lt_cnt;
 			else if (is_l == 0) ++re_cnt;
+			else ++mid_cnt;
 			uint32_t j = i + 1;
 			/*fprintf(stderr, "%u\t%u\n",j,z);*/
 			while (j <= z) {
 				if (j == z || p[j].bctn != p[i].bctn) {
 					uint32_t is_hd = lt_cnt > re_cnt ? 1 : 0;//is_head
 
-					fprintf(stderr, "%s\t%u\t%u\n",ctgs->seq[p[i].bctn&0xFFFF].name, lt_cnt,re_cnt);
+					fprintf(stderr, "%s\t%u\t%u\t%u\n",ctgs->seq[p[i].bctn&0xFFFF].name, lt_cnt,re_cnt, mid_cnt);
 					if (j - i > min_inner_bcn && lt_cnt != re_cnt && 1 - norm_cdf(is_hd ? lt_cnt : re_cnt, 0.5, j - i) < 0.05) 
 						kv_push(uint32_t, ctgl, (p[i].bctn & 0xFFFF) << 1 | is_hd);
 					 					
 					if (j == z) break; //without this will lead to infinate loop
 					i = j;
-					lt_cnt = re_cnt = 0;
+					lt_cnt = re_cnt = mid_cnt = 0;
 					is_l = check_left_half(ctgs->seq[p[i].bctn & 0xFFFF].le, ctgs->seq[p[i].bctn & 0xFFFF].rs, p[i].s); 
 					if (is_l == 1) ++lt_cnt;
 					else if (is_l == 0) ++re_cnt;
+					else ++mid_cnt;
 					j = i + 1;
 				} else {
 					is_l = check_left_half(ctgs->seq[p[j].bctn & 0xFFFF].le, ctgs->seq[p[j].bctn & 0xFFFF].rs, p[j].s);
 					if (is_l == 1) ++lt_cnt;
 					else if (is_l == 0) ++re_cnt;
+					else ++mid_cnt;
 					++j;
 				}
 			}
@@ -330,7 +332,7 @@ cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_
 		/*fprintf(stderr, "enter\n");*/
 			if (ctgl_s > 1) 
 				for ( j = 0; j < ctgl_s; ++j) fprintf(stderr, "%s%c,",ctgs->seq[ctgl.a[j]>>1].name, ctgl.a[j]&1 ? '+':'-');
-				fprintf(stderr, "/n");	
+				fprintf(stderr, "\n");	
 				for (j = 0; j < ctgl_s; ++j) {
 						uint32_t w;
 						for ( w = j + 1; w < ctgl_s; ++w) col_joints(ctgl.a[j], ctgl.a[w], ctgs, cs); 

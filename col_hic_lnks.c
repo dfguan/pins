@@ -143,8 +143,10 @@ int core(char *snps_fn, char *edge_fn)
 int col_joints(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, cdict_t *cs)
 {
 	if (a_cnt == 2) {
-		uint32_t ind1 = a[0].tid;
-		uint32_t ind2 = a[0].ntid;
+		uint32_t ind1 = a[0].tid; //maybe not well paired up
+		uint32_t ind2 = a[1].tid;
+		if (ind1 == ind2) return 1;
+		/*fprintf(stderr, "%u\t%u\n", ind1, ind2);*/
 		/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
 		uint32_t is_l1 = check_left_half(ctgs->seq[ind1].le, ctgs->seq[ind1].rs, a[0].s);
 		if (is_l1 > 1) return 1; //middle won't be added
@@ -156,7 +158,8 @@ int col_joints(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, 
 		return 0;
 	} else if (f_cnt == 2){
 		uint32_t ind1 = f[0].tid;
-		uint32_t ind2 = f[0].ntid;
+		uint32_t ind2 = f[1].tid;
+		if (ind1 == ind2) return 1;
 		/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
 		uint32_t is_l1 = check_left_half(ctgs->seq[ind1].le, ctgs->seq[ind1].rs, f[0].s);
 		if (is_l1 > 1) return 1; //middle won't be added
@@ -207,8 +210,7 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t ws, sdict_t *ctgs, cdict_t **cs)
 		lenl = lenr = ws;
 		sd_put2(ctgs, name, len, le, rs, lenl, lenr);
 	}
-	char *ctest = calloc(1,sizeof(char));
-
+	
 	if (!*cs) {
 		*cs = calloc(ctgs->n_seq << 1, sizeof(cdict_t));
 		for ( i = 0; i < ctgs->n_seq << 1; ++i) cd_init(&(*cs)[i]); //be careful with the access way
@@ -217,7 +219,7 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t ws, sdict_t *ctgs, cdict_t **cs)
 		/*init_gaps(gap_fn, ns, ctgs, max_ins_len);*/
 	/*}*/
 
-	char *cur_qn = NULL;
+	char *cur_qn = 0;
 	long bam_cnt = 0;
 	int is_set = 0;
 	/*aln_inf_t aln[2];*/

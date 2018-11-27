@@ -160,15 +160,17 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ct
 		/*ctg_pos_push(d, i);*/
 	int i;
 	//50k
+	uint32_t cur_ws;
 	for ( i = 0; i < h->n_targets; ++i) {
 		char *name = h->target_name[i];
 		uint32_t len = h->target_len[i];
 		/*uint32_t ws = 50000;*/
-		if (len < (ws << 1)) ws = len << 1;
-		uint32_t le = ws;
-		uint32_t rs = len - ws + 1;
+		cur_ws = ws;
+		if (len < (cur_ws << 1)) cur_ws = len >> 1;
+		uint32_t le = cur_ws;
+		uint32_t rs = len - cur_ws + 1;
 		uint32_t lenl, lenr;
-		lenl = lenr = ws;
+		lenl = lenr = cur_ws;
 		sd_put2(ctgs, name, len, le, rs, lenl, lenr);
 	}
 	/*for ( i = 0; i < h->n_targets; ++i) {*/

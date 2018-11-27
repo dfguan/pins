@@ -1,0 +1,541 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+AC_KSEQ_H	kseq.h	/^#define AC_KSEQ_H$/;"	d
+AC_KSORT_H	ksort.h	/^#define AC_KSORT_H$/;"	d
+AC_KVEC_H	kvec.h	/^#define AC_KVEC_H$/;"	d
+AC_VERSION_KHASH_H	khash.h	/^#define AC_VERSION_KHASH_H /;"	d
+BAMLITE_H_	bamlite.h	/^#define BAMLITE_H_$/;"	d
+BAM_CDEL	bamlite.h	/^#define BAM_CDEL /;"	d
+BAM_CHARD_CLIP	bamlite.h	/^#define BAM_CHARD_CLIP /;"	d
+BAM_CIGAR_MASK	bamlite.h	/^#define BAM_CIGAR_MASK /;"	d
+BAM_CIGAR_SHIFT	bamlite.h	/^#define BAM_CIGAR_SHIFT /;"	d
+BAM_CIGAR_STR	bamlite.h	/^#define BAM_CIGAR_STR /;"	d
+BAM_CIGAR_TYPE	bamlite.h	/^#define BAM_CIGAR_TYPE /;"	d
+BAM_CINS	bamlite.h	/^#define BAM_CINS /;"	d
+BAM_CMATCH	bamlite.h	/^#define BAM_CMATCH /;"	d
+BAM_CPAD	bamlite.h	/^#define BAM_CPAD /;"	d
+BAM_CREF_SKIP	bamlite.h	/^#define BAM_CREF_SKIP /;"	d
+BAM_CSOFT_CLIP	bamlite.h	/^#define BAM_CSOFT_CLIP /;"	d
+BAM_FDUP	bamlite.h	/^#define BAM_FDUP /;"	d
+BAM_FMREVERSE	bamlite.h	/^#define BAM_FMREVERSE /;"	d
+BAM_FMUNMAP	bamlite.h	/^#define BAM_FMUNMAP /;"	d
+BAM_FPAIRED	bamlite.h	/^#define BAM_FPAIRED /;"	d
+BAM_FPROPER_PAIR	bamlite.h	/^#define BAM_FPROPER_PAIR /;"	d
+BAM_FQCFAIL	bamlite.h	/^#define BAM_FQCFAIL /;"	d
+BAM_FREAD1	bamlite.h	/^#define BAM_FREAD1 /;"	d
+BAM_FREAD2	bamlite.h	/^#define BAM_FREAD2 /;"	d
+BAM_FREVERSE	bamlite.h	/^#define BAM_FREVERSE /;"	d
+BAM_FSECONDARY	bamlite.h	/^#define BAM_FSECONDARY /;"	d
+BAM_FUNMAP	bamlite.h	/^#define BAM_FUNMAP /;"	d
+BC_LEN	col_10x_lnks.c	/^#define BC_LEN /;"	d	file:
+BC_LEN	scaff_10x2.c	/^#define BC_LEN /;"	d	file:
+BUILD_GRAPH_H	build_graph.h	/^#define BUILD_GRAPH_H$/;"	d
+CC	makefile	/^CC      =  gcc$/;"	m
+CFLAGS	makefile	/^CFLAGS  =  -g -Wall -D VERBOSE -D PRINT_COVERAGE #-O2  $/;"	m
+KDQ_DECLARE	kdq.h	/^#define KDQ_DECLARE(/;"	d
+KDQ_INIT	kdq.h	/^#define KDQ_INIT(/;"	d
+KDQ_INIT2	kdq.h	/^#define KDQ_INIT2(/;"	d
+KHASH_DECLARE	khash.h	/^#define KHASH_DECLARE(/;"	d
+KHASH_INIT	khash.h	/^#define KHASH_INIT(/;"	d
+KHASH_INIT2	khash.h	/^#define KHASH_INIT2(/;"	d
+KHASH_MAP_INIT_INT	khash.h	/^#define KHASH_MAP_INIT_INT(/;"	d
+KHASH_MAP_INIT_INT64	khash.h	/^#define KHASH_MAP_INIT_INT64(/;"	d
+KHASH_MAP_INIT_STR	khash.h	/^#define KHASH_MAP_INIT_STR(/;"	d
+KHASH_SET_INIT_INT	khash.h	/^#define KHASH_SET_INIT_INT(/;"	d
+KHASH_SET_INIT_INT64	khash.h	/^#define KHASH_SET_INIT_INT64(/;"	d
+KHASH_SET_INIT_STR	khash.h	/^#define KHASH_SET_INIT_STR(/;"	d
+KRADIX_SORT_INIT	ksort.h	/^#define KRADIX_SORT_INIT(/;"	d
+KSEQ_DECLARE	kseq.h	/^#define KSEQ_DECLARE(/;"	d
+KSEQ_INIT	kseq.h	/^#define KSEQ_INIT(/;"	d
+KSEQ_INIT2	kseq.h	/^#define KSEQ_INIT2(/;"	d
+KSORT_INIT	ksort.h	/^#define KSORT_INIT(/;"	d
+KSORT_INIT_GENERIC	ksort.h	/^#define KSORT_INIT_GENERIC(/;"	d
+KSORT_INIT_STR	ksort.h	/^#define KSORT_INIT_STR /;"	d
+KSORT_SWAP	ksort.h	/^#define KSORT_SWAP(/;"	d
+KSTREAM_DECLARE	kseq.h	/^#define KSTREAM_DECLARE(/;"	d
+KSTREAM_INIT	kseq.h	/^#define KSTREAM_INIT(/;"	d
+KSTREAM_INIT2	kseq.h	/^#define KSTREAM_INIT2(/;"	d
+KSTRING_T	bed.h	/^#define KSTRING_T /;"	d
+KSTRING_T	kseq.h	/^#define KSTRING_T /;"	d
+KSTRING_T	ld_io.h	/^#define KSTRING_T /;"	d
+KS_SEP_LINE	kseq.h	/^#define KS_SEP_LINE /;"	d
+KS_SEP_MAX	kseq.h	/^#define KS_SEP_MAX /;"	d
+KS_SEP_SPACE	kseq.h	/^#define KS_SEP_SPACE /;"	d
+KS_SEP_TAB	kseq.h	/^#define KS_SEP_TAB /;"	d
+LDFLAGS	makefile	/^LDFLAGS = -lz -lm$/;"	m
+PROG	makefile	/^PROG = scaff_10x  scaff_hic scaff_gm$/;"	m
+RS_MIN_SIZE	ksort.h	/^#define RS_MIN_SIZE /;"	d
+SDICT_H	sdict.h	/^#define SDICT_H$/;"	d
+USE_VERBOSE_ZLIB_WRAPPERS	bamlite.h	/^#define USE_VERBOSE_ZLIB_WRAPPERS$/;"	d
+_BED_H	bed.h	/^#define _BED_H$/;"	d
+_CDICT_H	cdict.h	/^#define _CDICT_H$/;"	d
+_COL_10X_LNKS_H	col_10x_lnks.h	/^#define _COL_10X_LNKS_H$/;"	d
+_COL_GM_LNKS_H	col_gm_lnks.h	/^#define _COL_GM_LNKS_H$/;"	d
+_COL_HIC_LNKS_H	col_hic_lnks.h	/^#define _COL_HIC_LNKS_H$/;"	d
+_GET_SEQ_H	get_seq.h	/^#define _GET_SEQ_H$/;"	d
+_GRAPH_H	graph.h	/^#define _GRAPH_H$/;"	d
+_LD_H	ld.h	/^#define _LD_H$/;"	d
+_LD_IO_H	ld_io.h	/^#define _LD_IO_H$/;"	d
+__AC_KDQ_H	kdq.h	/^#define __AC_KDQ_H$/;"	d
+__AC_KHASH_H	khash.h	/^#define __AC_KHASH_H$/;"	d
+__KDQ_IMPL	kdq.h	/^#define __KDQ_IMPL(/;"	d
+__KDQ_TYPE	kdq.h	/^#define __KDQ_TYPE(/;"	d
+__KHASH_IMPL	khash.h	/^#define __KHASH_IMPL(/;"	d
+__KHASH_PROTOTYPES	khash.h	/^#define __KHASH_PROTOTYPES(/;"	d
+__KHASH_TYPE	khash.h	/^#define __KHASH_TYPE(/;"	d
+__KSEQ_BASIC	kseq.h	/^#define __KSEQ_BASIC(/;"	d
+__KSEQ_READ	kseq.h	/^#define __KSEQ_READ(/;"	d
+__KSEQ_TYPE	kseq.h	/^#define __KSEQ_TYPE(/;"	d
+__KS_BASIC	kseq.h	/^#define __KS_BASIC(/;"	d
+__KS_GETUNTIL	kseq.h	/^#define __KS_GETUNTIL(/;"	d
+__KS_INLINED	kseq.h	/^#define __KS_INLINED(/;"	d
+__KS_TYPE	kseq.h	/^#define __KS_TYPE(/;"	d
+__ac_HASH_UPPER	khash.h	/^static const double __ac_HASH_UPPER = 0.77;$/;"	v
+__ac_Wang_hash	khash.h	/^static kh_inline khint_t __ac_Wang_hash(khint_t key)$/;"	f
+__ac_X31_hash_string	khash.h	/^static kh_inline khint_t __ac_X31_hash_string(const char *s)$/;"	f
+__ac_fsize	khash.h	/^#define __ac_fsize(/;"	d
+__ac_isdel	khash.h	/^#define __ac_isdel(/;"	d
+__ac_iseither	khash.h	/^#define __ac_iseither(/;"	d
+__ac_isempty	khash.h	/^#define __ac_isempty(/;"	d
+__ac_set_isboth_false	khash.h	/^#define __ac_set_isboth_false(/;"	d
+__ac_set_isdel_false	khash.h	/^#define __ac_set_isdel_false(/;"	d
+__ac_set_isdel_true	khash.h	/^#define __ac_set_isdel_true(/;"	d
+__ac_set_isempty_false	khash.h	/^#define __ac_set_isempty_false(/;"	d
+__kstring_t	bed.h	/^typedef struct __kstring_t {$/;"	s
+__kstring_t	kseq.h	/^typedef struct __kstring_t {$/;"	s
+__kstring_t	ld_io.h	/^typedef struct __kstring_t {$/;"	s
+_skip_aux	bamlite.c	/^#define _skip_aux(/;"	d	file:
+aa_hic	aa_hic.c	/^int aa_hic(char **bam_fn, int n_bam, char *gap_fn, int min_mq, int min_cov, int max_cov, uint32_t max_ins_len)$/;"	f
+add_e	graph.c	/^int add_e(graph_t *g, char *s)$/;"	f
+add_edge	graph.c	/^int add_edge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, uint32_t wt)$/;"	f
+add_edge1	graph.c	/^int add_edge1(graph_t *g, edge_t *e)$/;"	f
+add_edge2	graph.c	/^int add_edge2(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, uint32_t wt)$/;"	f
+add_node	graph.c	/^uint32_t add_node(graph_t *g, char* name, char *seq, uint32_t len)$/;"	f
+add_p	graph.c	/^int add_p(graph_t *g, char *s)$/;"	f
+add_path	graph.c	/^int add_path(graph_t *g, char *name,  uint32_t *nodes, uint32_t n) $/;"	f
+add_record	col_gm_lnks.c	/^int add_record(ld_t *r, sdict_t *ctgs, cdict_t *cds)$/;"	f
+add_s	graph.c	/^int add_s(graph_t *g, char *s)$/;"	f
+aln_inf_t	aa_hic.c	/^}aln_inf_t;$/;"	t	typeref:struct:__anon29	file:
+aln_inf_t	col_10x_lnks.c	/^}aln_inf_t;$/;"	t	typeref:struct:__anon23	file:
+aln_inf_t	col_hic_lnks.c	/^}aln_inf_t;$/;"	t	typeref:struct:__anon10	file:
+aln_inf_t	scaff_10x2.c	/^}aln_inf_t;$/;"	t	typeref:struct:__anon7	file:
+anothernorm	build_graph.c	/^int anothernorm(cdict_t *cds, sdict_t *ctgs)$/;"	f
+ary	col_10x_lnks.c	/^	bc_t *ary;$/;"	m	struct:__anon25	file:
+ary	scaff_10x2.c	/^	bc_t *ary;$/;"	m	struct:__anon9	file:
+as	aa_hic.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon29	file:
+as	col_10x_lnks.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon23	file:
+as	scaff_10x2.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon7	file:
+bam1_aux	bamlite.h	/^#define bam1_aux(/;"	d
+bam1_cigar	bamlite.h	/^#define bam1_cigar(/;"	d
+bam1_core_t	bamlite.h	/^} bam1_core_t;$/;"	t	typeref:struct:__anon2
+bam1_mstrand	bamlite.h	/^#define bam1_mstrand(/;"	d
+bam1_qname	bamlite.h	/^#define bam1_qname(/;"	d
+bam1_qual	bamlite.h	/^#define bam1_qual(/;"	d
+bam1_seq	bamlite.h	/^#define bam1_seq(/;"	d
+bam1_seqi	bamlite.h	/^#define bam1_seqi(/;"	d
+bam1_strand	bamlite.h	/^#define bam1_strand(/;"	d
+bam1_t	bamlite.h	/^} bam1_t;$/;"	t	typeref:struct:__anon3
+bamFile	bamlite.h	/^typedef gzFile bamFile;$/;"	t
+bam_aux_get	bamlite.c	/^uint8_t *bam_aux_get(const bam1_t *b, const char tag[2])$/;"	f
+bam_cigar_gen	bamlite.h	/^#define bam_cigar_gen(/;"	d
+bam_cigar_op	bamlite.h	/^#define bam_cigar_op(/;"	d
+bam_cigar_opchr	bamlite.h	/^#define bam_cigar_opchr(/;"	d
+bam_cigar_oplen	bamlite.h	/^#define bam_cigar_oplen(/;"	d
+bam_cigar_type	bamlite.h	/^#define bam_cigar_type(/;"	d
+bam_close	bamlite.h	/^#  define bam_close(/;"	d
+bam_destroy1	bamlite.h	/^#define bam_destroy1(/;"	d
+bam_dopen	bamlite.h	/^#  define bam_dopen(/;"	d
+bam_header_destroy	bamlite.c	/^void bam_header_destroy(bam_header_t *header)$/;"	f
+bam_header_init	bamlite.c	/^bam_header_t *bam_header_init()$/;"	f
+bam_header_read	bamlite.c	/^bam_header_t *bam_header_read(bamFile fp)$/;"	f
+bam_header_t	bamlite.h	/^} bam_header_t;$/;"	t	typeref:struct:__anon1
+bam_init1	bamlite.h	/^#define bam_init1(/;"	d
+bam_is_be	bamlite.c	/^int bam_is_be;$/;"	v
+bam_is_big_endian	bamlite.c	/^static inline int bam_is_big_endian()$/;"	f	file:
+bam_open	bamlite.h	/^#  define bam_open(/;"	d
+bam_read	bamlite.h	/^#  define bam_read(/;"	d
+bam_read1	bamlite.c	/^int bam_read1(bamFile fp, bam1_t *b)$/;"	f
+bam_swap_endian_2	bamlite.c	/^static inline uint16_t bam_swap_endian_2(uint16_t v)$/;"	f	file:
+bam_swap_endian_2p	bamlite.c	/^static inline void *bam_swap_endian_2p(void *x)$/;"	f	file:
+bam_swap_endian_4	bamlite.c	/^static inline uint32_t bam_swap_endian_4(uint32_t v)$/;"	f	file:
+bam_swap_endian_4p	bamlite.c	/^static inline void *bam_swap_endian_4p(void *x)$/;"	f	file:
+bam_swap_endian_8	bamlite.c	/^static inline uint64_t bam_swap_endian_8(uint64_t v)$/;"	f	file:
+bam_swap_endian_8p	bamlite.c	/^static inline void *bam_swap_endian_8p(void *x)$/;"	f	file:
+bamlite_gzclose	bamlite.c	/^int bamlite_gzclose(gzFile file) {$/;"	f
+bamlite_gzopen	bamlite.c	/^gzFile bamlite_gzopen(const char *fn, const char *mode) {$/;"	f
+bamlite_gzread	bamlite.c	/^int bamlite_gzread(gzFile file, void *ptr, unsigned int len) {$/;"	f
+bc_ary_push	col_10x_lnks.c	/^void bc_ary_push(bc_ary_t *l, bc_t *z)$/;"	f
+bc_ary_push	scaff_10x2.c	/^void bc_ary_push(bc_ary_t *l, bc_t *z)$/;"	f
+bc_ary_t	col_10x_lnks.c	/^}bc_ary_t;$/;"	t	typeref:struct:__anon25	file:
+bc_ary_t	scaff_10x2.c	/^}bc_ary_t;$/;"	t	typeref:struct:__anon9	file:
+bc_key	col_10x_lnks.c	/^#define bc_key(/;"	d	file:
+bc_key	scaff_10x2.c	/^#define bc_key(/;"	d	file:
+bc_t	col_10x_lnks.c	/^}bc_t;$/;"	t	typeref:struct:__anon24	file:
+bc_t	scaff_10x2.c	/^}bc_t;$/;"	t	typeref:struct:__anon8	file:
+bctn	col_10x_lnks.c	/^	uint64_t bctn;$/;"	m	struct:__anon24	file:
+bctn	scaff_10x2.c	/^	uint64_t bctn;$/;"	m	struct:__anon8	file:
+bed_close	bed.c	/^int bed_close(bed_file_t *pf)$/;"	f
+bed_file_t	bed.h	/^}bed_file_t;$/;"	t	typeref:struct:__anon18
+bed_hdr_read	bed.c	/^int bed_hdr_read(bed_file_t *pf, bed_hdr_t *hdr)$/;"	f
+bed_hdr_t	bed.h	/^}bed_hdr_t;$/;"	t	typeref:struct:__anon19
+bed_init_track	bed.c	/^int bed_init_track(char *s, int sl, bed_hdr_t *hdr)$/;"	f
+bed_open	bed.c	/^bed_file_t *bed_open(const char *fn)$/;"	f
+bed_parse	bed.c	/^int bed_parse(int l, char *s, bed_rec_t *pr) \/\/ s must be NULL terminated$/;"	f
+bed_parse_lnks	bed.c	/^int bed_parse_lnks(int l, char *s, lnk_rec_t *pr) \/\/ s must be NULL terminated$/;"	f
+bed_read	bed.c	/^int bed_read(bed_file_t *pf, bed_rec_t *r)$/;"	f
+bed_rec_t	bed.h	/^}bed_rec_t;$/;"	t	typeref:struct:__anon20
+bin	bamlite.h	/^	uint32_t bin:16, qual:8, l_qname:8;$/;"	m	struct:__anon2
+buf	bed.h	/^	kstring_t buf;$/;"	m	struct:__anon18
+buf	ld_io.h	/^	kstring_t buf;	$/;"	m	struct:__anon31
+build_graph	build_graph.c	/^graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)$/;"	f
+cd_add	cdict.c	/^void cd_add(cdict_t *c, const char *name, uint32_t is_l, uint32_t snp_n)$/;"	f
+cd_add2	cdict.c	/^void cd_add2(cdict_t *c, const char *name, uint32_t is_l, uint32_t cnt, uint32_t snp_n)$/;"	f
+cd_cnt_t	cdict.h	/^} cd_cnt_t;$/;"	t	typeref:struct:__anon4
+cd_destroy	cdict.c	/^void cd_destroy(cdict_t *c)$/;"	f
+cd_init	cdict.c	/^void cd_init(cdict_t *c)$/;"	f
+cd_norm	cdict.c	/^void cd_norm(cdict_t *c)$/;"	f
+cd_set_lim	cdict.c	/^void cd_set_lim(cdict_t *c, uint32_t n, uint32_t min_wt)$/;"	f
+cd_sort	cdict.c	/^void cd_sort(cdict_t *c)$/;"	f
+cdict_t	cdict.h	/^}cdict_t;$/;"	t	typeref:struct:__anon5
+check_left_half	col_10x_lnks.c	/^uint32_t check_left_half(uint32_t le, uint32_t rs, uint32_t p) \/\/ 1 for left half 0 for right half 2 for middle$/;"	f
+check_left_half	col_gm_lnks.c	/^uint32_t check_left_half(uint32_t le, uint32_t rs, uint32_t p) \/\/ 1 for left half 0 for right half 2 for middle$/;"	f
+check_left_half	col_hic_lnks.c	/^uint32_t check_left_half(uint32_t le, uint32_t rs, uint32_t p) \/\/ 1 for left half 0 for right half 2 for middle$/;"	f
+check_left_half	scaff_10x2.c	/^uint32_t check_left_half(uint32_t le, uint32_t rs, uint32_t p) \/\/ 1 for left half 0 for right half 2 for middle$/;"	f
+chiSqFisher	ld.h	/^	double		chiSqFisher;$/;"	m	struct:__anon6
+chiSqModel	ld.h	/^	double		chiSqModel;		$/;"	m	struct:__anon6
+clean_edges	graph.c	/^int clean_edges(graph_t *g)$/;"	f
+close_ld	ld_io.c	/^int close_ld(ld_file_t *fp)$/;"	f
+cmp_cnt	cdict.c	/^int cmp_cnt(const void *a, const void *b) $/;"	f
+cnt	cdict.h	/^	uint32_t cnt:31, is_added:1;	$/;"	m	struct:__anon4
+cnts	cdict.h	/^	cd_cnt_t	*cnts;$/;"	m	struct:__anon5
+col_10x_lnks	col_10x_lnks.c	/^int col_10x_lnks(char *bam_fn[], int n_bam, int min_mq,  uint32_t win_s, uint32_t max_is, int min_bc, int max_bc, uint32_t min_inner_bcn, int opt)$/;"	f
+col_bcnt	col_10x_lnks.c	/^int col_bcnt(aln_inf_t  *fal, uint32_t bc, int min_mq, uint32_t max_is, bc_ary_t *l)$/;"	f
+col_bcnt	scaff_10x2.c	/^int col_bcnt(aln_inf_t  *fal, uint32_t bc, int min_mq, uint32_t max_is, bc_ary_t *l)$/;"	f
+col_cds	col_10x_lnks.c	/^cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_inner_bcn, int n_targets, sdict_t *ctgs)$/;"	f
+col_cds	scaff_10x2.c	/^cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_inner_bcn, uint32_t max_span, uint32_t min_mol_len, int n_targets, sdict_t *ctgs)$/;"	f
+col_gm_lnks	col_gm_lnks.c	/^int col_gm_lnks(char *snps_fn, char **ld_fn, int n_ld, double pv) \/\/will be changed into two_fn$/;"	f
+col_hic_lnks	col_hic_lnks.c	/^int col_hic_lnks(char **bam_fn, int n_bam, int min_mq, uint32_t win_s)$/;"	f
+col_joints	col_10x_lnks.c	/^int col_joints(uint32_t ind1l, uint32_t ind2l, sdict_t *ctgs, cdict_t *cs)$/;"	f
+col_joints	col_hic_lnks.c	/^int col_joints(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, cdict_t *cs)$/;"	f
+col_joints	scaff_10x2.c	/^int col_joints(uint32_t ind1l, uint32_t ind2l, sdict_t *ctgs, cdict_t *cs)$/;"	f
+col_pos	aa_hic.c	/^void col_pos(aln_inf_t  *fal, int min_mq, uint32_t max_ins_len, ns_t *ns, ctg_pos_t *d)$/;"	f
+col_snp_distri	col_gm_lnks.c	/^sdict_t *col_snp_distri(char *fn)$/;"	f
+core	bamlite.h	/^	bam1_core_t core;$/;"	m	struct:__anon3
+cp_seq	graph.c	/^int cp_seq(char *s, char *t, uint32_t len, int is_rc)$/;"	f
+ct	aa_hic.c	/^	cord_t *ct;$/;"	m	struct:__anon30	file:
+ctgn	bed.h	/^	char		*ctgn;$/;"	m	struct:__anon20
+ctgn	bed.h	/^	char *ctgn, *ctgn2;$/;"	m	struct:__anon22
+ctgn	bed.h	/^	char *ctgn;$/;"	m	struct:__anon21
+ctgn1	ld.h	/^	char		*ctgn1;$/;"	m	struct:__anon6
+ctgn2	bed.h	/^	char *ctgn, *ctgn2;$/;"	m	struct:__anon22
+ctgn2	ld.h	/^	char		*ctgn2;$/;"	m	struct:__anon6
+d	ld.h	/^	float		d, dprime; \/\/ D and D'$/;"	m	struct:__anon6
+data	bamlite.h	/^	uint8_t *data;$/;"	m	struct:__anon3
+del_r	graph.c	/^int del_r(graph_t *g, edge_t *a) \/\/ remove reverse edge$/;"	f
+depth	ksort.h	/^	int depth;$/;"	m	struct:__anon26
+desc	bed.h	/^	char *desc;$/;"	m	struct:__anon19
+dprime	ld.h	/^	float		d, dprime; \/\/ D and D'$/;"	m	struct:__anon6
+dump_gfa	graph.c	/^int dump_gfa(graph_t *g)$/;"	f
+e	aa_hic.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon29	file:
+e	bed.h	/^	uint32_t s, e;$/;"	m	struct:__anon21
+e	col_10x_lnks.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon23	file:
+e	col_10x_lnks.c	/^	uint32_t s, e; \/\/no more than $/;"	m	struct:__anon24	file:
+e	scaff_10x2.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon7	file:
+e	scaff_10x2.c	/^	uint32_t s, e; \/\/no more than $/;"	m	struct:__anon8	file:
+edge_idx	graph.h	/^	uint64_t *edge_idx; \/\/ idx + num $/;"	m	struct:__anon14
+edge_key	graph.c	/^#define edge_key(/;"	d	file:
+edge_n	graph.h	/^#define edge_n(/;"	d
+edge_t	graph.h	/^}edge_t;$/;"	t	typeref:struct:__anon13
+edges	graph.h	/^	edge_t *edges;$/;"	m	struct:__anon14
+edges	graph.h	/^#define edges(/;"	d
+edges_t	graph.h	/^}edges_t;$/;"	t	typeref:struct:__anon14
+eg	graph.h	/^	edges_t eg;$/;"	m	struct:__anon17
+flag	bamlite.h	/^	uint32_t flag:16, n_cigar:16;$/;"	m	struct:__anon2
+flags	ld.h	/^	uint16_t    flags;$/;"	m	struct:__anon6
+fp	bed.h	/^	void *fp;$/;"	m	struct:__anon18
+fp	ld_io.h	/^	void *fp;$/;"	m	struct:__anon31
+free_node	graph.c	/^void free_node(vertex_t *n)$/;"	f
+gap_rec_t	bed.h	/^}gap_rec_t;$/;"	t	typeref:struct:__anon21
+get_aux_type2size	bamlite.c	/^int get_aux_type2size(uint8_t t)$/;"	f
+get_links	build_graph.c	/^int get_links(char *links_fn, cdict_t *cds, sdict_t *ctgs)$/;"	f
+get_name2id	graph.c	/^uint32_t get_name2id(graph_t *g, char *nm)$/;"	f
+get_path	graph.c	/^int get_path(graph_t *g)$/;"	f
+get_target_end	aa_hic.c	/^uint32_t get_target_end(uint32_t *cigar, int n_cigar, uint32_t s)$/;"	f
+get_target_end	col_10x_lnks.c	/^uint32_t get_target_end(uint32_t *cigar, int n_cigar, uint32_t s)$/;"	f
+get_target_end	scaff_10x2.c	/^uint32_t get_target_end(uint32_t *cigar, int n_cigar, uint32_t s)$/;"	f
+graph_destroy	graph.c	/^void graph_destroy(graph_t *g)$/;"	f
+graph_init	graph.c	/^graph_t *graph_init(void) $/;"	f
+graph_t	graph.h	/^} graph_t;$/;"	t	typeref:struct:__anon17
+h	cdict.h	/^	void		*h;$/;"	m	struct:__anon5
+h	graph.h	/^	void	*h;$/;"	m	struct:__anon12
+h	graph.h	/^	void	*h;$/;"	m	struct:__anon16
+h	sdict.h	/^	void *h;$/;"	m	struct:__anon28
+idx_edge	graph.c	/^int idx_edge(graph_t *g)$/;"	f
+init_gaps	aa_hic.c	/^void init_gaps(char *gap_fn, ns_t *ns, sdict_t *ctgs, uint32_t max_ins_len)$/;"	f
+insert_sort	col_10x_lnks.c	/^void insert_sort(bc_t *b, bc_t *e)$/;"	f
+insert_sort	scaff_10x2.c	/^void insert_sort(bc_t *b, bc_t *e)$/;"	f
+is_added	cdict.h	/^	uint32_t cnt:31, is_added:1;	$/;"	m	struct:__anon4
+is_circ	graph.h	/^	uint32_t n:31, is_circ:1; \/\/be careful with these uint32_t $/;"	m	struct:__anon15
+is_del	graph.h	/^	uint32_t wt:30, is_vis:1, is_del:1;$/;"	m	struct:__anon13
+is_eof	bed.h	/^	int is_eof;$/;"	m	struct:__anon18
+is_l	bed.h	/^	uint32_t wt:30, is_l:1, is_l2:1;$/;"	m	struct:__anon22
+is_l	cdict.h	/^	uint32_t snp_n:31, is_l:1;$/;"	m	struct:__anon4
+is_l2	bed.h	/^	uint32_t wt:30, is_l:1, is_l2:1;$/;"	m	struct:__anon22
+is_srt	graph.h	/^	uint32_t is_srt;$/;"	m	struct:__anon14
+is_vis	graph.h	/^	uint32_t wt:30, is_vis:1, is_del:1;$/;"	m	struct:__anon13
+isize	bamlite.h	/^	int32_t isize;$/;"	m	struct:__anon2
+join_ends	graph.c	/^int join_ends(graph_t *g)$/;"	f
+kcalloc	khash.h	/^#define kcalloc(/;"	d
+kdq_at	kdq.h	/^#define kdq_at(/;"	d
+kdq_destroy	kdq.h	/^#define kdq_destroy(/;"	d
+kdq_first	kdq.h	/^#define kdq_first(/;"	d
+kdq_init	kdq.h	/^#define kdq_init(/;"	d
+kdq_last	kdq.h	/^#define kdq_last(/;"	d
+kdq_pop	kdq.h	/^#define kdq_pop(/;"	d
+kdq_push	kdq.h	/^#define kdq_push(/;"	d
+kdq_pushp	kdq.h	/^#define kdq_pushp(/;"	d
+kdq_resize	kdq.h	/^#define kdq_resize(/;"	d
+kdq_shift	kdq.h	/^#define kdq_shift(/;"	d
+kdq_size	kdq.h	/^#define kdq_size(/;"	d
+kdq_t	kdq.h	/^#define kdq_t(/;"	d
+kdq_unshift	kdq.h	/^#define kdq_unshift(/;"	d
+kdq_unshiftp	kdq.h	/^#define kdq_unshiftp(/;"	d
+kfree	khash.h	/^#define kfree(/;"	d
+kh_begin	khash.h	/^#define kh_begin(/;"	d
+kh_clear	khash.h	/^#define kh_clear(/;"	d
+kh_cstr_t	khash.h	/^typedef const char *kh_cstr_t;$/;"	t
+kh_del	khash.h	/^#define kh_del(/;"	d
+kh_destroy	khash.h	/^#define kh_destroy(/;"	d
+kh_end	khash.h	/^#define kh_end(/;"	d
+kh_exist	khash.h	/^#define kh_exist(/;"	d
+kh_foreach	khash.h	/^#define kh_foreach(/;"	d
+kh_foreach_value	khash.h	/^#define kh_foreach_value(/;"	d
+kh_get	khash.h	/^#define kh_get(/;"	d
+kh_init	khash.h	/^#define kh_init(/;"	d
+kh_inline	khash.h	/^#define kh_inline /;"	d
+kh_int64_hash_equal	khash.h	/^#define kh_int64_hash_equal(/;"	d
+kh_int64_hash_func	khash.h	/^#define kh_int64_hash_func(/;"	d
+kh_int_hash_equal	khash.h	/^#define kh_int_hash_equal(/;"	d
+kh_int_hash_func	khash.h	/^#define kh_int_hash_func(/;"	d
+kh_int_hash_func2	khash.h	/^#define kh_int_hash_func2(/;"	d
+kh_key	khash.h	/^#define kh_key(/;"	d
+kh_n_buckets	khash.h	/^#define kh_n_buckets(/;"	d
+kh_put	khash.h	/^#define kh_put(/;"	d
+kh_resize	khash.h	/^#define kh_resize(/;"	d
+kh_size	khash.h	/^#define kh_size(/;"	d
+kh_str_hash_equal	khash.h	/^#define kh_str_hash_equal(/;"	d
+kh_str_hash_func	khash.h	/^#define kh_str_hash_func(/;"	d
+kh_val	khash.h	/^#define kh_val(/;"	d
+kh_value	khash.h	/^#define kh_value(/;"	d
+khash_t	khash.h	/^#define khash_t(/;"	d
+khint32_t	khash.h	/^typedef unsigned int khint32_t;$/;"	t
+khint32_t	khash.h	/^typedef unsigned long khint32_t;$/;"	t
+khint64_t	khash.h	/^typedef unsigned long khint64_t;$/;"	t
+khint64_t	khash.h	/^typedef unsigned long long khint64_t;$/;"	t
+khint_t	khash.h	/^typedef khint32_t khint_t;$/;"	t
+khiter_t	khash.h	/^typedef khint_t khiter_t;$/;"	t
+klib_unused	kdq.h	/^#define klib_unused /;"	d
+klib_unused	kdq.h	/^#define klib_unused$/;"	d
+klib_unused	khash.h	/^#define klib_unused /;"	d
+klib_unused	khash.h	/^#define klib_unused$/;"	d
+klib_unused	kseq.h	/^#define klib_unused /;"	d
+klib_unused	kseq.h	/^#define klib_unused$/;"	d
+kmalloc	khash.h	/^#define kmalloc(/;"	d
+krealloc	khash.h	/^#define krealloc(/;"	d
+kroundup32	bamlite.h	/^#define kroundup32(/;"	d
+kroundup32	khash.h	/^#define kroundup32(/;"	d
+kroundup32	kseq.h	/^#define kroundup32(/;"	d
+ks_eof	kseq.h	/^#define ks_eof(/;"	d
+ks_isort_stack_t	ksort.h	/^} ks_isort_stack_t;$/;"	t	typeref:struct:__anon26
+ks_lt_generic	ksort.h	/^#define ks_lt_generic(/;"	d
+ks_lt_str	ksort.h	/^#define ks_lt_str(/;"	d
+ks_rewind	kseq.h	/^#define ks_rewind(/;"	d
+kseq_rewind	kseq.h	/^#define kseq_rewind(/;"	d
+ksstr_t	ksort.h	/^typedef const char *ksstr_t;$/;"	t
+kstring_t	bed.h	/^} kstring_t;$/;"	t	typeref:struct:__kstring_t
+kstring_t	kseq.h	/^} kstring_t;$/;"	t	typeref:struct:__kstring_t
+kstring_t	ld_io.h	/^} kstring_t;$/;"	t	typeref:struct:__kstring_t
+kv_A	kvec.h	/^#define kv_A(/;"	d
+kv_a	kvec.h	/^#define kv_a(/;"	d
+kv_copy	kvec.h	/^#define kv_copy(/;"	d
+kv_destroy	kvec.h	/^#define kv_destroy(/;"	d
+kv_init	kvec.h	/^#define kv_init(/;"	d
+kv_max	kvec.h	/^#define kv_max(/;"	d
+kv_pop	kvec.h	/^#define kv_pop(/;"	d
+kv_push	kvec.h	/^#define kv_push(/;"	d
+kv_pushp	kvec.h	/^#define kv_pushp(/;"	d
+kv_reset	kvec.h	/^#define kv_reset(/;"	d
+kv_resize	kvec.h	/^#define kv_resize(/;"	d
+kv_reverse	kvec.h	/^#define kv_reverse(/;"	d
+kv_roundup32	kvec.h	/^#define kv_roundup32(/;"	d
+kv_size	kvec.h	/^#define kv_size(/;"	d
+kvec_t	kvec.h	/^#define kvec_t(/;"	d
+l	bed.h	/^	size_t l, m;$/;"	m	struct:__kstring_t
+l	kseq.h	/^	size_t l, m;$/;"	m	struct:__kstring_t
+l	ld_io.h	/^	size_t l, m;$/;"	m	struct:__kstring_t
+l_aux	bamlite.h	/^	int l_aux, l_data, m_data;$/;"	m	struct:__anon3
+l_data	bamlite.h	/^	int l_aux, l_data, m_data;$/;"	m	struct:__anon3
+l_qname	bamlite.h	/^	uint32_t bin:16, qual:8, l_qname:8;$/;"	m	struct:__anon2
+l_qseq	bamlite.h	/^	int32_t l_qseq;$/;"	m	struct:__anon2
+l_snp_n	bed.h	/^	uint32_t    l_snp_n, r_snp_n;$/;"	m	struct:__anon20
+l_snp_n	sdict.h	/^	uint32_t l_snp_n, r_snp_n;$/;"	m	struct:__anon27
+l_text	bamlite.h	/^	size_t l_text, n_text;$/;"	m	struct:__anon1
+ld_file_t	ld_io.h	/^} ld_file_t;$/;"	t	typeref:struct:__anon31
+ld_t	ld.h	/^} ld_t;$/;"	t	typeref:struct:__anon6
+le	bed.h	/^	uint32_t	rs, le;$/;"	m	struct:__anon20
+le	sdict.h	/^	uint32_t le, rs;$/;"	m	struct:__anon27
+left	ksort.h	/^	void *left, *right;$/;"	m	struct:__anon26
+len	bed.h	/^	uint32_t	len;$/;"	m	struct:__anon20
+len	graph.h	/^	uint32_t len;$/;"	m	struct:__anon11
+len	sdict.h	/^	uint32_t len;$/;"	m	struct:__anon27
+lim	cdict.h	/^	size_t		lim;$/;"	m	struct:__anon5
+llen	bed.h	/^	uint32_t llen, rlen;$/;"	m	struct:__anon22
+lnk_read	bed.c	/^int lnk_read(bed_file_t *pf, lnk_rec_t *r)$/;"	f
+lnk_rec_t	bed.h	/^}lnk_rec_t;$/;"	t	typeref:struct:__anon22
+load_gfa	graph.c	/^graph_t  *load_gfa(char *fn)$/;"	f
+m	aa_hic.c	/^	size_t n, m;	$/;"	m	struct:__anon30	file:
+m	bed.h	/^	size_t l, m;$/;"	m	struct:__kstring_t
+m	col_10x_lnks.c	/^	uint32_t n, m;$/;"	m	struct:__anon25	file:
+m	graph.h	/^	uint32_t n, m;	$/;"	m	struct:__anon12
+m	graph.h	/^	uint32_t n, m;$/;"	m	struct:__anon14
+m	graph.h	/^	uint32_t n,m; \/\/be careful with these uint32_t$/;"	m	struct:__anon16
+m	kseq.h	/^	size_t l, m;$/;"	m	struct:__kstring_t
+m	ld_io.h	/^	size_t l, m;$/;"	m	struct:__kstring_t
+m	scaff_10x2.c	/^	uint32_t n, m;$/;"	m	struct:__anon9	file:
+m_cnt	cdict.h	/^	size_t		n_cnt, m_cnt;$/;"	m	struct:__anon5
+m_data	bamlite.h	/^	int l_aux, l_data, m_data;$/;"	m	struct:__anon3
+m_seq	sdict.h	/^	uint32_t n_seq, m_seq;$/;"	m	struct:__anon28
+main	aa_hic.c	/^int main(int argc, char *argv[])$/;"	f
+main	scaff_10x.c	/^int main(int argc, char *argv[])$/;"	f
+main	scaff_10x2.c	/^int main(int argc, char *argv[])$/;"	f
+main	scaff_gm.c	/^int main(int argc, char *argv[])$/;"	f
+main	scaff_hic.c	/^int main(int argc, char *argv[])$/;"	f
+main_10x_lnks	col_10x_lnks.c	/^int main_10x_lnks(int argc, char *argv[])$/;"	f
+main_bldg	build_graph.c	/^int main_bldg(int argc, char *argv[])$/;"	f
+main_get_seq	get_seq.c	/^int main_get_seq(int argc, char *argv[])$/;"	f
+main_gm_lnks	col_gm_lnks.c	/^int main_gm_lnks(int argc, char *argv[]) $/;"	f
+main_hic_lnks	col_hic_lnks.c	/^int main_hic_lnks(int argc, char *argv[])$/;"	f
+mpos	bamlite.h	/^	int32_t mpos;$/;"	m	struct:__anon2
+mq	aa_hic.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon29	file:
+mq	col_10x_lnks.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon23	file:
+mq	scaff_10x2.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon7	file:
+mtid	bamlite.h	/^	int32_t mtid;$/;"	m	struct:__anon2
+n	aa_hic.c	/^	size_t n, m;	$/;"	m	struct:__anon30	file:
+n	col_10x_lnks.c	/^	uint32_t n, m;$/;"	m	struct:__anon25	file:
+n	graph.h	/^	uint32_t n, m;	$/;"	m	struct:__anon12
+n	graph.h	/^	uint32_t n, m;$/;"	m	struct:__anon14
+n	graph.h	/^	uint32_t n,m; \/\/be careful with these uint32_t$/;"	m	struct:__anon16
+n	graph.h	/^	uint32_t n:31, is_circ:1; \/\/be careful with these uint32_t $/;"	m	struct:__anon15
+n	scaff_10x2.c	/^	uint32_t n, m;$/;"	m	struct:__anon9	file:
+n_cigar	bamlite.h	/^	uint32_t flag:16, n_cigar:16;$/;"	m	struct:__anon2
+n_cnt	cdict.h	/^	size_t		n_cnt, m_cnt;$/;"	m	struct:__anon5
+n_del	graph.h	/^	uint32_t n_del;$/;"	m	struct:__anon14
+n_seq	sdict.h	/^	uint32_t n_seq, m_seq;$/;"	m	struct:__anon28
+n_targets	bamlite.h	/^	int32_t n_targets;$/;"	m	struct:__anon1
+n_text	bamlite.h	/^	size_t l_text, n_text;$/;"	m	struct:__anon1
+name	cdict.h	/^	char	*name; $/;"	m	struct:__anon4
+name	graph.h	/^	char *name;$/;"	m	struct:__anon11
+name	graph.h	/^	char *name;$/;"	m	struct:__anon15
+name	sdict.h	/^	char *name;$/;"	m	struct:__anon27
+norm_cdf	col_10x_lnks.c	/^float norm_cdf(int x, float p, int n) {$/;"	f
+norm_cdf	scaff_10x2.c	/^float norm_cdf(int x, float p, int n) {$/;"	f
+ns	col_hic_lnks.c	/^	uint32_t s, ns, tid, ntid;$/;"	m	struct:__anon10	file:
+ns	graph.h	/^	uint32_t *ns;$/;"	m	struct:__anon15
+ns_t	aa_hic.c	/^}ns_t;$/;"	t	typeref:struct:__anon30	file:
+ntid	col_hic_lnks.c	/^	uint32_t s, ns, tid, ntid;$/;"	m	struct:__anon10	file:
+open_ld	ld_io.c	/^ld_file_t * open_ld(const char *ld_fn)$/;"	f
+out_edges	graph.c	/^int out_edges(graph_t *g, int all)$/;"	f
+out_graph	graph.c	/^int out_graph(graph_t *g)$/;"	f
+out_matrix	col_10x_lnks.c	/^void out_matrix(cdict_t *cds, sdict_t *ctgs, uint32_t n)$/;"	f
+out_matrix	col_hic_lnks.c	/^void out_matrix(cdict_t *cds, sdict_t *ctgs, uint32_t n)$/;"	f
+out_paths	graph.c	/^int out_paths(graph_t *g)$/;"	f
+out_record	col_gm_lnks.c	/^void out_record(cdict_t *cds, sdict_t *ctgs, uint32_t n)$/;"	f
+out_record	scaff_10x2.c	/^void out_record(cdict_t *cds, sdict_t *ctgs, uint32_t n)$/;"	f
+out_vetices	graph.c	/^int out_vetices(graph_t *g)$/;"	f
+p	ld.h	/^	double		p;         \/\/ P-value$/;"	m	struct:__anon6
+p1	ld.h	/^	float		p1, p2, q1, q2;$/;"	m	struct:__anon6
+p2	ld.h	/^	float		p1, p2, q1, q2;$/;"	m	struct:__anon6
+parse_ld_t	ld_io.c	/^int parse_ld_t(kstring_t *buf, ld_t *t)$/;"	f
+path_t	graph.h	/^}path_t;$/;"	t	typeref:struct:__anon15
+paths	graph.h	/^	path_t *paths;$/;"	m	struct:__anon16
+paths_t	graph.h	/^}paths_t;$/;"	t	typeref:struct:__anon16
+pos	bamlite.h	/^	int32_t pos;$/;"	m	struct:__anon2
+pos1	ld.h	/^	uint32_t	pos1;$/;"	m	struct:__anon6
+pos2	ld.h	/^	uint32_t	pos2;$/;"	m	struct:__anon6
+proc_bam	aa_hic.c	/^int proc_bam(char *bam_fn, int min_mq, uint32_t max_ins_len, sdict_t *ctgs, ctg_pos_t *d, char *gap_fn, ns_t *ns)$/;"	f
+proc_bam	col_10x_lnks.c	/^int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ctgs, int opt, bc_ary_t *bc_l)$/;"	f
+proc_bam	col_hic_lnks.c	/^int proc_bam(char *bam_fn, int min_mq, uint32_t ws, sdict_t *ctgs, cdict_t **cs)$/;"	f
+proc_bam	scaff_10x2.c	/^int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ctgs, int opt, bc_ary_t *bc_l)$/;"	f
+proc_ld	col_gm_lnks.c	/^int proc_ld(char *ld_fn, double pv, sdict_t *ctgs, cdict_t *cds)$/;"	f
+process_graph	graph.c	/^int process_graph(graph_t *g)$/;"	f
+pt	graph.h	/^	paths_t pt;$/;"	m	struct:__anon17
+q1	ld.h	/^	float		p1, p2, q1, q2;$/;"	m	struct:__anon6
+q2	ld.h	/^	float		p1, p2, q1, q2;$/;"	m	struct:__anon6
+qual	bamlite.h	/^	uint32_t bin:16, qual:8, l_qname:8;$/;"	m	struct:__anon2
+r	ld.h	/^	float		r, r2;     \/\/ Correlation coefficient$/;"	m	struct:__anon6
+r2	ld.h	/^	float		r, r2;     \/\/ Correlation coefficient$/;"	m	struct:__anon6
+r_snp_n	bed.h	/^	uint32_t    l_snp_n, r_snp_n;$/;"	m	struct:__anon20
+r_snp_n	sdict.h	/^	uint32_t l_snp_n, r_snp_n;$/;"	m	struct:__anon27
+rc_table	graph.c	/^uint8_t rc_table[128]={$/;"	v
+read_ld1	ld_io.c	/^int read_ld1(ld_file_t *ld_fp, ld_t *t)$/;"	f
+rev	aa_hic.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon29	file:
+rev	col_10x_lnks.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon23	file:
+rev	scaff_10x2.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon7	file:
+right	ksort.h	/^	void *left, *right;$/;"	m	struct:__anon26
+rlen	bed.h	/^	uint32_t llen, rlen;$/;"	m	struct:__anon22
+rs	bed.h	/^	uint32_t	rs, le;$/;"	m	struct:__anon20
+rs	sdict.h	/^	uint32_t le, rs;$/;"	m	struct:__anon27
+run	build_graph.c	/^int run(int n_ctg, char *edge_fn, int min_wt)$/;"	f
+s	aa_hic.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon29	file:
+s	bed.h	/^	char *s;$/;"	m	struct:__kstring_t
+s	bed.h	/^	uint32_t s, e;$/;"	m	struct:__anon21
+s	col_10x_lnks.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon23	file:
+s	col_10x_lnks.c	/^	uint32_t s, e; \/\/no more than $/;"	m	struct:__anon24	file:
+s	col_hic_lnks.c	/^	uint32_t s, ns, tid, ntid;$/;"	m	struct:__anon10	file:
+s	kseq.h	/^	char *s;$/;"	m	struct:__kstring_t
+s	ld_io.h	/^	char *s;$/;"	m	struct:__kstring_t
+s	scaff_10x2.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon7	file:
+s	scaff_10x2.c	/^	uint32_t s, e; \/\/no more than $/;"	m	struct:__anon8	file:
+scaff_10x	scaff_10x2.c	/^int scaff_10x(char *bam_fn[], int n_bam, int min_mq, uint32_t max_span, uint32_t max_is, int min_bc, int max_bc, uint32_t min_inner_bcn, uint32_t min_mol_len, int opt)$/;"	f
+sd_destroy	sdict.c	/^void sd_destroy(sdict_t *d)$/;"	f
+sd_get	sdict.c	/^int32_t sd_get(const sdict_t *d, const char *name)$/;"	f
+sd_hash	sdict.c	/^void sd_hash(sdict_t *d)$/;"	f
+sd_init	sdict.c	/^sdict_t *sd_init(void)$/;"	f
+sd_put	sdict.c	/^int32_t sd_put(sdict_t *d, const char *name)$/;"	f
+sd_put2	sdict.c	/^int32_t sd_put2(sdict_t *d, const char *name, uint32_t len, uint32_t le, uint32_t rs, uint32_t l_snp_n, uint32_t r_snp_n)$/;"	f
+sd_seq_t	sdict.h	/^} sd_seq_t;$/;"	t	typeref:struct:__anon27
+sd_squeeze	sdict.c	/^int32_t *sd_squeeze(sdict_t *d)$/;"	f
+sdict_t	sdict.h	/^} sdict_t;$/;"	t	typeref:struct:__anon28
+seq	graph.h	/^	char *seq;$/;"	m	struct:__anon11
+seq	sdict.h	/^	sd_seq_t *seq;$/;"	m	struct:__anon28
+shash_t	cdict.c	/^typedef khash_t(str) shash_t;$/;"	t	file:
+shash_t	graph.c	/^typedef khash_t(str) shash_t;$/;"	t	file:
+shash_t	sdict.c	/^typedef khash_t(str) shash_t;$/;"	t	file:
+snp_n	cdict.h	/^	uint32_t snp_n:31, is_l:1;$/;"	m	struct:__anon4
+srch_path	graph.c	/^int srch_path(graph_t *g)$/;"	f
+srt_by_nm_loc	col_10x_lnks.c	/^void srt_by_nm_loc(bc_t *s, bc_t *e)$/;"	f
+srt_by_nm_loc	scaff_10x2.c	/^void srt_by_nm_loc(bc_t *s, bc_t *e)$/;"	f
+swap_endian_data	bamlite.c	/^static void swap_endian_data(const bam1_core_t *c, int l_data, uint8_t *data)$/;"	f	file:
+target_len	bamlite.h	/^	uint32_t *target_len;$/;"	m	struct:__anon1
+target_name	bamlite.h	/^	char **target_name;$/;"	m	struct:__anon1
+text	bamlite.h	/^	char *text;$/;"	m	struct:__anon1
+tid	aa_hic.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon29	file:
+tid	bamlite.h	/^	int32_t tid;$/;"	m	struct:__anon2
+tid	col_10x_lnks.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon23	file:
+tid	col_hic_lnks.c	/^	uint32_t s, ns, tid, ntid;$/;"	m	struct:__anon10	file:
+tid	scaff_10x2.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon7	file:
+type	bed.h	/^	char *type;$/;"	m	struct:__anon19
+update_graph	graph.c	/^int update_graph(graph_t *g) \/\/ update index$/;"	f
+v	graph.h	/^	uint32_t v; \/\/$/;"	m	struct:__anon13
+vertex_t	graph.h	/^}vertex_t;$/;"	t	typeref:struct:__anon11
+vertices	graph.h	/^	vertex_t *vertices;$/;"	m	struct:__anon12
+vertices_t	graph.h	/^}vertices_t;$/;"	t	typeref:struct:__anon12
+vis_r	graph.c	/^int vis_r(graph_t *g, edge_t *a)$/;"	f
+vtx	graph.h	/^	vertices_t vtx;$/;"	m	struct:__anon17
+w	graph.h	/^	uint32_t w; \/\/$/;"	m	struct:__anon13
+wt	bed.h	/^	uint32_t wt:30, is_l:1, is_l2:1;$/;"	m	struct:__anon22
+wt	graph.h	/^	uint32_t wt:30, is_vis:1, is_del:1;$/;"	m	struct:__anon13

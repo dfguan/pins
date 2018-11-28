@@ -72,8 +72,8 @@ extern "C" {
 #endif
 	graph_t *graph_init(void);
 	void graph_destroy(graph_t *g);
-	int add_edge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, uint32_t wt);
-	int add_edge2(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, uint32_t wt);
+	int add_udedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, uint32_t wt);
+	int add_dedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, uint32_t wt);
 	uint32_t add_node(graph_t *g, char* name, char *seq, uint32_t len);
 	int srch_path(graph_t *g);
 	int out_graph(graph_t *g); // print path
@@ -81,8 +81,8 @@ extern "C" {
 	uint32_t get_name2id(graph_t *g, char *nm);
 	int chk_edge(uint32_t id1, uint32_t id2);
 //gfa 
-graph_t  *load_gfa(char *fn);
-int get_path(graph_t *g);
+	graph_t  *load_gfa(char *fn);
+	int get_path(graph_t *g);
 #ifdef __cplusplus
 }
 #endif

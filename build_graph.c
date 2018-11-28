@@ -27,6 +27,18 @@
 #include "sdict.h"
 #include "cdict.h"
 
+sdict_t *col_ctgs(char *fn)
+{
+	bed_file_t *bf = bed_open(fn);
+	if (!bf) return 0;
+	sdict_t *ctgs = sd_init();		
+	bed_rec_t r;
+	while (bed_read(bf, &r) >= 0) 
+		sd_put2(ctgs, r.ctgn, r.len, r.le, r.rs, r.l_snp_n, r.r_snp_n);
+	bed_close(bf);
+	return ctgs;
+}
+
 int get_links(char *links_fn, cdict_t *cds, sdict_t *ctgs)
 {	
 	bed_file_t *bf = bed_open(links_fn);
@@ -47,7 +59,6 @@ int get_links(char *links_fn, cdict_t *cds, sdict_t *ctgs)
 		line_n += 1;
 		cd_add2(&cds[ind1<<1|r.is_l], r.ctgn2, r.is_l2, r.wt, r.llen);	//this has been normalized	
 	} 
-	/*fprintf(stderr, "%u links\n", line_n);*/
 	bed_close(bf);
 	return 0;	
 }
@@ -74,8 +85,14 @@ int anothernorm(cdict_t *cds, sdict_t *ctgs)
 graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)
 {
 	graph_t *g = graph_init();
+	
 	uint32_t n = ctgs->n_seq << 1;
 	uint32_t i, j;
+	//create nodes
+	for ( i = 0; i < ctgs->n_seq; ++i) 
+		add_node(g, ctgs->seq[i].name, 0, ctgs->seq[i].len);
+	
+	//create edges	
 	for ( i = 0; i < n; ++i) {
 		char *name1 = ctgs->seq[i>>1].name;
 		uint8_t is_l = i & 1;	
@@ -97,7 +114,8 @@ graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)
 					}
 			}	
 			/*if (hand_shaking) fprintf(stderr, "I hand shaking\n");*/
-			if (hand_shaking) add_edge2(g, name1, is_l, name2, c->cnts[j].is_l, ocnt * c->cnts[j].cnt);	
+			ocnt = 1;
+			if (hand_shaking) add_dedge(g, name1, is_l, name2, c->cnts[j].is_l, ocnt * c->cnts[j].cnt);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.
 		}		
 	}	
 	
@@ -106,24 +124,35 @@ graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)
 
 
 
-int run(int n_ctg, char *edge_fn, int min_wt)
+int run(char *ctg_fn, char *edge_fn, int min_wt)
 {
-	sdict_t *ctgs = sd_init();	
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] collecting contigs\n", __func__);
+#endif
+	sdict_t *ctgs = col_ctgs(ctg_fn);	
 	if (!ctgs) return 1;
-	
+	uint32_t n_ctg = ctgs->n_seq;	
 	/*fprintf(stderr, "%u\n", ctgs->n_seq);*/
 	cdict_t* cds = calloc(n_ctg<<1, sizeof(cdict_t)); 
 	uint32_t n_cds = n_ctg<<1;
-	
 	uint32_t i;
 	for ( i = 0; i < n_cds; ++i) cd_init(cds+i); 
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] collecting links\n", __func__);
+#endif
 	get_links(edge_fn, cds, ctgs);
 	/*anothernorm(cds, ctgs);*/
 	/*return 0;*/
 	for ( i = 0; i < n_cds; ++i) cd_sort(cds+i); 
 	cd_set_lim(cds, n_cds, min_wt); 
 	/*for (i = 0; i < n_cds; ++i)	cd_norm(cds + i);*/
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] building graph\n", __func__);
+#endif
 	graph_t *g = build_graph(cds, ctgs);
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] processing graph\n", __func__);
+#endif
 	process_graph(g);
 	
 
@@ -134,6 +163,9 @@ int run(int n_ctg, char *edge_fn, int min_wt)
 	} 
 	/*fprintf(stderr, "leave\n");*/
 	if (cds) free(cds);
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] releasing memory\n", __func__);
+#endif
 	graph_destroy(g);
 	return 0;
 
@@ -152,7 +184,7 @@ int main_bldg(int argc, char *argv[])
 			default:
 				if (c != 'h') fprintf(stderr, "[E::%s] undefined option %c\n", __func__, c);
 help:	
-				fprintf(stderr, "\nUsage: %s %s [<options>] <CONTIG_NUM> <LINKS_MATRIX> \n", program, argv[0]);
+				fprintf(stderr, "\nUsage: %s %s [<options>] <CONTIGs> <LINKS_MATRIX> \n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
 				fprintf(stderr, "         -w    INT      minimum weight for links [5]\n");
 				fprintf(stderr, "         -h             help\n");
@@ -162,10 +194,10 @@ help:
 	if (optind + 2 > argc) {
 		fprintf(stderr,"[E::%s] require number of contig and links file!\n", __func__); goto help;
 	}
-	int n_ctg = atoi(argv[optind++]);
+	char *ctg_fn = argv[optind++];
 	char *lnk_fn = argv[optind];
 	fprintf(stderr, "Program starts\n");	
-	run(n_ctg, lnk_fn, min_wt);
+	run(ctg_fn, lnk_fn, min_wt);
 	fprintf(stderr, "Program ends\n");	
 	return 0;	
 

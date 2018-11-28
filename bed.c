@@ -122,6 +122,7 @@ int bed_parse(int l, char *s, bed_rec_t *pr) // s must be NULL terminated
 	int i, t;
 	
 	/*pr->tech = NULL;*/
+	pr->le = pr->l_snp_n = pr->rs = pr->r_snp_n = 0;
 	for (i = t = 0, q = s; i <= l; ++i) {
 		if (i < l && s[i] != '\t') continue;
 		s[i] = 0;

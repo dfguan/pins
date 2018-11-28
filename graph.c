@@ -213,7 +213,21 @@ int add_edge1(graph_t *g, edge_t *e)
 	es->edges[es->n++] = *e;
 }
 
-int add_edge2(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, uint32_t wt)
+int add_udedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, uint32_t wt)
+{
+	uint32_t sind = add_node(g, sname, 0, 0);
+	uint32_t eind = add_node(g, ename, 0, 0);
+	
+	edge_t e = (edge_t) {sind << 1 | sl, eind << 1 | er, wt, 0, 0};
+	edge_t re = (edge_t) {eind << 1 | er, sind << 1 | sl, wt, 0, 0}; //undirect graph
+	
+	add_edge1(g, &e);
+	add_edge1(g, &re);
+	return 0;
+}
+
+
+int add_dedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, uint32_t wt)
 {
 	uint32_t sind = add_node(g, sname, 0, 0);
 	uint32_t eind = add_node(g, ename, 0, 0);
@@ -226,18 +240,6 @@ int add_edge2(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, ui
 	return 0;
 }
 
-int add_edge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, uint32_t wt)
-{
-	uint32_t sind = add_node(g, sname, 0, 0);
-	uint32_t eind = add_node(g, ename, 0, 0);
-	
-	edge_t e = (edge_t) {sind << 1 | sl, eind << 1 | er, wt, 0, 0};
-	edge_t re = (edge_t) {eind << 1 | er, sind << 1 | sl, wt, 0, 0}; //undirect graph
-	
-	add_edge1(g, &e);
-	add_edge1(g, &re);
-	return 0;
-}
 
 int add_path(graph_t *g, char *name,  uint32_t *nodes, uint32_t n) 
 {
@@ -491,7 +493,6 @@ int add_s(graph_t *g, char *s)
 
 int add_e(graph_t *g, char *s)
 {
-	fprintf(stderr, "entere\n");
 	char *n1, *n2;
 	char d1, d2;
 	char *p, *q;
@@ -511,8 +512,7 @@ int add_e(graph_t *g, char *s)
 		}
 	}	
 
-	add_edge2(g, n1, d1 == '+', n2, d2 == '+', wt);
-	fprintf(stderr, "leavee\n");
+	add_dedge(g, n1, d1 == '+', n2, d2 == '+', wt);
 	return 0;
 }
 

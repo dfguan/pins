@@ -51,19 +51,19 @@ void cd_set_lim(cdict_t *c, uint32_t n, uint32_t min_wt)
 	for (i = 0; i < n; ++i)  {
 		t = c + i;
 		//maximum weight
-		t->lim = 0;
+		t->lim = 1;
 		if (!t->n_cnt)  continue;
 		/*uint32_t max = 5; */
 			/*= t->cnts[0].cnt;*/
 		/*fprintf(stderr, "%u\t", max);*/
 		/*if (max <= 2) continue;*/
 		/*max >>= 1;*/
-		for(j = 0; j < t->n_cnt; ++j) {
-			if (t->cnts[j].cnt >= min_wt)
-				++t->lim;
-			else
-				break;				
-		}	
+		/*for(j = 0; j < t->n_cnt; ++j) {*/
+			/*if (t->cnts[j].cnt >= min_wt)*/
+				/*++t->lim;*/
+			/*else*/
+				/*break;				*/
+		/*}	*/
 	}
 }
 
@@ -209,7 +209,11 @@ int cmp_cnt(const void *a, const void *b)
 	cd_cnt_t *f = (cd_cnt_t *)a;
 	cd_cnt_t *h = (cd_cnt_t *)b;
 	if (f->cnt > h->cnt) return -1;
-	else if (f->cnt == h->cnt) return 0;
+	else if (f->cnt == h->cnt) {
+		if (f->snp_n > h->snp_n) return 1;
+		else if (f->snp_n == h->snp_n) return 0;
+		else return -1;
+	}
 	else return 1;
 }
 

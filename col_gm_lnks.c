@@ -70,7 +70,7 @@ void out_record(cdict_t *cds, sdict_t *ctgs, uint32_t n)
 		c = cds + i;
 		uint32_t j;
 		for ( j = 0; j < c->n_cnt; ++j) {
-			fprintf(stdout, "%s\t%c\t%s\t%c\t%u\t%u\t%u\n", ctgs->seq[i>>1].name, i&1?'+':'-', c->cnts[j].name, j&1?'+':'-',c->cnts[j].cnt, c->cnts[j].snp_n, i&1?ctgs->seq[i].l_snp_n:ctgs->seq[i].r_snp_n);				
+			fprintf(stdout, "%s\t%c\t%s\t%c\t%u\t%u\t%u\n", ctgs->seq[i>>1].name, i&1?'+':'-', c->cnts[j].name, j&1?'+':'-',c->cnts[j].cnt, c->cnts[j].snp_n, i&1?ctgs->seq[i>>1].l_snp_n:ctgs->seq[i>>1].r_snp_n);				
 		}	
 	}
 
@@ -88,7 +88,7 @@ int proc_ld(char *ld_fn, double pv, sdict_t *ctgs, cdict_t *cds)
 	long n_records = 0;	
 	while ((ret = read_ld1(fp, &r) >= 0)) { // we should add the snps no matter whether it  
 		++n_records;
-		if (r.p < pv &&  r.pos1 < r.pos2  && strcmp(r.ctgn1, r.ctgn2) <= 0) 
+		if (r.p < pv &&  r.pos1 < r.pos2  && strcmp(r.ctgn1, r.ctgn2) < 0) 
 			add_record(&r, ctgs, cds);	
 		if (n_records % 1000000 == 0) fprintf(stderr, "Process %lu records\n", n_records);
 	}
@@ -145,7 +145,7 @@ int main_gm_lnks(int argc, char *argv[])
 help:	
 				fprintf(stderr, "\nUsage: %s %s [<options>] <SNP_DISTRI> <LD>\n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
-				fprintf(stderr, "         -q    FLOAT      maximum p value [1e-6]\n");
+				fprintf(stderr, "         -p    FLOAT      maximum p value [1e-6]\n");
 				fprintf(stderr, "         -h               help\n");
 				return 1;	
 		}		

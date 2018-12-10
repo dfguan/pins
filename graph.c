@@ -140,7 +140,7 @@ int out_graph(graph_t *g)
 {
 	fprintf(stdout, "H\tVN:Z:1.0\n");	
 	out_vetices(g);
-	out_edges(g, 1);
+	out_edges(g, 0);
 	out_paths(g);
 	return 0;
 }

@@ -22,7 +22,7 @@
 int main_get_seq(int argc, char *argv[])
 {
 	if (argc < 3) {
-		fprintf(stderr, "%s %s <GFA>", argv[0], argv[1]);
+		fprintf(stderr, "%s %s <GFA>\n", argv[0], argv[1]);
 		return 1;
 	}
 	char *gfa_fn = argv[2];

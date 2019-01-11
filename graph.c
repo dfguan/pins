@@ -253,11 +253,12 @@ int add_path(graph_t *g, char *name,  uint32_t *nodes, uint32_t n)
 			ps->m = ps->m ? ps->m << 1 : 16;
 			ps->paths = realloc(ps->paths, sizeof(path_t) * ps->m);
 		}	
-		path_t *p = &ps->paths[ps->n++];
+		path_t *p = &ps->paths[ps->n];
 		p->ns = malloc(n*sizeof(uint32_t));
 		memcpy(p->ns, nodes, sizeof(uint32_t) * n);
+		p->n = n;
 		kh_key(h, k) =p->name = strdup(name);	
-		kh_val(h, k) = p->n++;	
+		kh_val(h, k) = ps->n++;	
 	} else 
 		fprintf(stderr, "[W::%s] edge has been added\n", __func__);
 	return 0;
@@ -466,7 +467,7 @@ int process_graph(graph_t *g)
 // GFA IO
 int add_s(graph_t *g, char *s)
 {	
-	fprintf(stderr, "enters\n");
+	/*fprintf(stderr, "enters\n");*/
 	char *name = 0;
 	char *seq = 0;
 	char *p, *q;
@@ -486,7 +487,7 @@ int add_s(graph_t *g, char *s)
 	}	
 	uint32_t len = seq == 0 ? 0 : strlen(seq);
 	add_node(g, name, seq, len);
-	fprintf(stderr, "leaves\n");
+	/*fprintf(stderr, "leaves\n");*/
 	return 0;
 
 }
@@ -534,24 +535,28 @@ int add_p(graph_t *g, char *s)
 			if (c == 0) break;	
 		}
 	}	
-	for (p = q = nodes_str; *p; ++p) {
+	for (p = q = nodes_str;; ++p) {
+		int e = *p; 
 		if (*p == 0 || *p == ',') {
 			*p = 0;
-			int ql = strlen(q);
-			if (ql) {
-				int c = q[ql - 1];
-				q[ql-1] = 0;
-				uint32_t n_id = add_node(g, q, 0, 0);
-				n_id = n_id << 1 | (c == '+');
-				kv_push(uint32_t, ns, n_id);
-			}
+				/*int c = q[ql - 1];*/
+			int c =*(p-1);
+			*(p-1) = 0;
+			/*q[ql-1] = 0;*/
+			uint32_t n_id = add_node(g, q, 0, 0);
+			/*fprintf(stderr, "node: %s  %u\n",q, n_id);*/
+			n_id = n_id << 1 | (c == '-');
+			kv_push(uint32_t, ns, n_id);
+			q = p + 1;
+			
 		}
+	  	if (!e)	break;
 	}
-	fprintf(stderr, "enterp %d\n", ns.n);
+	/*fprintf(stderr, "enterp %d\n", ns.n);*/
 	
 	if (ns.n) add_path(g, name, ns.a, ns.n);
 	kv_destroy(ns);
-	fprintf(stderr, "leavep\n");
+	/*fprintf(stderr, "leavep\n");*/
 	return 0;
 }
 
@@ -597,7 +602,7 @@ int get_path(graph_t *g)
 		for ( j = 0; j < p->n; ++j) {
 			uint32_t seq_len = vs[p->ns[j] >> 1].len;
 			if (seq_len) {
-				ref_len += vs[p->ns[j]>>1].len;//200 'N' s	
+				ref_len += seq_len;//200 'N' s	
 				if (j != p->n - 1) ref_len += 200;
 			} else {
 				ref_len = 0;
@@ -606,17 +611,20 @@ int get_path(graph_t *g)
 		}
 		char *ref_seq = NULL;
 		if (ref_len) {
-			ref_seq = malloc(sizeof(char) * (ref_len+i));
+			ref_seq = malloc(sizeof(char) * (ref_len+1));
 			char *s = ref_seq;
+		
 			for (j = 0; j < p->n; ++j) {
-				cp_seq(s, vs[p->ns[j]>> 1].seq, vs[p->ns[j]>>1].len, p->ns[j] & 1) , s += vs[p->ns[j>>1]].len;
+				cp_seq(s, vs[p->ns[j]>> 1].seq, vs[p->ns[j]>>1].len, p->ns[j] & 1) , s += vs[p->ns[j]>>1].len;
 				if (j != p->n - 1) memset(s,'N', 200), s += 200;
 			}
 			*s = 0;
 		} 	
 		fprintf(stdout, ">%s_%u\n",ref_nm, ref_len);
-		if (ref_seq) fprintf(stdout, "%s\n",ref_seq);
-		if (ref_seq) free(ref_seq);		
+		if (ref_seq) {
+			fprintf(stdout, "%s\n",ref_seq);
+			free(ref_seq);		
+		}
 	}
 	return 0;
 }

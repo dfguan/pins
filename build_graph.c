@@ -91,12 +91,12 @@ graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)
 	//create nodes
 	for ( i = 0; i < ctgs->n_seq; ++i) 
 		add_node(g, ctgs->seq[i].name, 0, ctgs->seq[i].len);
-	
 	//create edges	
 	for ( i = 0; i < n; ++i) {
 		char *name1 = ctgs->seq[i>>1].name;
 		uint8_t is_l = i & 1;	
 		cdict_t *c = cds + i;	
+		if (!c->n_cnt) continue;	
 		for (j = 0; j < c->lim; ++j) {
 			char *name2 = c->cnts[j].name;
 			if (strcmp(name1, name2) == 0) continue;

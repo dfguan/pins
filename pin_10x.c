@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 {
 	if (argc < 2) {
 help:
-		fprintf(stderr, "\n  scaff_10x [-v] [-h] <command> [<args>]\n");
+		fprintf(stderr, "\n  pin_10x [-v] [-h] <command> [<args>]\n");
 		fprintf(stderr, "  commands:\n");
 		fprintf(stderr, "           link        generate links for contigs\n");
 		fprintf(stderr, "           build       generate graph with links\n");

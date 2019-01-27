@@ -322,7 +322,8 @@ int main_hic_lnks(int argc, char *argv[])
 	/*int min_as = 0;*/
 	/*uint32_t max_ins_len = 10000;*/
 	uint32_t win_s = 50000;
-	char *program = argv[0];
+	char *program;
+   	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
 	--argc, ++argv;
 	while (~(c=getopt(argc, argv, "q:w:h"))) {
 		switch (c) {

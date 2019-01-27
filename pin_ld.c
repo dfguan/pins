@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "col_gm_lnks.h"
+#include "col_ld_lnks.h"
 #include "build_graph.h"
 #include "get_seq.h"
 
@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 {
 	if (argc < 2) {
 help:
-		fprintf(stderr, "\n  scaff_gm [-v] [-h] <command> [<args>]\n");
+		fprintf(stderr, "\n  pin_ld [-v] [-h] <command> [<args>]\n");
 		fprintf(stderr, "  commands:\n");
 		fprintf(stderr, "           link        generate links for contigs\n");
 		fprintf(stderr, "           build       generate graph with links\n");

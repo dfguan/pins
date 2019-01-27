@@ -400,7 +400,9 @@ int main_10x_lnks(int argc, char *argv[])
 	char *r;
 	
 	int option = 0; //the way to calculate molecule length //internal parameters not allowed to adjust by users
-	char *program = argv[0];
+	char *program;
+   	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
+	
 	--argc, ++argv;
 	//optind points at argv[1]
 	while (~(c=getopt(argc, argv, "b:B:q:L:w:a:h"))) {

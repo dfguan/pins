@@ -82,7 +82,8 @@ extern "C" {
 	int chk_edge(uint32_t id1, uint32_t id2);
 //gfa 
 	graph_t  *load_gfa(char *fn);
-	int get_path(graph_t *g);
+	int get_path(graph_t *g, uint32_t minl);
+	int read_seq(graph_t *g, char *fn);
 #ifdef __cplusplus
 }
 #endif

@@ -133,7 +133,8 @@ int main_gm_lnks(int argc, char *argv[])
 {
 	double pv = 1e-6;
 	int c;
-	char *program = argv[0];
+	char *program;
+   	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
 	--argc, ++argv;	
 	while (~(c=getopt(argc, argv, "p:h"))) {
 		switch (c) {

@@ -28,7 +28,11 @@
 
 KDQ_INIT(uint32_t)
 
-KSTREAM_INIT(gzFile, gzread, gzseek, 0x10000)
+
+KSEQ_INIT(gzFile, gzread, gzseek)	
+/*KSTREAM_INIT(gzFile, gzread, gzseek, 0x10000)*/
+
+
 
 #define edge_key(a) ((a).v)
 KRADIX_SORT_INIT(edge, edge_t, edge_key, 4)
@@ -580,6 +584,19 @@ graph_t  *load_gfa(char *fn)
 	return g;
 }
 
+int read_seq(graph_t *g, char *seqfn)
+{
+	gzFile fp = seqfn && strcmp(seqfn, "-") ? gzopen(seqfn, "r") : gzdopen(fileno(stdin), "r");
+	if (fp == 0) return 1;
+	kseq_t *seq = kseq_init(fp);
+	while (kseq_read(seq) >= 0) 
+		add_node(g, seq->name.s, seq->seq.s, seq->seq.l);
+	kseq_destroy(seq);
+	gzclose(fp);
+	return 0;
+}
+
+
 int cp_seq(char *s, char *t, uint32_t len, int is_rc)
 {
 	if (is_rc) {
@@ -590,7 +607,7 @@ int cp_seq(char *s, char *t, uint32_t len, int is_rc)
 	return 0;
 }
 
-int get_path(graph_t *g)
+int get_path(graph_t *g, uint32_t min_l)
 {	
 	paths_t *ps = &g->pt;
 	vertex_t *vs = g->vtx.vertices;
@@ -610,7 +627,7 @@ int get_path(graph_t *g)
 			}
 		}
 		char *ref_seq = NULL;
-		if (ref_len) {
+		if (ref_len && ref_len >= min_l) {
 			ref_seq = malloc(sizeof(char) * (ref_len+1));
 			char *s = ref_seq;
 		
@@ -629,8 +646,3 @@ int get_path(graph_t *g)
 	return 0;
 }
 
-int dump_gfa(graph_t *g)
-{
-	
-
-}

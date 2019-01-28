@@ -39,6 +39,17 @@ sdict_t *col_ctgs(char *fn)
 	return ctgs;
 }
 
+sdict_t *col_ctgs_from_graph(graph_t *g)
+{
+	sdict_t *ctgs = sd_init();
+	vertex_t *vs = g->vtx.vertices;
+	uint32_t n_vs = g->vtx.n;
+	uint32_t i;
+	for ( i = 0; i < n_vs; ++i) 
+		sd_put2(ctgs, vs[i].name, vs[i].len, 0, 0, 0, 0);
+	return ctgs;
+}
+
 int get_links(char *links_fn, cdict_t *cds, sdict_t *ctgs)
 {	
 	bed_file_t *bf = bed_open(links_fn);
@@ -124,12 +135,23 @@ graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)
 
 
 
-int run(char *ctg_fn, char *edge_fn, int min_wt)
+int buildg(char *fn, char *edge_fn, int min_wt, int use_sat)
 {
+	graph_t *og; 
+	sdict_t *ctgs;
+	if (use_sat) {
 #ifdef VERBOSE
-	fprintf(stderr, "[M::%s] collecting contigs\n", __func__);
+	fprintf(stderr, "[M::%s] collecting contigs from sat file\n", __func__);
 #endif
-	sdict_t *ctgs = col_ctgs(ctg_fn);	
+		og = load_sat(fn);
+				
+	} else {
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] collecting contigs from faidx file\n", __func__);
+#endif
+		ctgs = col_ctgs(fn);	
+		og = graph_init();	
+	}
 	if (!ctgs) return 1;
 	uint32_t n_ctg = ctgs->n_seq;	
 	/*fprintf(stderr, "%u\n", ctgs->n_seq);*/
@@ -175,29 +197,43 @@ int main_bldg(int argc, char *argv[])
 {
 	int c;
 	uint32_t min_wt = 5; char *program = argv[0];
+	char *sat_fn = 0, *ctg_fn = 0;
+	int use_sat = 0;
 	--argc, ++argv;
 	while (~(c=getopt(argc, argv, "w:h"))) {
 		switch (c) {
 			case 'w': 
 				min_wt = atoi(optarg);
 				break;
+			case 's': 
+				sat_fn = optarg;
+				use_sat =  1;
+				break;
+			case 'c': 
+				ctg_fn = optarg;
+				break;
 			default:
 				if (c != 'h') fprintf(stderr, "[E::%s] undefined option %c\n", __func__, c);
 help:	
-				fprintf(stderr, "\nUsage: %s %s [<options>] <CONTIGs> <LINKS_MATRIX> \n", program, argv[0]);
+				fprintf(stderr, "\nUsage: %s %s [<options>] <LINKS_MATRIX> \n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
 				fprintf(stderr, "         -w    INT      minimum weight for links [5]\n");
+				fprintf(stderr, "         -c    FILE     reference index file\n");
+				fprintf(stderr, "         -s    FILE     sat file\n");
 				fprintf(stderr, "         -h             help\n");
 				return 1;	
 		}		
 	}
-	if (optind + 2 > argc) {
+	if (optind + 1 > argc) {
 		fprintf(stderr,"[E::%s] require number of contig and links file!\n", __func__); goto help;
 	}
-	char *ctg_fn = argv[optind++];
 	char *lnk_fn = argv[optind];
 	fprintf(stderr, "Program starts\n");	
-	run(ctg_fn, lnk_fn, min_wt);
+	if (use_sat) 
+		buildg(sat_fn, lnk_fn, min_wt, 1);
+	else 
+		buildg(ctg_fn, lnk_fn, min_wt, 0);
+
 	fprintf(stderr, "Program ends\n");	
 	return 0;	
 

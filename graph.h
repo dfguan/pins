@@ -29,7 +29,6 @@ typedef struct {
 
 typedef struct {
 	vertex_t *vertices;
-	void	*h;
 	uint32_t n, m;	
 }vertices_t;
 
@@ -54,15 +53,28 @@ typedef struct {
 
 typedef struct {
 	path_t *paths;
-	void	*h;
 	uint32_t n,m; //be careful with these uint32_t
 }paths_t;
 
+typedef struct {
+	uint32_t n, m;
+	uint32_t *pn;
+	char *name;
+}asm_t;
+
+typedef struct {
+	asm_t *asms;
+	uint32_t n, m;
+	void *h;
+	uint32_t casm; //currently assembly
+} asms_t;
 
 typedef struct {
 	vertices_t vtx;
 	edges_t eg;
 	paths_t pt;
+	void *h;//namespace for vertices edges and paths
+	asms_t as;
 } graph_t;
 
 #define edges(g, v) ((g)->eg.edges + (g->eg.edge_idx[(v)] >> 32))
@@ -78,10 +90,13 @@ extern "C" {
 	int srch_path(graph_t *g);
 	int out_graph(graph_t *g); // print path
 	int process_graph(graph_t *g);
+	int merge_graph(graph_t *g, graph_t *c, int all);
+	int dump_sat(graph_t *g);
 	uint32_t get_name2id(graph_t *g, char *nm);
 	int chk_edge(uint32_t id1, uint32_t id2);
 //gfa 
 	graph_t  *load_gfa(char *fn);
+	graph_t  *load_sat(char *fn);
 	int get_path(graph_t *g, uint32_t minl);
 	int read_seq(graph_t *g, char *fn);
 #ifdef __cplusplus

@@ -285,19 +285,54 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t ws, sdict_t *ctgs, cdict_t **cs)
 	return 0;
 }
 
+int init_ctgs(graph_t *g, sdict_t* ctgs) 
+{
+
+
+}
+
+int init_scaffs(graph_t *g, sdict_t *ctgs, sdict_t *scfs)
+{
+	
+
+}
+
+int init_seqs(char *fn, sdict_t *ctgs, sdict_t *scfs)
+{
+	graph_t *g = load_sat(fn);
+	init_ctgs(g, ctgs);
+	init_scaffs(g, ctgs, scfs);
+	return 0;
+}
+
+
 /*int aa_10x_hic(char *bam_fn, int min_as, int min_mq, int min_cov, float min_cov_rat, int max_cov, float max_cov_rat)*/
 /*int aa_hic(char *bam_fn, int min_as, int min_mq, int min_cov, int max_cov, uint32_t max_ins_len)*/
-int col_hic_lnks(char **bam_fn, int n_bam, int min_mq, uint32_t win_s)
+int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t win_s)
 {
 
 	/*uint32_t n_cds = ctgs->n_seq<<1;*/
 	/*cdict_t* cds = calloc(ctgs->n_seq<<1, sizeof(cdict_t)); */
+
 	sdict_t *ctgs = sd_init();	
-	cdict_t *cds = 0;
+	sdict_t *scfs = sd_init();
+
+	
+	if (sat_fn) {
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] initiate contigs and scaffolds\n", __func__);
+#endif
+		init_seqs(sat_fn, ctgs, scfs);	
+	}
+
+
 
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] processing bam file\n", __func__);
 #endif
+	
+	cdict_t *cds = 0;
+	
 	int i;	
 	for ( i = 0; i < n_bam; ++i) {
 		if (proc_bam(bam_fn[i], min_mq, win_s, ctgs, &cds)) {
@@ -323,6 +358,7 @@ int main_hic_lnks(int argc, char *argv[])
 	/*uint32_t max_ins_len = 10000;*/
 	uint32_t win_s = 50000;
 	char *program;
+	char *sat_fn = 0;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
 	--argc, ++argv;
 	while (~(c=getopt(argc, argv, "q:w:h"))) {
@@ -333,6 +369,9 @@ int main_hic_lnks(int argc, char *argv[])
 			case 'w':
 				win_s = strtol(optarg, NULL, 10);
 				break;
+			case 's':
+				sat_fn  = optarg;
+				break;
 			default:
 				if (c != 'h') fprintf(stderr, "[E::%s] undefined option %c\n", __func__, c);
 help:	
@@ -340,6 +379,7 @@ help:
 				fprintf(stderr, "Options:\n");
 				fprintf(stderr, "         -q    INT      minimum alignment quality [0]\n");
 				fprintf(stderr, "         -w    INT      window size [50000]\n");
+				fprintf(stderr, "         -s    STR      sat file\n");
 				fprintf(stderr, "         -h             help\n");
 				return 1;	
 		}		
@@ -350,7 +390,7 @@ help:
 	char **bam_fn = &argv[optind];
 	int n_bam = argc - optind;
 	fprintf(stderr, "Program starts\n");	
-	col_hic_lnks(bam_fn, n_bam, min_mq, win_s);
+	col_hic_lnks(sat_fn, bam_fn, n_bam, min_mq, win_s);
 	fprintf(stderr, "Program ends\n");	
 	return 0;	
 }

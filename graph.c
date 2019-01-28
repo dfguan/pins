@@ -55,8 +55,8 @@ uint8_t rc_table[128]={
 graph_t *graph_init(void) 
 {	
 	graph_t *g = (graph_t *)calloc(1, sizeof(graph_t));	
-	g->vtx.h = kh_init(str);
-	g->pt.h = kh_init(str);
+	g->h = kh_init(str);
+	g->as.h = kh_init(str);
 	return g;
 }
 
@@ -77,7 +77,7 @@ void graph_destroy(graph_t *g)
 		uint32_t i;
 		for ( i = 0 ; i < n_nd; ++i) free_node(&g->vtx.vertices[i]);
 		free(g->vtx.vertices);
-		if (g->vtx.h) kh_destroy(str, (shash_t *)g->vtx.h);		
+		if (g->h) kh_destroy(str, (shash_t *)g->h);		
 		//free edges
 		if (g->eg.edges) free(g->eg.edges);
 		if (g->eg.edge_idx) free(g->eg.edge_idx);
@@ -86,6 +86,12 @@ void graph_destroy(graph_t *g)
 			for (i = 0; i < g->pt.n; ++i) free(g->pt.paths[i].ns);
 			free(g->pt.paths);
 		} 
+		//free asms
+		if (g->as.h) kh_destroy(str, (shash_t *)g->as.h);
+		if (g->as.asms) {
+			for ( i = 0; i < g->as.n; ++i) free(g->as.asms[i].pn);
+			free(g->as.asms);	
+		}
 		free(g);
 	}
 
@@ -114,7 +120,7 @@ int out_edges(graph_t *g, int all)
 	uint32_t i;
 	for ( i = 0; i < n_edges; ++i) {
 		uint32_t v = edg[i].v, w = edg[i].w;
-		if (v>>1 != w >> 1) fprintf(stdout, "L\t%s\t%c\t%s\t%c\t%s\twt:%u\n", vs[v>>1].name, v&1?'+':'-', vs[w>>1].name, w&1?'+':'-', "*", edg[i].wt); // + head of sequence - tail of sequqnce	
+		if (v>>1 != w >> 1) fprintf(stdout, "L\t%s\t%c\t%s\t%c\t%s\twt:%u\n", vs[v>>2].name, v&1?'+':'-', vs[w>>2].name, w&1?'+':'-', "*", edg[i].wt); // + head of sequence - tail of sequqnce	
 	}
 	return 0;
 }
@@ -127,7 +133,7 @@ int out_paths(graph_t *g)
 	uint32_t i;	
 	for ( i = 0; i < n_p; ++i) {
 		uint32_t j;
-		if (!p[i].name) fprintf(stdout, "P\t%c%06u\t", p[i].is_circ?'c':'u',i);
+		if (!p[i].name) fprintf(stdout, "P\t%c%06u\t", p[i].is_circ?'c':'u',i); //check before output use the same name?
 		else fprintf(stdout, "P\t%s\t", p[i].name);
 		uint32_t v;	
 		for ( j = 0; j + 1 < p[i].n; ++j)  {
@@ -137,6 +143,25 @@ int out_paths(graph_t *g)
 		v = p[i].ns[j];
 		fprintf(stdout, "%s%c\n", vs[v>>1].name, v&1?'+':'-');
 	}
+	return 0;
+}
+
+int out_asms(graph_t *g)
+{
+	asm_t *as = g->as.asms;
+	path_t *ps = g->pt.paths;
+	uint32_t n_a = g->as.n;
+	uint32_t i, j;
+	for ( i = 0; i < n_a; ++i) {
+		fprintf(stdout, "A\t%s\t%u\t", as[i].name, as[i].n);
+		uint32_t t;
+		for ( j = 0; j < as[i].n; ++j ) {
+			t = as[i].pn[j];
+			if (j == as[i].n - 1) fprintf(stdout, "%s\n",ps[t>>2].name);
+			else fprintf(stdout, "%s,",ps[t>>2].name);
+		}
+	}
+	fprintf(stdout, "C\t%s\n", as[g->as.casm].name);
 	return 0;
 }
 
@@ -151,13 +176,13 @@ int out_graph(graph_t *g)
 
 uint32_t get_name2id(graph_t *g, char *nm)
 {
-	shash_t *h = (shash_t *)g->vtx.h;
+	shash_t *h = (shash_t *)g->h;
 	khint_t k = kh_get(str, h, nm);
 	return k == kh_end(h) ? -1 : kh_val(h, k);
 }
 uint32_t add_node(graph_t *g, char* name, char *seq, uint32_t len)
 {
-	shash_t *h = (shash_t *)g->vtx.h;
+	shash_t *h = (shash_t *)g->h;
 	khint_t k;
 	int absent;
 	k = kh_put(str, h, name, &absent);
@@ -172,9 +197,16 @@ uint32_t add_node(graph_t *g, char* name, char *seq, uint32_t len)
 		else n->seq = 0;
 		n->len = len;
 		kh_key(h, k) =n->name = strdup(name);	
-		kh_val(h, k) = ns->n++;	
+		kh_val(h, k) = (ns->n<<1 | 0); //0 to identify vertices
+		++ns->n;	
 	} else {
 		uint32_t ind = kh_val(h, k);
+		if (ind & 1) {
+			//this is a path
+			fprintf(stderr, "[W::%s] %s is a path\n", __func__, name);
+			return -1;		
+		} 
+		ind = ind >> 1;
 		if (seq && !g->vtx.vertices[ind].seq) g->vtx.vertices[ind].seq = strdup(seq);
 		if (len && !g->vtx.vertices[ind].len) g->vtx.vertices[ind].len = len; 	
 	}	
@@ -245,13 +277,28 @@ int add_dedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, ui
 }
 
 
-int add_path(graph_t *g, char *name,  uint32_t *nodes, uint32_t n) 
+uint32_t add_path(graph_t *g, char *name,  uint32_t *nodes, uint32_t n, uint32_t is_circ) 
 {
+	
 	paths_t *ps = &g->pt;
-	shash_t *h = (shash_t *)ps->h;
+	shash_t *h = (shash_t *)g->h;
+	char *pname = name;
+	uint32_t pn = ps->n;
+	if (!pname) {
+		//this is a new path it's name hasn't been initiated yet
+		pname = malloc(sizeof(char) * 8) // path name length is 7;
+		do {
+			sprintf(pname, "%c%06u%c", is_circ ? 'c':'u', n, 0);	
+			++n;	
+		} while (kh_get(str, h, pname) == kh_end(h)); 
+	} else {
+		pname = malloc(sizeof(char) * (strlen(name) + 1));
+		strcpy(pname, name);
+	}
+	
 	khint_t k;
 	int absent;
-	k = kh_put(str, h, name, &absent);
+	k = kh_put(str, h, pname, &absent);
 	if (absent) {
 		if (ps->n == ps->m) {
 			ps->m = ps->m ? ps->m << 1 : 16;
@@ -261,11 +308,52 @@ int add_path(graph_t *g, char *name,  uint32_t *nodes, uint32_t n)
 		p->ns = malloc(n*sizeof(uint32_t));
 		memcpy(p->ns, nodes, sizeof(uint32_t) * n);
 		p->n = n;
-		kh_key(h, k) =p->name = strdup(name);	
-		kh_val(h, k) = ps->n++;	
+		kh_key(h, k) =p->name = strdup(pname);	
+		kh_val(h, k) = (ps->n<<1 | 1);
+		++ps->n;	
 	} else 
-		fprintf(stderr, "[W::%s] edge has been added\n", __func__);
-	return 0;
+		fprintf(stderr, "[W::%s] path has been added\n", __func__);
+	if (pname) free(pname);
+	return kh_val(h, k);
+}
+
+int add_asm(graph_t *g, char *name,  uint32_t *nodes, uint32_t n) 
+{
+	asms_t *as = &g->as;
+	shash_t *h = (shash_t *)as->h;
+	
+	char *aname = name;
+	uint32_t an = as->n;
+	if (!aname) {
+		//this is a new path it's name hasn't been initiated yet
+		aname = malloc(sizeof(char) * 7) // path name length is 7;
+		do {
+			sprintf(pname, "a%05u%c", n, 0);	
+			++n;	
+		} while (kh_get(str, h, aname) == kh_end(h)); 
+	} else {
+		aname = malloc(sizeof(char) * (strlen(name) + 1));
+		strcpy(aname, name);
+	}
+
+	khint_t k;
+	int absent;
+	k = kh_put(str, h, aname, &absent);
+	if (absent) {
+		if (as->n == as->m) {
+			as->m = as->m ? as->m << 1 : 16;
+			as->asms = realloc(as->asms, sizeof(asm_t) * as->m);
+		}	
+		asm_t *a = &as->asms[as->n];
+		a->pn = malloc(n*sizeof(uint32_t));
+		memcpy(a->pn, nodes, sizeof(uint32_t) * n);
+		a->n = n;
+		kh_key(h, k) =a->name = strdup(aname);	
+		kh_val(h, k) = as->n++;
+	} else 
+		fprintf(stderr, "[W::%s] assembly has been added\n", __func__);
+	if (aname) free(aname);
+	return kh_val(h, k);
 }
 
 int del_r(graph_t *g, edge_t *a) // remove reverse edge
@@ -455,6 +543,39 @@ int srch_path(graph_t *g)
 	return 0;
 }
 
+int merge_graph(graph_t *g, graph_t *c, int all)
+{
+	vertex_t *vs = c->vtx.vertices;
+	uint32_t n_vs = c->vtx.n;
+	
+	uint32_t i;
+	for ( i = 0; i < n_vs; ++i) 
+		add_node(g, vs[i].name, vs[i].seq, vs[i].len);
+	
+	edge_t *edg = c->eg.edges;
+	uint32_t n_edges = c->eg.n;		
+	if (all) n_edges += c->eg.n_del;	
+	for ( i = 0; i < n_edges; ++i) {
+		uint32_t v = edg[i].v, w = edg[i].w;
+		add_dedge(g, vs[v>>2].name, v&1, vs[w>>2].name, w&1, edg[i].wt);
+	}
+	
+	path_t *p = c->pt.paths;
+	uint32_t n_p = c->pt.n;
+	kvec_t(uint32_t) pids;
+	for ( i = 0; i < n_p; ++i) {
+		uint32_t pid = add_path(g, 0, p[i].ns, p[i].n, p[i].is_circ);
+		kv_push(uint32_t, pids, pid);
+	}
+	//add asm
+	uint32_t aid = add_asm(g, 0,  pids.a, pids.n);	
+	g->as.casm = aid;
+	graph_destroy(c);
+	return 0;
+}
+
+
+
 
 int process_graph(graph_t *g)
 {
@@ -464,7 +585,6 @@ int process_graph(graph_t *g)
 	join_ends(g);
 	update_graph(g);
 	srch_path(g);
-	out_graph(g);
 	return 0;
 }
 
@@ -558,12 +678,53 @@ int add_p(graph_t *g, char *s)
 	}
 	/*fprintf(stderr, "enterp %d\n", ns.n);*/
 	
-	if (ns.n) add_path(g, name, ns.a, ns.n);
+	if (ns.n) add_path(g, name, ns.a, ns.n, name[0]=='c');
 	kv_destroy(ns);
 	/*fprintf(stderr, "leavep\n");*/
 	return 0;
 }
 
+int add_a(graph_t *g, char *s)
+{
+	char *name;	
+	char *p, *q;
+	int i;
+	kvec_t(uint32_t) ns;
+	kv_init(ns);
+	char *nodes_str;
+	for (i = 0, p = q = s + 2;; ++p) {
+		if (*p == 0 || *p == '\t') {
+			int c = *p;
+			*p = 0;
+			if (i == 0) name = q;
+			else if (i == 1) nodes_str = q;
+			++i, q = p + 1;	
+			if (c == 0) break;	
+		}
+	}	
+	for (p = q = nodes_str;; ++p) {
+		int e = *p; 
+		if (*p == 0 || *p == ',') {
+			*p = 0;
+				/*int c = q[ql - 1];*/
+			/*int c =*(p-1);*/
+			/**(p-1) = 0;*/
+			/*q[ql-1] = 0;*/
+			uint32_t n_id = get_name2id(g, q);
+			/*fprintf(stderr, "node: %s  %u\n",q, n_id);*/
+			/*n_id = n_id << 1 | (c == '-');*/
+			kv_push(uint32_t, ns, n_id);
+			q = p + 1;
+			
+		}
+	  	if (!e)	break;
+	}
+	/*fprintf(stderr, "enterp %d\n", ns.n);*/
+	if (ns.n) add_asm(g, name, ns.a, ns.n);
+	kv_destroy(ns);
+	/*fprintf(stderr, "leavep\n");*/
+	return 0;
+}
 
 graph_t  *load_gfa(char *fn)
 {
@@ -646,3 +807,60 @@ int get_path(graph_t *g, uint32_t min_l)
 	return 0;
 }
 
+int set_c(graph_t *g, char *s)
+{
+	int i;
+	char *p, *q, *name;
+	for (i = 0, p = q = s + 2;; ++p) {
+		if (*p == 0 || *p == '\t') {
+			int c = *p;
+			*p = 0;
+			if (i == 0) name = q;
+			++i, q = p + 1;	
+			if (c == 0) break;	
+		}
+	}	
+	if (i == 0) {
+		fprintf(stderr, "[E::%s] current assembly is not set\n", __func__);
+		return 1;
+	}
+	shash_t *h = (shash_t *)g->as.h;
+	khint_t k = kh_get(str, h, name);
+	if (k == kh_end(h)) {
+		fprintf(stderr, "[E::%s] wrong assembly id \n", __func__);
+		return 1;			
+	}
+   	g->as.casm = kh_val(h, k);
+	return 0;
+}
+
+graph_t *load_sat(char *fn) 
+{
+	graph_t *g = graph_init();
+	
+	kstream_t *ks;
+	gzFile fp;
+	fp = fn && strcmp(fn, "-")? gzopen(fn, "r") : gzdopen(fileno(stdin), "r");
+	if (fp == 0) return 0;
+	ks = ks_init(fp);
+	kstring_t buf = {0, 0, 0};
+	int dret;
+	while (ks_getuntil(ks, KS_SEP_LINE, &buf, &dret) >= 0) {
+		if (buf.s[0] == 'S') add_s(g, buf.s);
+		else if (buf.s[0] == 'L') add_e(g, buf.s);	
+		else if (buf.s[0] == 'P') add_p(g, buf.s);
+		else if (buf.s[0] == 'A') add_a(g, buf.s);
+		else if (buf.s[0] == 'C') set_c(g, buf.s);
+	}
+	return g;	
+}
+
+int dump_sat(graph_t *g)
+{
+	fprintf(stdout, "H\tVN:Z:1.0\n");	
+	out_vetices(g);
+	out_edges(g, 0);
+	out_paths(g);
+	out_asms(g);
+	return 0;
+}

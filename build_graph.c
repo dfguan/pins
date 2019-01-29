@@ -42,11 +42,11 @@ sdict_t *col_ctgs(char *fn)
 sdict_t *col_ctgs_from_graph(graph_t *g)
 {
 	sdict_t *ctgs = sd_init();
-	vertex_t *vs = g->vtx.vertices;
-	uint32_t n_vs = g->vtx.n;
+	asm_t *ca = &g->as.asms[g->as.casm];
+	uint32_t n = ca->n;
 	uint32_t i;
-	for ( i = 0; i < n_vs; ++i) 
-		sd_put2(ctgs, vs[i].name, vs[i].len, 0, 0, 0, 0);
+	for ( i = 0; i < n; ++i) 
+		sd_put2(ctgs, ca[i].name, 0, 0, 0, 0, 0);
 	return ctgs;
 }
 
@@ -176,7 +176,10 @@ int buildg(char *fn, char *edge_fn, int min_wt, int use_sat)
 	fprintf(stderr, "[M::%s] processing graph\n", __func__);
 #endif
 	process_graph(g);
-	
+			
+	merge_graph(og, g, 1);
+
+	dump_sat(og);
 
 	for (i = 0; i < n_cds; ++i) {
 		/*fprintf(stderr, "%s\n", ctgs->seq[i>>1].name);*/
@@ -188,7 +191,7 @@ int buildg(char *fn, char *edge_fn, int min_wt, int use_sat)
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] releasing memory\n", __func__);
 #endif
-	graph_destroy(g);
+	graph_destroy(og);
 	return 0;
 
 }

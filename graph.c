@@ -837,7 +837,6 @@ int set_c(graph_t *g, char *s)
 graph_t *load_sat(char *fn) 
 {
 	graph_t *g = graph_init();
-	
 	kstream_t *ks;
 	gzFile fp;
 	fp = fn && strcmp(fn, "-")? gzopen(fn, "r") : gzdopen(fileno(stdin), "r");

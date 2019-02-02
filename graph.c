@@ -286,7 +286,7 @@ uint32_t add_path(graph_t *g, char *name,  uint32_t *nodes, uint32_t n, uint32_t
 	uint32_t pn = ps->n;
 	if (!pname) {
 		//this is a new path it's name hasn't been initiated yet
-		pname = malloc(sizeof(char) * 8) // path name length is 7;
+		pname = malloc(sizeof(char) * 8); // path name length is 7;
 		do {
 			sprintf(pname, "%c%06u%c", is_circ ? 'c':'u', n, 0);	
 			++n;	
@@ -326,9 +326,9 @@ int add_asm(graph_t *g, char *name,  uint32_t *nodes, uint32_t n)
 	uint32_t an = as->n;
 	if (!aname) {
 		//this is a new path it's name hasn't been initiated yet
-		aname = malloc(sizeof(char) * 7) // path name length is 7;
+		aname = malloc(sizeof(char) * 7);// path name length is 7
 		do {
-			sprintf(pname, "a%05u%c", n, 0);	
+			sprintf(aname, "a%05u%c", n, 0);	
 			++n;	
 		} while (kh_get(str, h, aname) == kh_end(h)); 
 	} else {

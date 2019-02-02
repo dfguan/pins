@@ -31,7 +31,8 @@
 
 typedef struct {
 	/*int mq:15, rev:1, as:16;*/
-	uint32_t s, ns, tid, ntid;
+	uint32_t s, ns;
+   	uint32_t tid:31, rev:1;
 }aln_inf_t;
 
 uint32_t check_left_half(uint32_t le, uint32_t rs, uint32_t p) // 1 for left half 0 for right half 2 for middle
@@ -142,33 +143,76 @@ int core(char *snps_fn, char *edge_fn)
 */
 int col_joints(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, sdict_t *scfs, cdict_t *cs)
 {
-	if (a_cnt == 2) {
-		uint32_t ind1 = a[0].tid; //maybe not well paired up
-		uint32_t ind2 = a[1].tid;
-		if (ind1 == ind2) return 1;
-		/*fprintf(stderr, "%u\t%u\n", ind1, ind2);*/
-		/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
-		uint32_t is_l1 = check_left_half(ctgs->seq[ind1].le, ctgs->seq[ind1].rs, a[0].s);
-		if (is_l1 > 1) return 1; //middle won't be added
-		uint32_t is_l2 = check_left_half(ctgs->seq[ind2].le, ctgs->seq[ind2].rs, a[1].s);
-		if (is_l2 > 1) return 1; //middle won't be added
-		
-		cd_add(&cs[ind1<<1|is_l1], ctgs->seq[ind2].name, is_l2, is_l2?ctgs->seq[ind2].l_snp_n:ctgs->seq[ind2].r_snp_n);		
-		cd_add(&cs[ind2<<1|is_l2], ctgs->seq[ind1].name, is_l1, is_l1?ctgs->seq[ind1].l_snp_n:ctgs->seq[ind1].r_snp_n);		
-		return 0;
-	} else if (f_cnt == 2){
-		uint32_t ind1 = f[0].tid;
-		uint32_t ind2 = f[1].tid;
-		if (ind1 == ind2) return 1;
-		/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
-		uint32_t is_l1 = check_left_half(ctgs->seq[ind1].le, ctgs->seq[ind1].rs, f[0].s);
-		if (is_l1 > 1) return 1; //middle won't be added
-		uint32_t is_l2 = check_left_half(ctgs->seq[ind2].le, ctgs->seq[ind2].rs, f[1].s);
-		if (is_l2 > 1) return 1; //middle won't be added
-		
-		cd_add(&cs[ind1<<1|is_l1], ctgs->seq[ind2].name, is_l2, is_l2?ctgs->seq[ind2].l_snp_n:ctgs->seq[ind2].r_snp_n);		
-		cd_add(&cs[ind2<<1|is_l2], ctgs->seq[ind1].name, is_l1, is_l1?ctgs->seq[ind1].l_snp_n:ctgs->seq[ind1].r_snp_n);		
-		return 0;	
+	if (scfs) {
+		if (a_cnt == 2) {
+			sd_seq_t *sq1 = &ctgs->seq[a[0].tid];
+			sd_seq_t *sq2 = &ctgs->seq[a[1].tid];
+
+			uint32_t ind1 = sq1->le; //maybe not well paired up
+			uint32_t ind2 = sq2->le;
+			if (ind1 == ind2) return 1;
+			/*fprintf(stderr, "%u\t%u\n", ind1, ind2);*/
+			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
+			uint32_t a0s = sq1->l_snp_n == a[0].rev ? sq1->rs + a[0].s : sq1->rs + sq1->len - a[0].s; 
+			uint32_t a1s = sq1->l_snp_n == a[1].rev ? sq1->rs + a[1].s : sq1->rs + sq1->len - a[1].s; 
+			uint32_t is_l1 = check_left_half(scfs->seq[ind1].le, scfs->seq[ind1].rs, a0s);
+			if (is_l1 > 1) return 1; //middle won't be added
+			uint32_t is_l2 = check_left_half(scfs->seq[ind2].le, scfs->seq[ind2].rs, a1s);
+			if (is_l2 > 1) return 1; //middle won't be added
+			
+			cd_add(&cs[ind1<<1|is_l1], scfs->seq[ind2].name, is_l2, is_l2?scfs->seq[ind2].l_snp_n:scfs->seq[ind2].r_snp_n);		
+			cd_add(&cs[ind2<<1|is_l2], scfs->seq[ind1].name, is_l1, is_l1?scfs->seq[ind1].l_snp_n:scfs->seq[ind1].r_snp_n);		
+			return 0;
+		} else if (f_cnt == 2){
+			sd_seq_t *sq1 = &ctgs->seq[f[0].tid];
+			sd_seq_t *sq2 = &ctgs->seq[f[1].tid];
+			uint32_t ind1 = sq1->le; //maybe not well paired up
+			uint32_t ind2 = sq2->le;
+			if (ind1 == ind2) return 1;
+			/*fprintf(stderr, "%u\t%u\n", ind1, ind2);*/
+			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
+			uint32_t f0s = sq1->l_snp_n == f[0].rev ? sq1->rs + f[0].s : sq1->rs + sq1->len - f[0].s; 
+			uint32_t f1s = sq1->l_snp_n == f[1].rev ? sq1->rs + f[1].s : sq1->rs + sq1->len - f[1].s; 
+			uint32_t is_l1 = check_left_half(scfs->seq[ind1].le, scfs->seq[ind1].rs, f0s);
+			if (is_l1 > 1) return 1; //middle won't be added
+			uint32_t is_l2 = check_left_half(scfs->seq[ind2].le, scfs->seq[ind2].rs, f1s);
+			if (is_l2 > 1) return 1; //middle won't be added
+			
+			cd_add(&cs[ind1<<1|is_l1], scfs->seq[ind2].name, is_l2, is_l2?scfs->seq[ind2].l_snp_n:scfs->seq[ind2].r_snp_n);		
+			cd_add(&cs[ind2<<1|is_l2], scfs->seq[ind1].name, is_l1, is_l1?scfs->seq[ind1].l_snp_n:scfs->seq[ind1].r_snp_n);		
+			return 0;	
+		}
+	} else {
+		if (a_cnt == 2) {
+			uint32_t ind1 = a[0].tid; //maybe not well paired up
+			uint32_t ind2 = a[1].tid;
+			if (ind1 == ind2) return 1;
+			/*fprintf(stderr, "%u\t%u\n", ind1, ind2);*/
+			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
+			uint32_t is_l1 = check_left_half(ctgs->seq[ind1].le, ctgs->seq[ind1].rs, a[0].s);
+			if (is_l1 > 1) return 1; //middle won't be added
+			uint32_t is_l2 = check_left_half(ctgs->seq[ind2].le, ctgs->seq[ind2].rs, a[1].s);
+			if (is_l2 > 1) return 1; //middle won't be added
+			
+			cd_add(&cs[ind1<<1|is_l1], ctgs->seq[ind2].name, is_l2, is_l2?ctgs->seq[ind2].l_snp_n:ctgs->seq[ind2].r_snp_n);		
+			cd_add(&cs[ind2<<1|is_l2], ctgs->seq[ind1].name, is_l1, is_l1?ctgs->seq[ind1].l_snp_n:ctgs->seq[ind1].r_snp_n);		
+			return 0;
+		} else if (f_cnt == 2){
+			uint32_t ind1 = f[0].tid;
+			uint32_t ind2 = f[1].tid;
+			if (ind1 == ind2) return 1;
+			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
+			uint32_t is_l1 = check_left_half(ctgs->seq[ind1].le, ctgs->seq[ind1].rs, f[0].s);
+			if (is_l1 > 1) return 1; //middle won't be added
+			uint32_t is_l2 = check_left_half(ctgs->seq[ind2].le, ctgs->seq[ind2].rs, f[1].s);
+			if (is_l2 > 1) return 1; //middle won't be added
+			
+			cd_add(&cs[ind1<<1|is_l1], ctgs->seq[ind2].name, is_l2, is_l2?ctgs->seq[ind2].l_snp_n:ctgs->seq[ind2].r_snp_n);		
+			cd_add(&cs[ind2<<1|is_l2], ctgs->seq[ind1].name, is_l1, is_l1?ctgs->seq[ind1].l_snp_n:ctgs->seq[ind1].r_snp_n);		
+			return 0;	
+		}
+	
+	
 	}
 	return 1;
 }
@@ -247,17 +291,18 @@ int proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, cdict_t **c
 				if (cur_qn) ++rdp_counter, free(cur_qn); 
 				cur_qn = strdup(bam1_qname(b));
 			}
-			if (b->core.flag & 0x4 || b->core.flag & 0x8 || b->core.qual < min_mq || b->core.tid == b->core.mtid) continue; //not aligned
-			rev = !!(b->core.flag & 0x10);
-			uint32_t *cigar = bam1_cigar(b);
-			//only collects five prime
+			if (b->core.flag & 0x4 || b->core.qual < min_mq) continue; //not aligned
 			aln_inf_t tmp;
+			tmp.rev = !!(b->core.flag & 0x10);
+			/*tmp.nrev = !!(b->core.flag & 0x20);*/
+			//only collects five prime
 			tmp.tid = b->core.tid;
-			tmp.ntid = b->core.mtid;
+			/*tmp.ntid = b->core.mtid;*/
 			tmp.s = b->core.pos + 1;
-			tmp.ns = b->core.mpos + 1;
+			/*tmp.ns = b->core.mpos + 1;*/
 			kv_push(aln_inf_t, all, tmp);
 			
+			uint32_t *cigar = bam1_cigar(b);
 			if ((rev && bam_cigar_op(cigar[0]) == BAM_CMATCH) || (!rev && bam_cigar_op(cigar[b->core.n_cigar-1]) == BAM_CMATCH)) 
 				kv_push(aln_inf_t, five, tmp);
 			
@@ -341,7 +386,7 @@ int init_scaffs(graph_t *g, sdict_t *ctgs, sdict_t *scfs)
 	return 0;
 }
 
-int col_ctgs(char *bam_fn, sdict_t *ctgs, uint32_t ws)
+int chl_col_ctgs(char *bam_fn, sdict_t *ctgs, uint32_t ws)
 {
 	bamFile fp;
 	bam_header_t *h;
@@ -359,7 +404,6 @@ int col_ctgs(char *bam_fn, sdict_t *ctgs, uint32_t ws)
 	/*for ( i = 0; i < h->n_targets; ++i) */
 		/*sd_put(ctgs, h->target_name[i], h->target_len[i]);*/
 		/*ctg_pos_push(d, i);*/
-	int i;
 	//50k
 	/*uint32_t cur_ws;*/
 	/*for ( i = 0; i < h->n_targets; ++i) {*/
@@ -373,6 +417,7 @@ int col_ctgs(char *bam_fn, sdict_t *ctgs, uint32_t ws)
 		/*lenl = lenr = cur_ws;*/
 		/*sd_put2(ctgs, name, len, le, rs, lenl, lenr);*/
 	/*}*/
+	int i;
 	for ( i = 0; i < h->n_targets; ++i) {
 		char *name = h->target_name[i];
 		uint32_t len = h->target_len[i];
@@ -411,11 +456,10 @@ int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t wi
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] initiate contigs\n", __func__);
 #endif
-	col_ctgs(bam_fn[0], ctgs, win_s);	
+	chl_col_ctgs(bam_fn[0], ctgs, win_s);	
 	if (!ctgs) {
 		fprintf(stderr, "[E::%s] fail to collect contigs\n", __func__);	
 		return 1;
-	
 	} 
 	if (sat_fn) {
 #ifdef VERBOSE

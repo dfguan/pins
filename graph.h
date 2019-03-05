@@ -79,6 +79,8 @@ typedef struct {
 
 #define edges(g, v) ((g)->eg.edges + (g->eg.edge_idx[(v)] >> 32))
 #define edge_n(g, v) ((uint32_t)g->eg.edge_idx[(v)])
+#define vtx_idx(v) (((v) >> 1) | ((v) & 1)) //convert edge pointer to 
+
 #ifdef __cplusplus 
 extern "C" {
 #endif
@@ -99,6 +101,7 @@ extern "C" {
 	graph_t  *load_sat(char *fn);
 	int get_path(graph_t *g, uint32_t minl);
 	int read_seq(graph_t *g, char *fn);
+	uint32_t *parse_path(graph_t *g, uint32_t pid, uint32_t *n);
 #ifdef __cplusplus
 }
 #endif

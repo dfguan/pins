@@ -115,12 +115,14 @@ int out_edges(graph_t *g, int all)
 {
 	vertex_t *vs = g->vtx.vertices;
 	edge_t *edg = g->eg.edges;
+	path_t *pt = g->pt.paths;
 	uint32_t n_edges = g->eg.n;		
 	if (all) n_edges += g->eg.n_del;	
 	uint32_t i;
 	for ( i = 0; i < n_edges; ++i) {
 		uint32_t v = edg[i].v, w = edg[i].w;
-		if (v>>1 != w >> 1) fprintf(stdout, "L\t%s\t%c\t%s\t%c\t%s\twt:%u\n", vs[v>>2].name, v&1?'+':'-', vs[w>>2].name, w&1?'+':'-', "*", edg[i].wt); // + head of sequence - tail of sequqnce	
+		
+		if (v>>2 > w >> 2) fprintf(stdout, "L\t%s\t%c\t%s\t%c\t%s\twt:%u\n", v>>1 & 1 ? pt[v>>2].name : vs[v>>2].name, v&1?'+':'-', w>>1 & 1 ? pt[w>>2].name : vs[w>>2].name, w&1?'+':'-', "*", edg[i].wt); // + head of sequence - tail of sequqnce	
 	}
 	return 0;
 }
@@ -133,15 +135,19 @@ int out_paths(graph_t *g)
 	uint32_t i;	
 	for ( i = 0; i < n_p; ++i) {
 		uint32_t j;
-		if (!p[i].name) fprintf(stdout, "P\t%c%06u\t", p[i].is_circ?'c':'u',i); //check before output use the same name?
-		else fprintf(stdout, "P\t%s\t", p[i].name);
+		if (!p[i].name) 
+			fprintf(stdout, "P\t%c%06u\t", p[i].is_circ?'c':'u',i); //check before output use the same name?
+		else 
+			fprintf(stdout, "P\t%s\t", p[i].name);
 		uint32_t v;	
+		/*fprintf(stderr, "%d\n", p[i].n);*/
 		for ( j = 0; j + 1 < p[i].n; ++j)  {
 			v = p[i].ns[j];
-			fprintf(stdout, "%s%c,", vs[v>>1].name, v&1?'+':'-'); // + head of sequence - tail of sequqnce	
+			fprintf(stdout, "%s%c,", v>>1 & 1 ? p[v>>2].name : vs[v>>2].name, v&1?'+':'-'); // + head of sequence - tail of sequqnce	
+			/*fprintf(stdout, "%s%c%d\n", vs[v>>2].name, v&1?'+':'-', p[i].n);*/
 		}
 		v = p[i].ns[j];
-		fprintf(stdout, "%s%c\n", vs[v>>1].name, v&1?'+':'-');
+		fprintf(stdout, "%s%c\n", v>>1 & 1 ? p[v>>2].name : vs[v>>2].name, v&1?'+':'-');
 	}
 	return 0;
 }
@@ -152,13 +158,14 @@ int out_asms(graph_t *g)
 	path_t *ps = g->pt.paths;
 	uint32_t n_a = g->as.n;
 	uint32_t i, j;
+	fprintf(stderr, "asm: %d\n", n_a);
 	for ( i = 0; i < n_a; ++i) {
 		fprintf(stdout, "A\t%s\t%u\t", as[i].name, as[i].n);
 		uint32_t t;
 		for ( j = 0; j < as[i].n; ++j ) {
 			t = as[i].pn[j];
-			if (j == as[i].n - 1) fprintf(stdout, "%s\n",ps[t>>2].name);
-			else fprintf(stdout, "%s,",ps[t>>2].name);
+			if (j == as[i].n - 1) fprintf(stdout, "%s\n",ps[t>>1].name);
+			else fprintf(stdout, "%s,",ps[t>>1].name);
 		}
 	}
 	fprintf(stdout, "C\t%s\n", as[g->as.casm].name);
@@ -203,8 +210,8 @@ uint32_t add_node(graph_t *g, char* name, char *seq, uint32_t len)
 		uint32_t ind = kh_val(h, k);
 		if (ind & 1) {
 			//this is a path
-			fprintf(stderr, "[W::%s] %s is a path\n", __func__, name);
-			return -1;		
+			/*fprintf(stderr, "[W::%s] %s is a path\n", __func__, name);*/
+			return ind;		
 		} 
 		ind = ind >> 1;
 		if (seq && !g->vtx.vertices[ind].seq) g->vtx.vertices[ind].seq = strdup(seq);
@@ -212,9 +219,10 @@ uint32_t add_node(graph_t *g, char* name, char *seq, uint32_t len)
 	}	
 	return kh_val(h, k);
 }
-
+//only used for new graph don't mix path with vertex
 int idx_edge(graph_t *g)
 {
+	fprintf(stderr, "indexing edges\n");
 	uint32_t n_vtx = g->vtx.n;
 	if (!g->eg.edge_idx) g->eg.edge_idx = calloc(n_vtx<<1, sizeof(uint64_t));
 	
@@ -232,7 +240,7 @@ int idx_edge(graph_t *g)
 				/*fprintf(stderr, "%u\n", i);*/
 			if (i == n_edges || es->edges[i].v != es->edges[j].v) {
 				/*fprintf(stderr, "%u\n", es->edges[j].v);*/
-				idx[es->edges[j].v] = (uint64_t) j << 32 | (i - j);	
+				idx[vtx_idx(es->edges[j].v)] = (uint64_t) j << 32 | (i - j);	
 				j = i;	
 			}
 		}
@@ -267,10 +275,10 @@ int add_dedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, ui
 {
 	uint32_t sind = add_node(g, sname, 0, 0);
 	uint32_t eind = add_node(g, ename, 0, 0);
-	
 	edge_t e = (edge_t) {sind << 1 | sl, eind << 1 | er, wt, 0, 0};
 	/*edge_t re = (edge_t) {eind << 1 | er, sind << 1 | sl, wt, 0, 0}; //undirect graph*/
-	
+	/*fprintf(stderr, "%s %s\n", sname, ename);	*/
+	/*fprintf(stderr, "EDGE %u\t%u\n",sind<<1|sl, eind << 1 | er);	*/
 	add_edge1(g, &e);
 	/*add_edge1(g, &re);*/
 	return 0;
@@ -288,9 +296,9 @@ uint32_t add_path(graph_t *g, char *name,  uint32_t *nodes, uint32_t n, uint32_t
 		//this is a new path it's name hasn't been initiated yet
 		pname = malloc(sizeof(char) * 8); // path name length is 7;
 		do {
-			sprintf(pname, "%c%06u%c", is_circ ? 'c':'u', n, 0);	
-			++n;	
-		} while (kh_get(str, h, pname) == kh_end(h)); 
+			sprintf(pname, "%c%06u%c", is_circ ? 'c':'u', pn, 0);	
+			++pn;	
+		} while (kh_get(str, h, pname) != kh_end(h)); 
 	} else {
 		pname = malloc(sizeof(char) * (strlen(name) + 1));
 		strcpy(pname, name);
@@ -328,9 +336,9 @@ int add_asm(graph_t *g, char *name,  uint32_t *nodes, uint32_t n)
 		//this is a new path it's name hasn't been initiated yet
 		aname = malloc(sizeof(char) * 7);// path name length is 7
 		do {
-			sprintf(aname, "a%05u%c", n, 0);	
-			++n;	
-		} while (kh_get(str, h, aname) == kh_end(h)); 
+			sprintf(aname, "a%05u%c", an, 0);	
+			++an;	
+		} while (kh_get(str, h, aname) != kh_end(h)); 
 	} else {
 		aname = malloc(sizeof(char) * (strlen(name) + 1));
 		strcpy(aname, name);
@@ -358,8 +366,9 @@ int add_asm(graph_t *g, char *name,  uint32_t *nodes, uint32_t n)
 
 int del_r(graph_t *g, edge_t *a) // remove reverse edge
 {
-	edge_t *e = edges(g, a->w);
-	uint32_t ne = edge_n(g, a->w);
+	uint32_t v_idx = vtx_idx(a->w);
+	edge_t *e = edges(g, v_idx);
+	uint32_t ne = edge_n(g, v_idx);
 	edge_t *i;
 	for ( i = e; i < e + ne; ++i) {
 		if (i->w == a->v) {
@@ -415,9 +424,9 @@ int join_ends(graph_t *g)
 	
 	uint32_t i;
 	for ( i = 0; i < n_vtx << 1; i+=2) {
-		edge_t e = (edge_t) {i, i+1, 1000, 0, 0};	
+		edge_t e = (edge_t) {(i<<1), (i<<1)+1, 1000, 0, 0};	
 		add_edge1(g, &e);
-		edge_t re = (edge_t) {i+1, i, 1000, 0, 0};
+		edge_t re = (edge_t) {(i<<1)+1, i<<1, 1000, 0, 0};
 		add_edge1(g, &re);
 	}
 	fprintf(stderr, "[M::%s] %u edges\n", __func__, g->eg.n);
@@ -442,7 +451,8 @@ int update_graph(graph_t *g) // update index
 			++n_del;
 		}	
 	}
-	fprintf(stderr, "%u edges, %u del\n", n_edges, n_del);	
+	fprintf(stderr, "[M::%s] %u vertices\n", __func__, g->vtx.n);	
+	fprintf(stderr, "[M::%s] %u edges, %u del\n", __func__, n_edges, n_del);	
 	g->eg.n -= n_del;
 	idx_edge(g);
 	return 0;
@@ -451,8 +461,8 @@ int update_graph(graph_t *g) // update index
 
 int vis_r(graph_t *g, edge_t *a)
 {
-	edge_t *e = edges(g, a->w);
-	uint32_t ne = edge_n(g, a->w);
+	edge_t *e = edges(g, vtx_idx(a->w));
+	uint32_t ne = edge_n(g, vtx_idx(a->w));
 	edge_t *i;
 	for ( i = e; i < e + ne; ++i) {
 		if (i->w == a->v) {
@@ -463,12 +473,12 @@ int vis_r(graph_t *g, edge_t *a)
 	return 0;
 }
 
-
+//no paths graph
 int srch_path(graph_t *g)
 {
-	
+	fprintf(stderr, "[M::%s] traversing graph\n", __func__);	
 	uint32_t n_vtx = g->vtx.n;
-	
+	/*fprintf(stderr, "%d\n", n_vtx);		*/
 	uint8_t *mark = calloc(n_vtx << 1, sizeof(uint8_t));
 	
 	uint32_t i;
@@ -479,18 +489,19 @@ int srch_path(graph_t *g)
 	for ( i = 0; i < n_vtx<<1; ++i) {
 		if (mark[i]) continue;
 		uint32_t p, s;
-		p = s = i; q->count = 0; is_circ = 0;
+		p = s = i; kdq_clean(q); is_circ = 0;
 		while (1) {
 			if (mark[p]) break;
 			else {
 				mark[p] = 1;
+				/*fprintf(stderr, "%d\n", p);*/
 				kdq_push(uint32_t, q, p);				
 			}
 		 //traverse forwardly
+			
 			edge_t *es = edges(g, p);
 			uint32_t es_n = edge_n(g, p);
 			uint32_t j;
-			/*fprintf(stderr, " enter %u\n", es_n);*/
 			for (j = 0; j < es_n; ++j) if (!(es + j)->is_vis) break;
 			/*fprintf(stderr, " leave \n");*/
 			if (j == es_n) break;
@@ -498,13 +509,13 @@ int srch_path(graph_t *g)
 				es = es + j;
 				es->is_vis = 1;
 				vis_r(g, es);
-				p = es->w;
+				p = vtx_idx(es->w);
 			}
 		}
-		/*fprintf(stderr, "2 enter \n");*/
+			/*fprintf(stderr, "ENTER %d %d\n", __LINE__, kdq_size(q));*/
 		if (p != s || kdq_size(q) == 1) {
 			p = s;
-			while (1) { // traverse the other way
+			while (1) { // traverse backwardly 
 				edge_t *es = edges(g, p);
 				uint32_t es_n = edge_n(g, p);
 				uint32_t j;
@@ -515,16 +526,18 @@ int srch_path(graph_t *g)
 					es = es + j;
 					es->is_vis = 1;
 					vis_r(g, es);
-					p = es->w;
+					p = vtx_idx(es->w);
 				}
 				if (mark[p]) break;
 				else {
 					mark[p] = 1;
+					/*fprintf(stderr, "%d\n", p);*/
 					kdq_unshift(uint32_t, q, p);
 				}	
 			}	
 		} else is_circ = 1;
 		//add path
+			/*fprintf(stderr, "ENTER %d %d\n", __LINE__, kdq_size(q));*/
 		if (kdq_size(q) >= 2) {
 			paths_t *pths = &g->pt;
 			if (pths->n == pths->m) {
@@ -534,11 +547,14 @@ int srch_path(graph_t *g)
 			path_t *pth = &pths->paths[pths->n++];
 			pth->name = 0;
 			pth->ns = malloc(sizeof(uint32_t) * (kdq_size(q) >> 1));	
+			/*fprintf(stderr, "ENTER %d %d\n", __LINE__, kdq_size(q));*/
 			uint32_t k, m;
 			for ( k = 0, m = 0; k < kdq_size(q); k += 2, ++m) pth->ns[m] = kdq_at(q, k);
+			/*for ( k = 0; k < m; ++k) fprintf(stderr, "PID: %d\t%d\n", k, pth->ns[k]);*/
 			pth->n = m;
 			pth->is_circ = is_circ;
 		}
+		/*fprintf(stderr, "LEAVE %d\n", __LINE__);*/
 	}
 	return 0;
 }
@@ -549,28 +565,39 @@ int merge_graph(graph_t *g, graph_t *c, int all)
 	uint32_t n_vs = c->vtx.n;
 	
 	uint32_t i;
+	uint32_t *crspid = (uint32_t *)malloc(sizeof(uint32_t) * n_vs);
 	for ( i = 0; i < n_vs; ++i) 
-		add_node(g, vs[i].name, vs[i].seq, vs[i].len);
-	
+		crspid[i] = (add_node(g, vs[i].name, vs[i].seq, vs[i].len)); //could return a path id 
 	edge_t *edg = c->eg.edges;
 	uint32_t n_edges = c->eg.n;		
 	if (all) n_edges += c->eg.n_del;	
 	for ( i = 0; i < n_edges; ++i) {
 		uint32_t v = edg[i].v, w = edg[i].w;
-		add_dedge(g, vs[v>>2].name, v&1, vs[w>>2].name, w&1, edg[i].wt);
+		add_dedge(g, vs[v>>2].name, v&1, vs[w>>2].name, w&1, edg[i].wt);//
 	}
-	
+	/*fprintf(stderr, "path\n");	*/
 	path_t *p = c->pt.paths;
 	uint32_t n_p = c->pt.n;
 	kvec_t(uint32_t) pids;
+	kv_init(pids);
+
 	for ( i = 0; i < n_p; ++i) {
+		uint32_t j;
+		/*fprintf(stderr, "old: %d\t%d\n", j, p[i].n);*/
+		/*for (j = 0; j < p[i].n; ++j) fprintf(stderr, "old: %d\t%d\t%d\n", j, p[i].ns[j], crspid[p[i].ns[j]>>1]);*/
+		for (j = 0; j < p[i].n; ++j) p[i].ns[j] = (crspid[p[i].ns[j]>>1] << 1) | (p[i].ns[j] & 1);
+		/*for (j = 0; j < p[i].n; ++j) fprintf(stderr, "new: %d\t%d\n", j, p[i].ns[j]);*/
+		/*fprintf(stderr, "new: %d\t%d\n", j, p[i].n);*/
 		uint32_t pid = add_path(g, 0, p[i].ns, p[i].n, p[i].is_circ);
 		kv_push(uint32_t, pids, pid);
 	}
 	//add asm
+	/*fprintf(stderr, "asm\n");	*/
 	uint32_t aid = add_asm(g, 0,  pids.a, pids.n);	
 	g->as.casm = aid;
 	graph_destroy(c);
+	kv_destroy(pids);
+	if (crspid) free(crspid);
 	return 0;
 }
 
@@ -631,7 +658,7 @@ int add_e(graph_t *g, char *s)
 			else if (i == 1) d1 = q[0];
 		   	else if (i == 2) n2 = q;
 			else if (i == 3) d2 = q[0];
-			else if (i == 5) wt = strtoul(q, NULL, 10);	
+			else if (i == 5) wt = strtoul(q+3, NULL, 10);	
 			++i, q = p + 1;	
 			if (c == 0) break;	
 		}
@@ -692,12 +719,14 @@ int add_a(graph_t *g, char *s)
 	kvec_t(uint32_t) ns;
 	kv_init(ns);
 	char *nodes_str;
+	int node_n; 
 	for (i = 0, p = q = s + 2;; ++p) {
 		if (*p == 0 || *p == '\t') {
 			int c = *p;
 			*p = 0;
 			if (i == 0) name = q;
-			else if (i == 1) nodes_str = q;
+			else if (i == 1) node_n = atoi(q);
+			else if (i == 2) nodes_str = q;
 			++i, q = p + 1;	
 			if (c == 0) break;	
 		}
@@ -768,20 +797,51 @@ int cp_seq(char *s, char *t, uint32_t len, int is_rc)
 	return 0;
 }
 
+uint32_t *parse_path(graph_t *g, uint32_t pid, uint32_t *n)
+{
+	path_t *pt = g->pt.paths;
+	kvec_t(uint32_t) eles, ctgids;
+	kv_init(eles);
+	kv_init(ctgids);
+	kv_push(uint32_t, eles, pid<<1);
+	/*fprintf(stderr, "Enter %d %d\n", __LINE__, pt->n);*/
+	while (eles.n > 0) {
+		pid = kv_pop(eles);		
+		if (pid >> 1 & 1) {
+			//is a path
+			pt = &pt[pid>>2];
+			int i;
+			if (pid & 1)  // == reverse complementary 
+				for (i = 0; i < pt->n; ++i) 
+					kv_push(uint32_t, eles, pt->ns[i]^1);	
+			 else 
+				for ( i = pt->n - 1; i >= 0; --i) 
+					kv_push(uint32_t, eles, pt->ns[i]);	
+		}else  // is a seq
+			kv_push(uint32_t, ctgids, pid);	
+	}	
+	/*fprintf(stderr, "LEAVE %d\n", __LINE__);*/
+	kv_destroy(eles);
+	*n = kv_size(ctgids);
+	return ctgids.a;
+}
+
 int get_path(graph_t *g, uint32_t min_l)
 {	
-	paths_t *ps = &g->pt;
+	path_t *ps = g->pt.paths;
 	vertex_t *vs = g->vtx.vertices;
+	asm_t *as = &g->as.asms[g->as.casm];
 	uint32_t i, j;
-	for ( i = 0; i < ps->n; ++i) {
-		path_t *p = &ps->paths[i];
-	   	char *ref_nm = p->name;
+	for ( i = 0; i < as->n; ++i) {
+		uint32_t m;
+		uint32_t *p = parse_path(g, as->pn[i], &m);
+	   	char *ref_nm = ps[as->pn[i]>>1].name;
 		uint32_t ref_len = 0; 	
-		for ( j = 0; j < p->n; ++j) {
-			uint32_t seq_len = vs[p->ns[j] >> 1].len;
+		for ( j = 0; j < m; ++j) {
+			uint32_t seq_len = vs[p[j] >> 2].len;
 			if (seq_len) {
 				ref_len += seq_len;//200 'N' s	
-				if (j != p->n - 1) ref_len += 200;
+				if (j != m - 1) ref_len += 200;
 			} else {
 				ref_len = 0;
 				break;
@@ -792,9 +852,9 @@ int get_path(graph_t *g, uint32_t min_l)
 			ref_seq = malloc(sizeof(char) * (ref_len+1));
 			char *s = ref_seq;
 		
-			for (j = 0; j < p->n; ++j) {
-				cp_seq(s, vs[p->ns[j]>> 1].seq, vs[p->ns[j]>>1].len, p->ns[j] & 1) , s += vs[p->ns[j]>>1].len;
-				if (j != p->n - 1) memset(s,'N', 200), s += 200;
+			for (j = 0; j < m; ++j) {
+				cp_seq(s, vs[p[j]>> 2].seq, vs[p[j]>>2].len, p[j] & 1) , s += vs[p[j]>>2].len;
+				if (j != m - 1) memset(s,'N', 200), s += 200;
 			}
 			*s = 0;
 		} 	
@@ -803,6 +863,7 @@ int get_path(graph_t *g, uint32_t min_l)
 			fprintf(stdout, "%s\n",ref_seq);
 			free(ref_seq);		
 		}
+		free(p);
 	}
 	return 0;
 }
@@ -859,7 +920,9 @@ int dump_sat(graph_t *g)
 	fprintf(stdout, "H\tVN:Z:1.0\n");	
 	out_vetices(g);
 	out_edges(g, 0);
+	/*fprintf(stderr, "output paths\n");*/
 	out_paths(g);
+	/*fprintf(stderr, "output asms\n");*/
 	out_asms(g);
 	return 0;
 }

@@ -14,7 +14,9 @@
 #define kdq_size(q) ((q)->count)
 #define kdq_first(q) ((q)->a[(q)->front])
 #define kdq_last(q) ((q)->a[((q)->front + (q)->count - 1) & (q)->mask])
+#define kdq_clean(q) ((q)->count = (q)->front =  0)
 #define kdq_at(q, i) ((q)->a[((q)->front + (i)) & (q)->mask])
+
 
 #define __KDQ_IMPL(type, SCOPE) \
 	SCOPE kdq_##type##_t *kdq_init_##type() \

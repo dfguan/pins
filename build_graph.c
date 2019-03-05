@@ -43,10 +43,11 @@ sdict_t *col_ctgs_from_graph(graph_t *g)
 {
 	sdict_t *ctgs = sd_init();
 	asm_t *ca = &g->as.asms[g->as.casm];
+	path_t *pt = g->pt.paths;
 	uint32_t n = ca->n;
 	uint32_t i;
 	for ( i = 0; i < n; ++i) 
-		sd_put2(ctgs, ca[i].name, 0, 0, 0, 0, 0);
+		sd_put2(ctgs, pt[ca->pn[i]>>1].name, 0, 0, 0, 0, 0);
 	return ctgs;
 }
 
@@ -129,7 +130,6 @@ graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)
 			if (hand_shaking) add_dedge(g, name1, is_l, name2, c->cnts[j].is_l, ocnt * c->cnts[j].cnt);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.
 		}		
 	}	
-	
 	return g;
 }
 
@@ -138,14 +138,18 @@ graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)
 int buildg(char *fn, char *edge_fn, int min_wt, int use_sat)
 {
 	graph_t *og; 
-	sdict_t *ctgs;
+	sdict_t *ctgs = 0;
 	if (use_sat) {
 #ifdef VERBOSE
-	fprintf(stderr, "[M::%s] collecting contigs from sat file\n", __func__);
+		fprintf(stderr, "[M::%s] collecting contigs from sat file\n", __func__);
 #endif
 		og = load_sat(fn);
-				
+		ctgs = col_ctgs_from_graph(og);
 	} else {
+		if (!fn) {
+			fprintf(stderr, "[E::%s] please set reference index file with -c\n", __func__);
+			return 1;
+		}
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] collecting contigs from faidx file\n", __func__);
 #endif
@@ -177,7 +181,14 @@ int buildg(char *fn, char *edge_fn, int min_wt, int use_sat)
 #endif
 	process_graph(g);
 			
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] merging graph\n", __func__);
+#endif
 	merge_graph(og, g, 1);
+
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] output graph\n", __func__);
+#endif
 
 	dump_sat(og);
 
@@ -203,7 +214,7 @@ int main_bldg(int argc, char *argv[])
 	char *sat_fn = 0, *ctg_fn = 0;
 	int use_sat = 0;
 	--argc, ++argv;
-	while (~(c=getopt(argc, argv, "w:h"))) {
+	while (~(c=getopt(argc, argv, "w:s:c:h"))) {
 		switch (c) {
 			case 'w': 
 				min_wt = atoi(optarg);
@@ -232,13 +243,14 @@ help:
 	}
 	char *lnk_fn = argv[optind];
 	fprintf(stderr, "Program starts\n");	
+	int ret;
 	if (use_sat) 
-		buildg(sat_fn, lnk_fn, min_wt, 1);
-	else 
-		buildg(ctg_fn, lnk_fn, min_wt, 0);
+		ret = buildg(sat_fn, lnk_fn, min_wt, 1);
+	else  
+		ret = buildg(ctg_fn, lnk_fn, min_wt, 0);
 
 	fprintf(stderr, "Program ends\n");	
-	return 0;	
+	return ret;	
 
 }
 

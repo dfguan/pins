@@ -143,15 +143,16 @@ int core(char *snps_fn, char *edge_fn)
 */
 int col_joints(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, sdict_t *scfs, cdict_t *cs)
 {
-	if (scfs) {
+	if (scfs->n_seq) {
 		if (a_cnt == 2) {
+			/*fprintf(stderr, "%u\t%u\n", a[0].tid, a[1].tid);*/
 			sd_seq_t *sq1 = &ctgs->seq[a[0].tid];
 			sd_seq_t *sq2 = &ctgs->seq[a[1].tid];
 
 			uint32_t ind1 = sq1->le; //maybe not well paired up
 			uint32_t ind2 = sq2->le;
 			if (ind1 == ind2) return 1;
-			/*fprintf(stderr, "%u\t%u\n", ind1, ind2);*/
+			/*fprintf(stderr, "%s\t%s\t%u\t%u\n", sq1->name, sq2->name, ind1, ind2);*/
 			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
 			uint32_t a0s = sq1->l_snp_n == a[0].rev ? sq1->rs + a[0].s : sq1->rs + sq1->len - a[0].s; 
 			uint32_t a1s = sq1->l_snp_n == a[1].rev ? sq1->rs + a[1].s : sq1->rs + sq1->len - a[1].s; 
@@ -231,7 +232,6 @@ int proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, cdict_t **c
 	
 	h = bam_header_read(fp);
 	b = bam_init1();
-	
 	/*int i;*/
 	/*for ( i = 0; i < h->n_targets; ++i) {*/
 		/*char *name = h->target_name[i];*/
@@ -278,6 +278,7 @@ int proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, cdict_t **c
 	uint8_t rev;
 	uint64_t rdp_counter  = 0;
 	uint64_t used_rdp_counter = 0;
+	/*fprintf(stderr, "Proc Bam %d\n", __LINE__);*/
 	while (1) {
 		//segment were mapped 
 		if (bam_read1(fp, b) >= 0 ) {
@@ -310,6 +311,7 @@ int proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, cdict_t **c
 			/*if ((++bam_cnt % 1000000) == 0) fprintf(stderr, "[M::%s] processing %ld bams\n", __func__, bam_cnt); */
 		} else {
 			if (!col_joints(all.a, all.n, five.a, five.n, ctgs, scfs, *cs)) ++used_rdp_counter;
+			if (cur_qn) ++rdp_counter, free(cur_qn); 
 			break;	
 		}
 	}
@@ -317,7 +319,8 @@ int proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, cdict_t **c
 	bam_destroy1(b);
 	bam_header_destroy(h);
 	bam_close(fp);
-
+	kv_destroy(all);
+	kv_destroy(five);
 	return 0;
 }
 
@@ -331,32 +334,10 @@ int init_ctgs(graph_t *g, sdict_t* ctgs)
 	return 0;
 }
 
-uint32_t *parse_path(graph_t *g, uint32_t pid, uint32_t *n)
-{
-	path_t *pt = &g->pt.paths[pid];
-	kvec_t(uint32_t) eles, ctgids;
-	kv_push(uint32_t, eles, pid);
-	while (eles.n > 0) {
-		pid = kv_pop(eles);		
-		if (pid >> 1 & 1) {
-			//is a path
-			int i;
-			if (pid & 1)  // == reverse complementary 
-				for (i = 0; i < pt[i].n; ++i) 
-					kv_push(uint32_t, eles, pt[i].ns[i]^1);	
-			 else 
-				for ( i = pt[i].n - 1; i >= 0; --i) 
-					kv_push(uint32_t, eles, pt[i].ns[i]);	
-		}else 
-			kv_push(uint32_t, ctgids, pid);	
-	}	
-	kv_destroy(eles);
-	*n = kv_size(ctgids);
-	return ctgids.a;
-}
 
 int init_scaffs(graph_t *g, sdict_t *ctgs, sdict_t *scfs)
 {
+	/*dump_sat(g);*/
 	asm_t *as = &g->as.asms[g->as.casm];
 	vertex_t *vt = g->vtx.vertices;
 	path_t *pt = g->pt.paths;
@@ -364,24 +345,27 @@ int init_scaffs(graph_t *g, sdict_t *ctgs, sdict_t *scfs)
 	uint32_t i;	
 	for ( i = 0; i < n; ++i) {
 		uint32_t m;
+		/*fprintf(stderr, "%d\n", as->pn[i]); */
 		uint32_t *p = parse_path(g, as->pn[i], &m);
 		uint32_t j, len, len_ctg;
 		//push scaffold name to scfs 
-		int32_t scf_id =sd_put2(scfs, pt[as->pn[i]>>2].name, 0, 0, 0, 0, 0);
+		int32_t scf_id =sd_put2(scfs, pt[as->pn[i]>>1].name, 0, 0, 0, 0, 0);
 		for ( j = 0; j < m; ++j ) { // pid, length,   
 			len_ctg = vt[p[j]>>2].len;	
 			uint32_t sid = sd_get(ctgs, vt[p[j]>>2].name);
 			//contig points to scaffold and set its start and direction
+			/*fprintf(stderr, "sid: %u\t%s\t%s\n", sid, pt[as->pn[i]>>1].name, vt[p[j]>>2].name);*/
 			ctgs->seq[sid].le = scf_id;
 			ctgs->seq[sid].rs = len_ctg;
 			ctgs->seq[sid].l_snp_n = p[j] & 1;	
 			if (j == m - 1) 
-				len += vt[p[j]].len;
+				len += len_ctg;
 			else 
 				len += len_ctg + 200;
 		}
 		//reset scaffold length le rs l_snp_n, r_snp_n
-		sd_put2(scfs, pt[as->pn[i]>>2].name, len, len >> 1, (len >>1) + 1, len >> 1, len >> 1);
+		sd_put2(scfs, pt[as->pn[i]>>1].name, len, len >> 1, (len >>1) + 1, len >> 1, len >> 1);
+		free(p);
 	}
 	return 0;
 }
@@ -437,6 +421,7 @@ int init_seqs(char *fn, sdict_t *ctgs, sdict_t *scfs)
 {
 	graph_t *g = load_sat(fn);
 	init_scaffs(g, ctgs, scfs);
+	fprintf(stderr, "init scaffs\n");
 	graph_destroy(g);
 	return 0;
 }
@@ -466,7 +451,7 @@ int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t wi
 	fprintf(stderr, "[M::%s] collect scaffolds\n", __func__);
 #endif
 		init_seqs(sat_fn, ctgs, scfs);	
-		if (!scfs) {
+		if (!scfs->n_seq) {
 			fprintf(stderr, "[E::%s] fail to collect scaffolds\n", __func__);	
 			return 1;
 		} 
@@ -483,10 +468,11 @@ int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t wi
 		if (proc_bam(bam_fn[i], min_mq, ctgs, scfs, &cds)) {
 			return 1;	
 		}	
-	}	
-	uint32_t n_cds = ctgs->n_seq << 1;
+	}
+	sdict_t *_sd = scfs->n_seq ? scfs : ctgs;
+	uint32_t n_cds = _sd->n_seq << 1;
 	/*for (i = 0; i < n_cds; ++i)	cd_norm(cds + i);*/
-	out_matrix(cds, ctgs, n_cds);
+	out_matrix(cds, _sd, n_cds);
 	for (i = 0; i < n_cds; ++i)  cd_destroy(cds +i);	
 	if (cds) free(cds);
 	return 0;
@@ -506,7 +492,7 @@ int main_hic_lnks(int argc, char *argv[])
 	char *sat_fn = 0;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
 	--argc, ++argv;
-	while (~(c=getopt(argc, argv, "q:w:h"))) {
+	while (~(c=getopt(argc, argv, "q:w:s:h"))) {
 		switch (c) {
 			case 'q':
 				min_mq = atoi(optarg);

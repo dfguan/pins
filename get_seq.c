@@ -47,7 +47,7 @@ int main_get_seq(int argc, char *argv[])
 			default:
 				if (c != 'h') fprintf(stderr, "[E::%s] undefined option %c\n", __func__, c);
 		help:	
-				fprintf(stderr, "\nUsage: %s %s [<options>] <GFA> ...\n", program, argv[0]);
+				fprintf(stderr, "\nUsage: %s %s [<options>] <SAT> ...\n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
 				fprintf(stderr, "         -s    STR      sequence source file\n");
 				fprintf(stderr, "         -o    STR      output file [stdout]\n");
@@ -59,12 +59,12 @@ int main_get_seq(int argc, char *argv[])
 	}
 
 	if (optind + 1 > argc) {
-		fprintf(stderr, "[E::%s] Require GFA file", __func__);
+		fprintf(stderr, "[E::%s] Require a SAT file", __func__);
 		goto help;
 	}
-	char *gfa_fn = argv[optind];
+	char *sat_fn = argv[optind];
 	fprintf(stderr, "[M::%s] program starts\n", __func__);
-	graph_t *g = load_gfa(gfa_fn);
+	graph_t *g = load_sat(sat_fn);
 	if (seq_fn) read_seq(g, seq_fn);
 	get_path(g, min_l);
 

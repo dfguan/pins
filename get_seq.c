@@ -21,6 +21,14 @@
 
 #include "graph.h"
 
+int get_seq(char *sat_fn, char *seq_fn, uint32_t min_l, char *out_fn)
+{
+	graph_t *g = load_sat(sat_fn);
+	if (seq_fn) read_seq(g, seq_fn);
+	get_path(g, min_l, out_fn);
+	graph_destroy(g);	
+	return 0;
+}
 
 int main_get_seq(int argc, char *argv[])
 {
@@ -64,11 +72,7 @@ int main_get_seq(int argc, char *argv[])
 	}
 	char *sat_fn = argv[optind];
 	fprintf(stderr, "[M::%s] program starts\n", __func__);
-	graph_t *g = load_sat(sat_fn);
-	if (seq_fn) read_seq(g, seq_fn);
-	get_path(g, min_l);
-
-	graph_destroy(g);	
+	get_seq(sat_fn, seq_fn, min_l, out_fn);
 	fprintf(stderr, "[M::%s] program ends\n", __func__);
 	return 0;
 

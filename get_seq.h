@@ -18,11 +18,12 @@
 
 #ifndef _GET_SEQ_H
 #define _GET_SEQ_H
-
+#include <stdint.h>
 
 #ifdef __cplusplus 
 extern "C" {
 #endif
+int get_seq(char *sat_fn, char *seq_fn, uint32_t min_l, char *out_fn);
 int main_get_seq(int argc, char *argv[]);
 #ifdef __cplusplus
 }

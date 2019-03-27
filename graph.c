@@ -826,12 +826,13 @@ uint32_t *parse_path(graph_t *g, uint32_t pid, uint32_t *n)
 	return ctgids.a;
 }
 
-int get_path(graph_t *g, uint32_t min_l)
+int get_path(graph_t *g, uint32_t min_l, char *fn)
 {	
 	path_t *ps = g->pt.paths;
 	vertex_t *vs = g->vtx.vertices;
 	asm_t *as = &g->as.asms[g->as.casm];
 	uint32_t i, j;
+	FILE *fout = fn ? fopen(fn, "w") : stdout;
 	for ( i = 0; i < as->n; ++i) {
 		uint32_t m;
 		uint32_t *p = parse_path(g, as->pn[i], &m);
@@ -858,13 +859,14 @@ int get_path(graph_t *g, uint32_t min_l)
 			}
 			*s = 0;
 		} 	
-		fprintf(stdout, ">%s_%u\n",ref_nm, ref_len);
+		fprintf(fout, ">%s_%u\n",ref_nm, ref_len);
 		if (ref_seq) {
-			fprintf(stdout, "%s\n",ref_seq);
+			fprintf(fout, "%s\n",ref_seq);
 			free(ref_seq);		
 		}
 		free(p);
 	}
+	if (fn) fclose(fout); 
 	return 0;
 }
 

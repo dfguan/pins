@@ -94,17 +94,20 @@ int get_edge_from_txt(char *links_fn, cdict_t *cds, sdict_t *ctgs)
 */
 
 
-void out_matrix(cdict_t *cds, sdict_t *ctgs, uint32_t n)
+void out_matrix(cdict_t *cds, sdict_t *ctgs, uint32_t n, char *out_fn)
 {
 	uint32_t i;
 	cdict_t *c;
+
+	FILE *fout = out_fn ? fopen(out_fn, "w") : stdout;
 	for ( i = 0; i < n; ++i) {
 		c = cds + i;
 		uint32_t j;
 		for ( j = 0; j < c->n_cnt; ++j) {
-			if (c->cnts[j].cnt) fprintf(stdout, "%s\t%c\t%s\t%c\t%u\t%u\t%u\n", ctgs->seq[i>>1].name, i&1?'+':'-', c->cnts[j].name, j&1?'+':'-', c->cnts[j].cnt, c->cnts[j].snp_n, ctgs->seq[i>>1].l_snp_n);				
+			if (c->cnts[j].cnt) fprintf(fout, "%s\t%c\t%s\t%c\t%u\t%u\t%u\n", ctgs->seq[i>>1].name, i&1?'+':'-', c->cnts[j].name, j&1?'+':'-', c->cnts[j].cnt, c->cnts[j].snp_n, ctgs->seq[i>>1].l_snp_n);				
 		}	
 	}
+	if (out_fn) fclose(fout);
 }
 
 /*  
@@ -421,7 +424,6 @@ int init_seqs(char *fn, sdict_t *ctgs, sdict_t *scfs)
 {
 	graph_t *g = load_sat(fn);
 	init_scaffs(g, ctgs, scfs);
-	fprintf(stderr, "init scaffs\n");
 	graph_destroy(g);
 	return 0;
 }
@@ -429,7 +431,7 @@ int init_seqs(char *fn, sdict_t *ctgs, sdict_t *scfs)
 
 /*int aa_10x_hic(char *bam_fn, int min_as, int min_mq, int min_cov, float min_cov_rat, int max_cov, float max_cov_rat)*/
 /*int aa_hic(char *bam_fn, int min_as, int min_mq, int min_cov, int max_cov, uint32_t max_ins_len)*/
-int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t win_s)
+int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t win_s, char *out_fn)
 {
 
 	/*uint32_t n_cds = ctgs->n_seq<<1;*/
@@ -446,7 +448,7 @@ int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t wi
 		fprintf(stderr, "[E::%s] fail to collect contigs\n", __func__);	
 		return 1;
 	} 
-	if (sat_fn) {
+	if (sat_fn && *sat_fn) {
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] collect scaffolds\n", __func__);
 #endif
@@ -472,7 +474,7 @@ int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t wi
 	sdict_t *_sd = scfs->n_seq ? scfs : ctgs;
 	uint32_t n_cds = _sd->n_seq << 1;
 	/*for (i = 0; i < n_cds; ++i)	cd_norm(cds + i);*/
-	out_matrix(cds, _sd, n_cds);
+	out_matrix(cds, _sd, n_cds, out_fn);
 	for (i = 0; i < n_cds; ++i)  cd_destroy(cds +i);	
 	if (cds) free(cds);
 	return 0;
@@ -489,7 +491,7 @@ int main_hic_lnks(int argc, char *argv[])
 	/*uint32_t max_ins_len = 10000;*/
 	uint32_t win_s = 50000;
 	char *program;
-	char *sat_fn = 0;
+	char *sat_fn = 0, *out_fn = 0;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
 	--argc, ++argv;
 	while (~(c=getopt(argc, argv, "q:w:s:h"))) {
@@ -503,6 +505,9 @@ int main_hic_lnks(int argc, char *argv[])
 			case 's':
 				sat_fn  = optarg;
 				break;
+			case 'o':
+				out_fn  = optarg;
+				break;
 			default:
 				if (c != 'h') fprintf(stderr, "[E::%s] undefined option %c\n", __func__, c);
 help:	
@@ -511,6 +516,7 @@ help:
 				fprintf(stderr, "         -q    INT      minimum alignment quality [0]\n");
 				fprintf(stderr, "         -w    INT      window size [50000]\n");
 				fprintf(stderr, "         -s    STR      sat file\n");
+				fprintf(stderr, "         -o    STR      output file\n");
 				fprintf(stderr, "         -h             help\n");
 				return 1;	
 		}		
@@ -521,7 +527,7 @@ help:
 	char **bam_fn = &argv[optind];
 	int n_bam = argc - optind;
 	fprintf(stderr, "Program starts\n");	
-	col_hic_lnks(sat_fn, bam_fn, n_bam, min_mq, win_s);
+	col_hic_lnks(sat_fn, bam_fn, n_bam, min_mq, win_s, out_fn);
 	fprintf(stderr, "Program ends\n");	
 	return 0;	
 }

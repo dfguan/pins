@@ -93,7 +93,7 @@ extern "C" {
 	int out_graph(graph_t *g); // print path
 	int process_graph(graph_t *g);
 	int merge_graph(graph_t *g, graph_t *c, int all);
-	int dump_sat(graph_t *g);
+	int dump_sat(graph_t *g, char *fn);
 	uint32_t get_name2id(graph_t *g, char *nm);
 	int chk_edge(uint32_t id1, uint32_t id2);
 //gfa 

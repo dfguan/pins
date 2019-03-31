@@ -99,19 +99,19 @@ void graph_destroy(graph_t *g)
 }
 
 
-int out_vetices(graph_t *g)
+int out_vetices(graph_t *g, FILE *fout)
 {
 
 	vertex_t *vs = g->vtx.vertices;
 	uint32_t n_vs = g->vtx.n;
 	uint32_t i;
 	for ( i = 0; i < n_vs; ++i) 
-		fprintf(stdout, "S\t%s\t%s\n",  vs[i].name, vs[i].seq ? vs[i].seq : "*");
+		fprintf(fout, "S\t%s\t%s\n",  vs[i].name, vs[i].seq ? vs[i].seq : "*");
 	
 	return 0;
 }
 
-int out_edges(graph_t *g, int all)
+int out_edges(graph_t *g, int all, FILE *fout)
 {
 	vertex_t *vs = g->vtx.vertices;
 	edge_t *edg = g->eg.edges;
@@ -121,13 +121,12 @@ int out_edges(graph_t *g, int all)
 	uint32_t i;
 	for ( i = 0; i < n_edges; ++i) {
 		uint32_t v = edg[i].v, w = edg[i].w;
-		
-		if (v>>2 > w >> 2) fprintf(stdout, "L\t%s\t%c\t%s\t%c\t%s\twt:%u\n", v>>1 & 1 ? pt[v>>2].name : vs[v>>2].name, v&1?'+':'-', w>>1 & 1 ? pt[w>>2].name : vs[w>>2].name, w&1?'+':'-', "*", edg[i].wt); // + head of sequence - tail of sequqnce	
+		if (v>>2 > w >> 2) fprintf(fout, "L\t%s\t%c\t%s\t%c\t%s\twt:%u\n", v>>1 & 1 ? pt[v>>2].name : vs[v>>2].name, v&1?'+':'-', w>>1 & 1 ? pt[w>>2].name : vs[w>>2].name, w&1?'+':'-', "*", edg[i].wt); // + head of sequence - tail of sequqnce	
 	}
 	return 0;
 }
 
-int out_paths(graph_t *g)
+int out_paths(graph_t *g, FILE *fout)
 {
 	vertex_t *vs = g->vtx.vertices;
 	path_t *p = g->pt.paths;
@@ -136,48 +135,43 @@ int out_paths(graph_t *g)
 	for ( i = 0; i < n_p; ++i) {
 		uint32_t j;
 		if (!p[i].name) 
-			fprintf(stdout, "P\t%c%06u\t", p[i].is_circ?'c':'u',i); //check before output use the same name?
+			fprintf(fout, "P\t%c%06u\t", p[i].is_circ?'c':'u',i); //check before output use the same name?
 		else 
-			fprintf(stdout, "P\t%s\t", p[i].name);
+			fprintf(fout, "P\t%s\t", p[i].name);
 		uint32_t v;	
 		/*fprintf(stderr, "%d\n", p[i].n);*/
-		for ( j = 0; j + 1 < p[i].n; ++j)  {
+		for ( j = 0; j < p[i].n; ++j)  {
 			v = p[i].ns[j];
-			fprintf(stdout, "%s%c,", v>>1 & 1 ? p[v>>2].name : vs[v>>2].name, v&1?'+':'-'); // + head of sequence - tail of sequqnce	
-			/*fprintf(stdout, "%s%c%d\n", vs[v>>2].name, v&1?'+':'-', p[i].n);*/
+			fprintf(fout, "%s%c%c", v>>1 & 1 ? p[v>>2].name : vs[v>>2].name, v&1?'+':'-', j + 1 == p[i].n ? '\n' : ','); // + head of sequence - tail of sequqnce	
 		}
-		v = p[i].ns[j];
-		fprintf(stdout, "%s%c\n", v>>1 & 1 ? p[v>>2].name : vs[v>>2].name, v&1?'+':'-');
 	}
 	return 0;
 }
 
-int out_asms(graph_t *g)
+int out_asms(graph_t *g, FILE *fout)
 {
 	asm_t *as = g->as.asms;
 	path_t *ps = g->pt.paths;
 	uint32_t n_a = g->as.n;
 	uint32_t i, j;
-	fprintf(stderr, "asm: %d\n", n_a);
 	for ( i = 0; i < n_a; ++i) {
-		fprintf(stdout, "A\t%s\t%u\t", as[i].name, as[i].n);
+		fprintf(fout, "A\t%s\t%u\t", as[i].name, as[i].n);
 		uint32_t t;
 		for ( j = 0; j < as[i].n; ++j ) {
 			t = as[i].pn[j];
-			if (j == as[i].n - 1) fprintf(stdout, "%s\n",ps[t>>1].name);
-			else fprintf(stdout, "%s,",ps[t>>1].name);
+			fprintf(fout, "%s%c",ps[t>>1].name, j + 1 == as[i].n ? '\n':',');
 		}
 	}
-	fprintf(stdout, "C\t%s\n", as[g->as.casm].name);
+	fprintf(fout, "C\t%s\n", as[g->as.casm].name);
 	return 0;
 }
 
 int out_graph(graph_t *g)
 {
 	fprintf(stdout, "H\tVN:Z:1.0\n");	
-	out_vetices(g);
-	out_edges(g, 0);
-	out_paths(g);
+	out_vetices(g, stdout);
+	out_edges(g, 0, stdout);
+	out_paths(g, stdout);
 	return 0;
 }
 
@@ -187,6 +181,7 @@ uint32_t get_name2id(graph_t *g, char *nm)
 	khint_t k = kh_get(str, h, nm);
 	return k == kh_end(h) ? -1 : kh_val(h, k);
 }
+//make mistakes when break the order S->P->L 
 uint32_t add_node(graph_t *g, char* name, char *seq, uint32_t len)
 {
 	shash_t *h = (shash_t *)g->h;
@@ -222,7 +217,7 @@ uint32_t add_node(graph_t *g, char* name, char *seq, uint32_t len)
 //only used for new graph don't mix path with vertex
 int idx_edge(graph_t *g)
 {
-	fprintf(stderr, "indexing edges\n");
+	/*fprintf(stderr, "indexing edges\n");*/
 	uint32_t n_vtx = g->vtx.n;
 	if (!g->eg.edge_idx) g->eg.edge_idx = calloc(n_vtx<<1, sizeof(uint64_t));
 	
@@ -320,7 +315,7 @@ uint32_t add_path(graph_t *g, char *name,  uint32_t *nodes, uint32_t n, uint32_t
 		kh_val(h, k) = (ps->n<<1 | 1);
 		++ps->n;	
 	} else 
-		fprintf(stderr, "[W::%s] path has been added\n", __func__);
+		fprintf(stderr, "[W::%s] path name %s has been added\n", __func__, pname);
 	if (pname) free(pname);
 	return kh_val(h, k);
 }
@@ -799,22 +794,27 @@ int cp_seq(char *s, char *t, uint32_t len, int is_rc)
 
 uint32_t *parse_path(graph_t *g, uint32_t pid, uint32_t *n)
 {
-	path_t *pt = g->pt.paths;
+	path_t *pts = g->pt.paths;
 	kvec_t(uint32_t) eles, ctgids;
 	kv_init(eles);
 	kv_init(ctgids);
 	kv_push(uint32_t, eles, pid<<1);
-	/*fprintf(stderr, "Enter %d %d\n", __LINE__, pt->n);*/
+	/*fprintf(stderr, "Enter %d %d\n", __LINE__, pts->n);*/
 	while (eles.n > 0) {
 		pid = kv_pop(eles);		
-		if (pid >> 1 & 1) {
+	/*fprintf(stderr, "Enter %d %s %s %d %d\n", __LINE__, pts[pid>>2].name, (pid>>1) & 1 ? "PATH" : "NODE", pts[pid>>2].n, pid);*/
+	/*int j;	*/
+	/*for (j = 0; j < pts[pid>>2].n; ++j) */
+		/*fprintf(stderr, "Enter %d %s %d\n", __LINE__, (pts[pid>>2].ns[j]>>1) & 1 ? "PATH" : "NODE", pts[pid>>2].ns[j]);*/
+		
+		if ((pid >> 1) & 1) {
 			//is a path
-			pt = &pt[pid>>2];
+			path_t *pt = &pts[pid>>2];
 			int i;
 			if (pid & 1)  // == reverse complementary 
 				for (i = 0; i < pt->n; ++i) 
 					kv_push(uint32_t, eles, pt->ns[i]^1);	
-			 else 
+			 else  //forward
 				for ( i = pt->n - 1; i >= 0; --i) 
 					kv_push(uint32_t, eles, pt->ns[i]);	
 		}else  // is a seq
@@ -917,14 +917,16 @@ graph_t *load_sat(char *fn)
 	return g;	
 }
 
-int dump_sat(graph_t *g)
+int dump_sat(graph_t *g, char *fn)
 {
-	fprintf(stdout, "H\tVN:Z:1.0\n");	
-	out_vetices(g);
-	out_edges(g, 0);
+	FILE *fout = fn ? fopen(fn, "w") : stdout;
+	fprintf(fout, "H\tVN:Z:1.0\n");	
+	out_vetices(g, fout);
 	/*fprintf(stderr, "output paths\n");*/
-	out_paths(g);
+	out_paths(g, fout);
 	/*fprintf(stderr, "output asms\n");*/
-	out_asms(g);
+	out_edges(g, 0, fout);
+	out_asms(g, fout);
+	if (fn) fclose(fout);
 	return 0;
 }

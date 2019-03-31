@@ -5,538 +5,1211 @@
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
 AC_KSEQ_H	kseq.h	29;"	d
+AC_KSEQ_H	yeast/pins/kseq.h	29;"	d
 AC_KSORT_H	ksort.h	29;"	d
+AC_KSORT_H	yeast/pins/ksort.h	29;"	d
 AC_KVEC_H	kvec.h	49;"	d
+AC_KVEC_H	yeast/pins/kvec.h	49;"	d
 AC_VERSION_KHASH_H	khash.h	126;"	d
+AC_VERSION_KHASH_H	yeast/pins/khash.h	126;"	d
+ADD	yeast/ld_exp/LDhat/header.h	60;"	d
+AM	yeast/ld_exp/LDhat/random.cc	19;"	d	file:
 BAMLITE_H_	bamlite.h	2;"	d
+BAMLITE_H_	yeast/pins/bamlite.h	2;"	d
 BAM_CDEL	bamlite.h	61;"	d
+BAM_CDEL	yeast/pins/bamlite.h	61;"	d
 BAM_CHARD_CLIP	bamlite.h	64;"	d
+BAM_CHARD_CLIP	yeast/pins/bamlite.h	64;"	d
 BAM_CIGAR_MASK	bamlite.h	49;"	d
+BAM_CIGAR_MASK	yeast/pins/bamlite.h	49;"	d
 BAM_CIGAR_SHIFT	bamlite.h	48;"	d
+BAM_CIGAR_SHIFT	yeast/pins/bamlite.h	48;"	d
 BAM_CIGAR_STR	bamlite.h	47;"	d
+BAM_CIGAR_STR	yeast/pins/bamlite.h	47;"	d
 BAM_CIGAR_TYPE	bamlite.h	50;"	d
+BAM_CIGAR_TYPE	yeast/pins/bamlite.h	50;"	d
 BAM_CINS	bamlite.h	60;"	d
+BAM_CINS	yeast/pins/bamlite.h	60;"	d
 BAM_CMATCH	bamlite.h	59;"	d
+BAM_CMATCH	yeast/pins/bamlite.h	59;"	d
 BAM_CPAD	bamlite.h	65;"	d
+BAM_CPAD	yeast/pins/bamlite.h	65;"	d
 BAM_CREF_SKIP	bamlite.h	62;"	d
+BAM_CREF_SKIP	yeast/pins/bamlite.h	62;"	d
 BAM_CSOFT_CLIP	bamlite.h	63;"	d
+BAM_CSOFT_CLIP	yeast/pins/bamlite.h	63;"	d
 BAM_FDUP	bamlite.h	45;"	d
+BAM_FDUP	yeast/pins/bamlite.h	45;"	d
 BAM_FMREVERSE	bamlite.h	40;"	d
+BAM_FMREVERSE	yeast/pins/bamlite.h	40;"	d
 BAM_FMUNMAP	bamlite.h	38;"	d
+BAM_FMUNMAP	yeast/pins/bamlite.h	38;"	d
 BAM_FPAIRED	bamlite.h	35;"	d
+BAM_FPAIRED	yeast/pins/bamlite.h	35;"	d
 BAM_FPROPER_PAIR	bamlite.h	36;"	d
+BAM_FPROPER_PAIR	yeast/pins/bamlite.h	36;"	d
 BAM_FQCFAIL	bamlite.h	44;"	d
+BAM_FQCFAIL	yeast/pins/bamlite.h	44;"	d
 BAM_FREAD1	bamlite.h	41;"	d
+BAM_FREAD1	yeast/pins/bamlite.h	41;"	d
 BAM_FREAD2	bamlite.h	42;"	d
+BAM_FREAD2	yeast/pins/bamlite.h	42;"	d
 BAM_FREVERSE	bamlite.h	39;"	d
+BAM_FREVERSE	yeast/pins/bamlite.h	39;"	d
 BAM_FSECONDARY	bamlite.h	43;"	d
+BAM_FSECONDARY	yeast/pins/bamlite.h	43;"	d
 BAM_FUNMAP	bamlite.h	37;"	d
+BAM_FUNMAP	yeast/pins/bamlite.h	37;"	d
 BC_LEN	col_10x_lnks.c	30;"	d	file:
+BC_LEN	yeast/pins/col_10x_lnks.c	30;"	d	file:
 BUILD_GRAPH_H	build_graph.h	19;"	d
+BUILD_GRAPH_H	yeast/pins/build_graph.h	19;"	d
 CC	makefile	/^CC      =  gcc$/;"	m
+CC	yeast/ld_exp/LDhat/makefile	/^CC = gcc$/;"	m
+CC	yeast/pins/makefile	/^CC      =  gcc$/;"	m
+CF	yeast/ld_exp/LDhat/pairlk.c	1020;"	d	file:
 CFLAGS	makefile	/^CFLAGS  =  -g -Wall -D VERBOSE -D PRINT_COVERAGE #-O2  $/;"	m
-KDQ_DECLARE	kdq.h	106;"	d
-KDQ_INIT	kdq.h	104;"	d
-KDQ_INIT2	kdq.h	92;"	d
+CFLAGS	yeast/ld_exp/LDhat/makefile	/^CFLAGS =  -O2 -pedantic$/;"	m
+CFLAGS	yeast/pins/makefile	/^CFLAGS  =  -g -Wall -D VERBOSE -D PRINT_COVERAGE #-O2  $/;"	m
+DEBUG	yeast/ld_exp/LDhat/convert.c	3;"	d	file:
+EPS	yeast/ld_exp/LDhat/random.cc	29;"	d	file:
+ERROR_MIN	yeast/ld_exp/LDhat/pairlk.c	242;"	d	file:
+ESS_MIN	yeast/ld_exp/LDhat/pairlk.c	1019;"	d	file:
+EXP_TIMES	yeast/ld_exp/LDhat/pairlk.c	18;"	d	file:
+IA1	yeast/ld_exp/LDhat/random.cc	21;"	d	file:
+IA2	yeast/ld_exp/LDhat/random.cc	22;"	d	file:
+IM1	yeast/ld_exp/LDhat/random.cc	17;"	d	file:
+IM2	yeast/ld_exp/LDhat/random.cc	18;"	d	file:
+IMM1	yeast/ld_exp/LDhat/random.cc	20;"	d	file:
+IQ1	yeast/ld_exp/LDhat/random.cc	23;"	d	file:
+IQ2	yeast/ld_exp/LDhat/random.cc	24;"	d	file:
+IR1	yeast/ld_exp/LDhat/random.cc	25;"	d	file:
+IR2	yeast/ld_exp/LDhat/random.cc	26;"	d	file:
+KDQ_DECLARE	kdq.h	108;"	d
+KDQ_DECLARE	yeast/pins/kdq.h	108;"	d
+KDQ_INIT	kdq.h	106;"	d
+KDQ_INIT	yeast/pins/kdq.h	106;"	d
+KDQ_INIT2	kdq.h	94;"	d
+KDQ_INIT2	yeast/pins/kdq.h	94;"	d
 KHASH_DECLARE	khash.h	357;"	d
+KHASH_DECLARE	yeast/pins/khash.h	357;"	d
 KHASH_INIT	khash.h	365;"	d
+KHASH_INIT	yeast/pins/khash.h	365;"	d
 KHASH_INIT2	khash.h	361;"	d
+KHASH_INIT2	yeast/pins/khash.h	361;"	d
 KHASH_MAP_INIT_INT	khash.h	593;"	d
+KHASH_MAP_INIT_INT	yeast/pins/khash.h	593;"	d
 KHASH_MAP_INIT_INT64	khash.h	608;"	d
+KHASH_MAP_INIT_INT64	yeast/pins/khash.h	608;"	d
 KHASH_MAP_INIT_STR	khash.h	624;"	d
+KHASH_MAP_INIT_STR	yeast/pins/khash.h	624;"	d
 KHASH_SET_INIT_INT	khash.h	585;"	d
+KHASH_SET_INIT_INT	yeast/pins/khash.h	585;"	d
 KHASH_SET_INIT_INT64	khash.h	600;"	d
+KHASH_SET_INIT_INT64	yeast/pins/khash.h	600;"	d
 KHASH_SET_INIT_STR	khash.h	616;"	d
+KHASH_SET_INIT_STR	yeast/pins/khash.h	616;"	d
 KRADIX_SORT_INIT	ksort.h	134;"	d
+KRADIX_SORT_INIT	yeast/pins/ksort.h	134;"	d
 KSEQ_DECLARE	kseq.h	259;"	d
+KSEQ_DECLARE	yeast/pins/kseq.h	259;"	d
 KSEQ_INIT	kseq.h	257;"	d
+KSEQ_INIT	yeast/pins/kseq.h	257;"	d
 KSEQ_INIT2	kseq.h	251;"	d
+KSEQ_INIT2	yeast/pins/kseq.h	251;"	d
 KSORT_INIT	ksort.h	41;"	d
+KSORT_INIT	yeast/pins/ksort.h	41;"	d
 KSORT_INIT_GENERIC	ksort.h	129;"	d
+KSORT_INIT_GENERIC	yeast/pins/ksort.h	129;"	d
 KSORT_INIT_STR	ksort.h	130;"	d
+KSORT_INIT_STR	yeast/pins/ksort.h	130;"	d
 KSORT_SWAP	ksort.h	39;"	d
+KSORT_SWAP	yeast/pins/ksort.h	39;"	d
 KSTREAM_DECLARE	kseq.h	169;"	d
+KSTREAM_DECLARE	yeast/pins/kseq.h	169;"	d
 KSTREAM_INIT	kseq.h	167;"	d
+KSTREAM_INIT	yeast/pins/kseq.h	167;"	d
 KSTREAM_INIT2	kseq.h	159;"	d
+KSTREAM_INIT2	yeast/pins/kseq.h	159;"	d
 KSTRING_T	bed.h	26;"	d
 KSTRING_T	kseq.h	96;"	d
 KSTRING_T	ld_io.h	27;"	d
+KSTRING_T	yeast/pins/bed.h	26;"	d
+KSTRING_T	yeast/pins/kseq.h	96;"	d
+KSTRING_T	yeast/pins/ld_io.h	27;"	d
 KS_SEP_LINE	kseq.h	37;"	d
+KS_SEP_LINE	yeast/pins/kseq.h	37;"	d
 KS_SEP_MAX	kseq.h	38;"	d
+KS_SEP_MAX	yeast/pins/kseq.h	38;"	d
 KS_SEP_SPACE	kseq.h	35;"	d
+KS_SEP_SPACE	yeast/pins/kseq.h	35;"	d
 KS_SEP_TAB	kseq.h	36;"	d
+KS_SEP_TAB	yeast/pins/kseq.h	36;"	d
 LDFLAGS	makefile	/^LDFLAGS = -lz -lm$/;"	m
-PROG	makefile	/^PROG = pin_10x  pin_hic pin_ld$/;"	m
+LDFLAGS	yeast/pins/makefile	/^LDFLAGS = -lz -lm$/;"	m
+LENTYPE	yeast/ld_exp/LDhat/pairlk.c	8;"	d	file:
+LIB	yeast/ld_exp/LDhat/makefile	/^LIB = -lm$/;"	m
+MAXLINE	yeast/ld_exp/LDhat/header.h	64;"	d
+MAXNAME	yeast/ld_exp/LDhat/header.h	63;"	d
+NDIV	yeast/ld_exp/LDhat/random.cc	28;"	d	file:
+NRUN	yeast/ld_exp/LDhat/header.h	59;"	d
+NSHUFF	yeast/ld_exp/LDhat/header.h	58;"	d
+NTAB	yeast/ld_exp/LDhat/random.cc	27;"	d	file:
+OBJ	yeast/ld_exp/LDhat/makefile	/^OBJ = tools.o seqtools.o pairlk.o$/;"	m
+PROG	makefile	/^PROG = pin_10x  pin_hic pin_ld pin_hic_it$/;"	m
+PROG	yeast/pins/makefile	/^PROG = pin_10x  pin_hic pin_ld$/;"	m
+QB_MAX	yeast/ld_exp/LDhat/pairlk.c	19;"	d	file:
+Qmat	yeast/ld_exp/LDhat/pairlk.c	/^void Qmat (double ****Q, double *****Qb, double theta[],int K,int L,int M, double *mu, double **P)$/;"	f
+RHO_MAX	yeast/ld_exp/LDhat/header.h	62;"	d
+RHO_Q	yeast/ld_exp/LDhat/pairlk.c	13;"	d	file:
+RNMX	yeast/ld_exp/LDhat/random.cc	30;"	d	file:
 RS_MIN_SIZE	ksort.h	132;"	d
+RS_MIN_SIZE	yeast/pins/ksort.h	132;"	d
 SDICT_H	sdict.h	2;"	d
+SDICT_H	yeast/pins/sdict.h	2;"	d
+SEQ_MAX	yeast/ld_exp/LDhat/header.h	61;"	d
+TINY	yeast/ld_exp/LDhat/pairlk.c	243;"	d	file:
 USE_VERBOSE_ZLIB_WRAPPERS	bamlite.h	11;"	d
+USE_VERBOSE_ZLIB_WRAPPERS	yeast/pins/bamlite.h	11;"	d
 _BED_H	bed.h	20;"	d
+_BED_H	yeast/pins/bed.h	20;"	d
 _CDICT_H	cdict.h	19;"	d
+_CDICT_H	yeast/pins/cdict.h	19;"	d
 _COL_10X_LNKS_H	col_10x_lnks.h	19;"	d
+_COL_10X_LNKS_H	yeast/pins/col_10x_lnks.h	19;"	d
 _COL_GM_LNKS_H	col_ld_lnks.h	20;"	d
+_COL_GM_LNKS_H	yeast/pins/col_ld_lnks.h	20;"	d
 _COL_HIC_LNKS_H	col_hic_lnks.h	20;"	d
+_COL_HIC_LNKS_H	yeast/pins/col_hic_lnks.h	20;"	d
 _GET_SEQ_H	get_seq.h	20;"	d
+_GET_SEQ_H	yeast/pins/get_seq.h	20;"	d
 _GRAPH_H	graph.h	19;"	d
+_GRAPH_H	yeast/pins/graph.h	19;"	d
 _LD_H	ld.h	2;"	d
+_LD_H	yeast/pins/ld.h	2;"	d
 _LD_IO_H	ld_io.h	19;"	d
+_LD_IO_H	yeast/pins/ld_io.h	19;"	d
 __AC_KDQ_H	kdq.h	2;"	d
+__AC_KDQ_H	yeast/pins/kdq.h	2;"	d
 __AC_KHASH_H	khash.h	118;"	d
-__KDQ_IMPL	kdq.h	19;"	d
+__AC_KHASH_H	yeast/pins/khash.h	118;"	d
+__KDQ_IMPL	kdq.h	21;"	d
+__KDQ_IMPL	yeast/pins/kdq.h	21;"	d
 __KDQ_TYPE	kdq.h	7;"	d
+__KDQ_TYPE	yeast/pins/kdq.h	7;"	d
 __KHASH_IMPL	khash.h	211;"	d
+__KHASH_IMPL	yeast/pins/khash.h	211;"	d
 __KHASH_PROTOTYPES	khash.h	202;"	d
+__KHASH_PROTOTYPES	yeast/pins/khash.h	202;"	d
 __KHASH_TYPE	khash.h	194;"	d
+__KHASH_TYPE	yeast/pins/khash.h	194;"	d
 __KSEQ_BASIC	kseq.h	182;"	d
+__KSEQ_BASIC	yeast/pins/kseq.h	182;"	d
 __KSEQ_READ	kseq.h	202;"	d
+__KSEQ_READ	yeast/pins/kseq.h	202;"	d
 __KSEQ_TYPE	kseq.h	244;"	d
+__KSEQ_TYPE	yeast/pins/kseq.h	244;"	d
 __KS_BASIC	kseq.h	60;"	d
+__KS_BASIC	yeast/pins/kseq.h	60;"	d
 __KS_GETUNTIL	kseq.h	109;"	d
+__KS_GETUNTIL	yeast/pins/kseq.h	109;"	d
 __KS_INLINED	kseq.h	75;"	d
+__KS_INLINED	yeast/pins/kseq.h	75;"	d
 __KS_TYPE	kseq.h	40;"	d
+__KS_TYPE	yeast/pins/kseq.h	40;"	d
 __ac_HASH_UPPER	khash.h	/^static const double __ac_HASH_UPPER = 0.77;$/;"	v
+__ac_HASH_UPPER	yeast/pins/khash.h	/^static const double __ac_HASH_UPPER = 0.77;$/;"	v
 __ac_Wang_hash	khash.h	/^static kh_inline khint_t __ac_Wang_hash(khint_t key)$/;"	f
+__ac_Wang_hash	yeast/pins/khash.h	/^static kh_inline khint_t __ac_Wang_hash(khint_t key)$/;"	f
 __ac_X31_hash_string	khash.h	/^static kh_inline khint_t __ac_X31_hash_string(const char *s)$/;"	f
+__ac_X31_hash_string	yeast/pins/khash.h	/^static kh_inline khint_t __ac_X31_hash_string(const char *s)$/;"	f
 __ac_fsize	khash.h	173;"	d
+__ac_fsize	yeast/pins/khash.h	173;"	d
 __ac_isdel	khash.h	166;"	d
+__ac_isdel	yeast/pins/khash.h	166;"	d
 __ac_iseither	khash.h	167;"	d
+__ac_iseither	yeast/pins/khash.h	167;"	d
 __ac_isempty	khash.h	165;"	d
+__ac_isempty	yeast/pins/khash.h	165;"	d
 __ac_set_isboth_false	khash.h	170;"	d
+__ac_set_isboth_false	yeast/pins/khash.h	170;"	d
 __ac_set_isdel_false	khash.h	168;"	d
+__ac_set_isdel_false	yeast/pins/khash.h	168;"	d
 __ac_set_isdel_true	khash.h	171;"	d
+__ac_set_isdel_true	yeast/pins/khash.h	171;"	d
 __ac_set_isempty_false	khash.h	169;"	d
+__ac_set_isempty_false	yeast/pins/khash.h	169;"	d
 __kstring_t	bed.h	/^typedef struct __kstring_t {$/;"	s
 __kstring_t	kseq.h	/^typedef struct __kstring_t {$/;"	s
 __kstring_t	ld_io.h	/^typedef struct __kstring_t {$/;"	s
+__kstring_t	yeast/pins/bed.h	/^typedef struct __kstring_t {$/;"	s
+__kstring_t	yeast/pins/kseq.h	/^typedef struct __kstring_t {$/;"	s
+__kstring_t	yeast/pins/ld_io.h	/^typedef struct __kstring_t {$/;"	s
 _skip_aux	bamlite.c	178;"	d	file:
+_skip_aux	yeast/pins/bamlite.c	178;"	d	file:
 aa_hic	aa_hic.c	/^int aa_hic(char **bam_fn, int n_bam, char *gap_fn, int min_mq, int min_cov, int max_cov, uint32_t max_ins_len)$/;"	f
+aa_hic	yeast/pins/aa_hic.c	/^int aa_hic(char **bam_fn, int n_bam, char *gap_fn, int min_mq, int min_cov, int max_cov, uint32_t max_ins_len)$/;"	f
 add_a	graph.c	/^int add_a(graph_t *g, char *s)$/;"	f
+add_a	yeast/pins/graph.c	/^int add_a(graph_t *g, char *s)$/;"	f
 add_asm	graph.c	/^int add_asm(graph_t *g, char *name,  uint32_t *nodes, uint32_t n) $/;"	f
+add_asm	yeast/pins/graph.c	/^int add_asm(graph_t *g, char *name,  uint32_t *nodes, uint32_t n) $/;"	f
 add_dedge	graph.c	/^int add_dedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, uint32_t wt)$/;"	f
+add_dedge	yeast/pins/graph.c	/^int add_dedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, uint32_t wt)$/;"	f
 add_e	graph.c	/^int add_e(graph_t *g, char *s)$/;"	f
+add_e	yeast/pins/graph.c	/^int add_e(graph_t *g, char *s)$/;"	f
 add_edge1	graph.c	/^int add_edge1(graph_t *g, edge_t *e)$/;"	f
+add_edge1	yeast/pins/graph.c	/^int add_edge1(graph_t *g, edge_t *e)$/;"	f
+add_new	yeast/ld_exp/LDhat/pairlk.c	/^void add_new(int *type,int *nd,int *new)$/;"	f
 add_node	graph.c	/^uint32_t add_node(graph_t *g, char* name, char *seq, uint32_t len)$/;"	f
+add_node	yeast/pins/graph.c	/^uint32_t add_node(graph_t *g, char* name, char *seq, uint32_t len)$/;"	f
 add_p	graph.c	/^int add_p(graph_t *g, char *s)$/;"	f
+add_p	yeast/pins/graph.c	/^int add_p(graph_t *g, char *s)$/;"	f
 add_path	graph.c	/^uint32_t add_path(graph_t *g, char *name,  uint32_t *nodes, uint32_t n, uint32_t is_circ) $/;"	f
+add_path	yeast/pins/graph.c	/^uint32_t add_path(graph_t *g, char *name,  uint32_t *nodes, uint32_t n, uint32_t is_circ) $/;"	f
+add_pset	yeast/ld_exp/LDhat/seqtools.c	/^struct site_type ** add_pset(pset) $/;"	f
 add_record	col_ld_lnks.c	/^int add_record(ld_t *r, sdict_t *ctgs, cdict_t *cds)$/;"	f
+add_record	yeast/pins/col_ld_lnks.c	/^int add_record(ld_t *r, sdict_t *ctgs, cdict_t *cds)$/;"	f
 add_s	graph.c	/^int add_s(graph_t *g, char *s)$/;"	f
+add_s	yeast/pins/graph.c	/^int add_s(graph_t *g, char *s)$/;"	f
+add_type	yeast/ld_exp/LDhat/seqtools.c	/^int add_type(pset,cpt,ntc,new) $/;"	f
 add_udedge	graph.c	/^int add_udedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, uint32_t wt)$/;"	f
-aln_inf_t	aa_hic.c	/^}aln_inf_t;$/;"	t	typeref:struct:__anon2	file:
-aln_inf_t	col_10x_lnks.c	/^}aln_inf_t;$/;"	t	typeref:struct:__anon9	file:
+add_udedge	yeast/pins/graph.c	/^int add_udedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, uint32_t wt)$/;"	f
+allele_count	yeast/ld_exp/LDhat/seqtools.c	/^void allele_count(seqs,nseq,lseq,nall) $/;"	f
+aln_inf_t	aa_hic.c	/^}aln_inf_t;$/;"	t	typeref:struct:__anon32	file:
+aln_inf_t	col_10x_lnks.c	/^}aln_inf_t;$/;"	t	typeref:struct:__anon39	file:
 aln_inf_t	col_hic_lnks.c	/^}aln_inf_t;$/;"	t	typeref:struct:__anon1	file:
+aln_inf_t	yeast/pins/aa_hic.c	/^}aln_inf_t;$/;"	t	typeref:struct:__anon3	file:
+aln_inf_t	yeast/pins/col_10x_lnks.c	/^}aln_inf_t;$/;"	t	typeref:struct:__anon10	file:
+aln_inf_t	yeast/pins/col_hic_lnks.c	/^}aln_inf_t;$/;"	t	typeref:struct:__anon2	file:
 anothernorm	build_graph.c	/^int anothernorm(cdict_t *cds, sdict_t *ctgs)$/;"	f
-ary	col_10x_lnks.c	/^	bc_t *ary;$/;"	m	struct:__anon11	file:
-as	aa_hic.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon2	file:
-as	col_10x_lnks.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon9	file:
-as	graph.h	/^	asms_t as;$/;"	m	struct:__anon24
-asm_t	graph.h	/^}asm_t;$/;"	t	typeref:struct:__anon22
-asms	graph.h	/^	asm_t *asms;$/;"	m	struct:__anon23
-asms_t	graph.h	/^} asms_t;$/;"	t	typeref:struct:__anon23
+anothernorm	yeast/pins/build_graph.c	/^int anothernorm(cdict_t *cds, sdict_t *ctgs)$/;"	f
+ary	col_10x_lnks.c	/^	bc_t *ary;$/;"	m	struct:__anon41	file:
+ary	yeast/pins/col_10x_lnks.c	/^	bc_t *ary;$/;"	m	struct:__anon12	file:
+as	aa_hic.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon32	file:
+as	col_10x_lnks.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon39	file:
+as	graph.h	/^	asms_t as;$/;"	m	struct:__anon54
+as	yeast/pins/aa_hic.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon3	file:
+as	yeast/pins/col_10x_lnks.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon10	file:
+as	yeast/pins/graph.h	/^	asms_t as;$/;"	m	struct:__anon25
+asm_t	graph.h	/^}asm_t;$/;"	t	typeref:struct:__anon52
+asm_t	yeast/pins/graph.h	/^}asm_t;$/;"	t	typeref:struct:__anon23
+asms	graph.h	/^	asm_t *asms;$/;"	m	struct:__anon53
+asms	yeast/pins/graph.h	/^	asm_t *asms;$/;"	m	struct:__anon24
+asms_t	graph.h	/^} asms_t;$/;"	t	typeref:struct:__anon53
+asms_t	yeast/pins/graph.h	/^} asms_t;$/;"	t	typeref:struct:__anon24
+avc	yeast/ld_exp/LDhat/header.h	/^	float avc;$/;"	m	struct:data_sum
 bam1_aux	bamlite.h	95;"	d
+bam1_aux	yeast/pins/bamlite.h	95;"	d
 bam1_cigar	bamlite.h	90;"	d
-bam1_core_t	bamlite.h	/^} bam1_core_t;$/;"	t	typeref:struct:__anon13
+bam1_cigar	yeast/pins/bamlite.h	90;"	d
+bam1_core_t	bamlite.h	/^} bam1_core_t;$/;"	t	typeref:struct:__anon43
+bam1_core_t	yeast/pins/bamlite.h	/^} bam1_core_t;$/;"	t	typeref:struct:__anon14
 bam1_mstrand	bamlite.h	89;"	d
+bam1_mstrand	yeast/pins/bamlite.h	89;"	d
 bam1_qname	bamlite.h	91;"	d
+bam1_qname	yeast/pins/bamlite.h	91;"	d
 bam1_qual	bamlite.h	93;"	d
 bam1_qual	bamlite.h	96;"	d
+bam1_qual	yeast/pins/bamlite.h	93;"	d
+bam1_qual	yeast/pins/bamlite.h	96;"	d
 bam1_seq	bamlite.h	92;"	d
+bam1_seq	yeast/pins/bamlite.h	92;"	d
 bam1_seqi	bamlite.h	94;"	d
+bam1_seqi	yeast/pins/bamlite.h	94;"	d
 bam1_strand	bamlite.h	88;"	d
-bam1_t	bamlite.h	/^} bam1_t;$/;"	t	typeref:struct:__anon14
+bam1_strand	yeast/pins/bamlite.h	88;"	d
+bam1_t	bamlite.h	/^} bam1_t;$/;"	t	typeref:struct:__anon44
+bam1_t	yeast/pins/bamlite.h	/^} bam1_t;$/;"	t	typeref:struct:__anon15
 bamFile	bamlite.h	/^typedef gzFile bamFile;$/;"	t
+bamFile	yeast/pins/bamlite.h	/^typedef gzFile bamFile;$/;"	t
 bam_aux_get	bamlite.c	/^uint8_t *bam_aux_get(const bam1_t *b, const char tag[2])$/;"	f
+bam_aux_get	yeast/pins/bamlite.c	/^uint8_t *bam_aux_get(const bam1_t *b, const char tag[2])$/;"	f
 bam_cigar_gen	bamlite.h	55;"	d
+bam_cigar_gen	yeast/pins/bamlite.h	55;"	d
 bam_cigar_op	bamlite.h	52;"	d
+bam_cigar_op	yeast/pins/bamlite.h	52;"	d
 bam_cigar_opchr	bamlite.h	54;"	d
+bam_cigar_opchr	yeast/pins/bamlite.h	54;"	d
 bam_cigar_oplen	bamlite.h	53;"	d
+bam_cigar_oplen	yeast/pins/bamlite.h	53;"	d
 bam_cigar_type	bamlite.h	56;"	d
+bam_cigar_type	yeast/pins/bamlite.h	56;"	d
 bam_close	bamlite.h	18;"	d
 bam_close	bamlite.h	23;"	d
+bam_close	yeast/pins/bamlite.h	18;"	d
+bam_close	yeast/pins/bamlite.h	23;"	d
 bam_destroy1	bamlite.h	99;"	d
+bam_destroy1	yeast/pins/bamlite.h	99;"	d
 bam_dopen	bamlite.h	17;"	d
 bam_dopen	bamlite.h	22;"	d
+bam_dopen	yeast/pins/bamlite.h	17;"	d
+bam_dopen	yeast/pins/bamlite.h	22;"	d
 bam_header_destroy	bamlite.c	/^void bam_header_destroy(bam_header_t *header)$/;"	f
+bam_header_destroy	yeast/pins/bamlite.c	/^void bam_header_destroy(bam_header_t *header)$/;"	f
 bam_header_init	bamlite.c	/^bam_header_t *bam_header_init()$/;"	f
+bam_header_init	yeast/pins/bamlite.c	/^bam_header_t *bam_header_init()$/;"	f
 bam_header_read	bamlite.c	/^bam_header_t *bam_header_read(bamFile fp)$/;"	f
-bam_header_t	bamlite.h	/^} bam_header_t;$/;"	t	typeref:struct:__anon12
+bam_header_read	yeast/pins/bamlite.c	/^bam_header_t *bam_header_read(bamFile fp)$/;"	f
+bam_header_t	bamlite.h	/^} bam_header_t;$/;"	t	typeref:struct:__anon42
+bam_header_t	yeast/pins/bamlite.h	/^} bam_header_t;$/;"	t	typeref:struct:__anon13
 bam_init1	bamlite.h	98;"	d
+bam_init1	yeast/pins/bamlite.h	98;"	d
 bam_is_be	bamlite.c	/^int bam_is_be;$/;"	v
+bam_is_be	yeast/pins/bamlite.c	/^int bam_is_be;$/;"	v
 bam_is_big_endian	bamlite.c	/^static inline int bam_is_big_endian()$/;"	f	file:
+bam_is_big_endian	yeast/pins/bamlite.c	/^static inline int bam_is_big_endian()$/;"	f	file:
 bam_open	bamlite.h	16;"	d
 bam_open	bamlite.h	21;"	d
+bam_open	yeast/pins/bamlite.h	16;"	d
+bam_open	yeast/pins/bamlite.h	21;"	d
 bam_read	bamlite.h	19;"	d
 bam_read	bamlite.h	24;"	d
+bam_read	yeast/pins/bamlite.h	19;"	d
+bam_read	yeast/pins/bamlite.h	24;"	d
 bam_read1	bamlite.c	/^int bam_read1(bamFile fp, bam1_t *b)$/;"	f
+bam_read1	yeast/pins/bamlite.c	/^int bam_read1(bamFile fp, bam1_t *b)$/;"	f
 bam_swap_endian_2	bamlite.c	/^static inline uint16_t bam_swap_endian_2(uint16_t v)$/;"	f	file:
+bam_swap_endian_2	yeast/pins/bamlite.c	/^static inline uint16_t bam_swap_endian_2(uint16_t v)$/;"	f	file:
 bam_swap_endian_2p	bamlite.c	/^static inline void *bam_swap_endian_2p(void *x)$/;"	f	file:
+bam_swap_endian_2p	yeast/pins/bamlite.c	/^static inline void *bam_swap_endian_2p(void *x)$/;"	f	file:
 bam_swap_endian_4	bamlite.c	/^static inline uint32_t bam_swap_endian_4(uint32_t v)$/;"	f	file:
+bam_swap_endian_4	yeast/pins/bamlite.c	/^static inline uint32_t bam_swap_endian_4(uint32_t v)$/;"	f	file:
 bam_swap_endian_4p	bamlite.c	/^static inline void *bam_swap_endian_4p(void *x)$/;"	f	file:
+bam_swap_endian_4p	yeast/pins/bamlite.c	/^static inline void *bam_swap_endian_4p(void *x)$/;"	f	file:
 bam_swap_endian_8	bamlite.c	/^static inline uint64_t bam_swap_endian_8(uint64_t v)$/;"	f	file:
+bam_swap_endian_8	yeast/pins/bamlite.c	/^static inline uint64_t bam_swap_endian_8(uint64_t v)$/;"	f	file:
 bam_swap_endian_8p	bamlite.c	/^static inline void *bam_swap_endian_8p(void *x)$/;"	f	file:
+bam_swap_endian_8p	yeast/pins/bamlite.c	/^static inline void *bam_swap_endian_8p(void *x)$/;"	f	file:
 bamlite_gzclose	bamlite.c	/^int bamlite_gzclose(gzFile file) {$/;"	f
+bamlite_gzclose	yeast/pins/bamlite.c	/^int bamlite_gzclose(gzFile file) {$/;"	f
 bamlite_gzopen	bamlite.c	/^gzFile bamlite_gzopen(const char *fn, const char *mode) {$/;"	f
+bamlite_gzopen	yeast/pins/bamlite.c	/^gzFile bamlite_gzopen(const char *fn, const char *mode) {$/;"	f
 bamlite_gzread	bamlite.c	/^int bamlite_gzread(gzFile file, void *ptr, unsigned int len) {$/;"	f
+bamlite_gzread	yeast/pins/bamlite.c	/^int bamlite_gzread(gzFile file, void *ptr, unsigned int len) {$/;"	f
 bc_ary_push	col_10x_lnks.c	/^void bc_ary_push(bc_ary_t *l, bc_t *z)$/;"	f
-bc_ary_t	col_10x_lnks.c	/^}bc_ary_t;$/;"	t	typeref:struct:__anon11	file:
+bc_ary_push	yeast/pins/col_10x_lnks.c	/^void bc_ary_push(bc_ary_t *l, bc_t *z)$/;"	f
+bc_ary_t	col_10x_lnks.c	/^}bc_ary_t;$/;"	t	typeref:struct:__anon41	file:
+bc_ary_t	yeast/pins/col_10x_lnks.c	/^}bc_ary_t;$/;"	t	typeref:struct:__anon12	file:
 bc_key	col_10x_lnks.c	45;"	d	file:
-bc_t	col_10x_lnks.c	/^}bc_t;$/;"	t	typeref:struct:__anon10	file:
-bctn	col_10x_lnks.c	/^	uint64_t bctn;$/;"	m	struct:__anon10	file:
+bc_key	yeast/pins/col_10x_lnks.c	45;"	d	file:
+bc_t	col_10x_lnks.c	/^}bc_t;$/;"	t	typeref:struct:__anon40	file:
+bc_t	yeast/pins/col_10x_lnks.c	/^}bc_t;$/;"	t	typeref:struct:__anon11	file:
+bctn	col_10x_lnks.c	/^	uint64_t bctn;$/;"	m	struct:__anon40	file:
+bctn	yeast/pins/col_10x_lnks.c	/^	uint64_t bctn;$/;"	m	struct:__anon11	file:
 bed_close	bed.c	/^int bed_close(bed_file_t *pf)$/;"	f
-bed_file_t	bed.h	/^}bed_file_t;$/;"	t	typeref:struct:__anon25
+bed_close	yeast/pins/bed.c	/^int bed_close(bed_file_t *pf)$/;"	f
+bed_file_t	bed.h	/^}bed_file_t;$/;"	t	typeref:struct:__anon55
+bed_file_t	yeast/pins/bed.h	/^}bed_file_t;$/;"	t	typeref:struct:__anon26
 bed_hdr_read	bed.c	/^int bed_hdr_read(bed_file_t *pf, bed_hdr_t *hdr)$/;"	f
-bed_hdr_t	bed.h	/^}bed_hdr_t;$/;"	t	typeref:struct:__anon26
+bed_hdr_read	yeast/pins/bed.c	/^int bed_hdr_read(bed_file_t *pf, bed_hdr_t *hdr)$/;"	f
+bed_hdr_t	bed.h	/^}bed_hdr_t;$/;"	t	typeref:struct:__anon56
+bed_hdr_t	yeast/pins/bed.h	/^}bed_hdr_t;$/;"	t	typeref:struct:__anon27
 bed_init_track	bed.c	/^int bed_init_track(char *s, int sl, bed_hdr_t *hdr)$/;"	f
+bed_init_track	yeast/pins/bed.c	/^int bed_init_track(char *s, int sl, bed_hdr_t *hdr)$/;"	f
 bed_open	bed.c	/^bed_file_t *bed_open(const char *fn)$/;"	f
+bed_open	yeast/pins/bed.c	/^bed_file_t *bed_open(const char *fn)$/;"	f
 bed_parse	bed.c	/^int bed_parse(int l, char *s, bed_rec_t *pr) \/\/ s must be NULL terminated$/;"	f
+bed_parse	yeast/pins/bed.c	/^int bed_parse(int l, char *s, bed_rec_t *pr) \/\/ s must be NULL terminated$/;"	f
 bed_parse_lnks	bed.c	/^int bed_parse_lnks(int l, char *s, lnk_rec_t *pr) \/\/ s must be NULL terminated$/;"	f
+bed_parse_lnks	yeast/pins/bed.c	/^int bed_parse_lnks(int l, char *s, lnk_rec_t *pr) \/\/ s must be NULL terminated$/;"	f
 bed_read	bed.c	/^int bed_read(bed_file_t *pf, bed_rec_t *r)$/;"	f
-bed_rec_t	bed.h	/^}bed_rec_t;$/;"	t	typeref:struct:__anon27
-bin	bamlite.h	/^	uint32_t bin:16, qual:8, l_qname:8;$/;"	m	struct:__anon13
-buf	bed.h	/^	kstring_t buf;$/;"	m	struct:__anon25
-buf	ld_io.h	/^	kstring_t buf;	$/;"	m	struct:__anon4
+bed_read	yeast/pins/bed.c	/^int bed_read(bed_file_t *pf, bed_rec_t *r)$/;"	f
+bed_rec_t	bed.h	/^}bed_rec_t;$/;"	t	typeref:struct:__anon57
+bed_rec_t	yeast/pins/bed.h	/^}bed_rec_t;$/;"	t	typeref:struct:__anon28
+bin	bamlite.h	/^	uint32_t bin:16, qual:8, l_qname:8;$/;"	m	struct:__anon43
+bin	yeast/pins/bamlite.h	/^	uint32_t bin:16, qual:8, l_qname:8;$/;"	m	struct:__anon14
+buf	bed.h	/^	kstring_t buf;$/;"	m	struct:__anon55
+buf	ld_io.h	/^	kstring_t buf;	$/;"	m	struct:__anon34
+buf	yeast/pins/bed.h	/^	kstring_t buf;$/;"	m	struct:__anon26
+buf	yeast/pins/ld_io.h	/^	kstring_t buf;	$/;"	m	struct:__anon5
 build_graph	build_graph.c	/^graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)$/;"	f
-buildg	build_graph.c	/^int buildg(char *fn, char *edge_fn, int min_wt, int use_sat)$/;"	f
-casm	graph.h	/^	uint32_t casm; \/\/currently assembly$/;"	m	struct:__anon23
+build_graph	yeast/pins/build_graph.c	/^graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)$/;"	f
+buildg	build_graph.c	/^int buildg(char *fn, char *edge_fn, int min_wt, int use_sat, char *out_fn)$/;"	f
+buildg	yeast/pins/build_graph.c	/^int buildg(char *fn, char *edge_fn, int min_wt, int use_sat)$/;"	f
+casm	graph.h	/^	uint32_t casm; \/\/currently assembly$/;"	m	struct:__anon53
+casm	yeast/pins/graph.h	/^	uint32_t casm; \/\/currently assembly$/;"	m	struct:__anon24
 cd_add	cdict.c	/^void cd_add(cdict_t *c, const char *name, uint32_t is_l, uint32_t snp_n)$/;"	f
+cd_add	yeast/pins/cdict.c	/^void cd_add(cdict_t *c, const char *name, uint32_t is_l, uint32_t snp_n)$/;"	f
 cd_add2	cdict.c	/^void cd_add2(cdict_t *c, const char *name, uint32_t is_l, uint32_t cnt, uint32_t snp_n)$/;"	f
-cd_cnt_t	cdict.h	/^} cd_cnt_t;$/;"	t	typeref:struct:__anon5
+cd_add2	yeast/pins/cdict.c	/^void cd_add2(cdict_t *c, const char *name, uint32_t is_l, uint32_t cnt, uint32_t snp_n)$/;"	f
+cd_cnt_t	cdict.h	/^} cd_cnt_t;$/;"	t	typeref:struct:__anon35
+cd_cnt_t	yeast/pins/cdict.h	/^} cd_cnt_t;$/;"	t	typeref:struct:__anon6
 cd_destroy	cdict.c	/^void cd_destroy(cdict_t *c)$/;"	f
+cd_destroy	yeast/pins/cdict.c	/^void cd_destroy(cdict_t *c)$/;"	f
 cd_init	cdict.c	/^void cd_init(cdict_t *c)$/;"	f
+cd_init	yeast/pins/cdict.c	/^void cd_init(cdict_t *c)$/;"	f
 cd_norm	cdict.c	/^void cd_norm(cdict_t *c)$/;"	f
+cd_norm	yeast/pins/cdict.c	/^void cd_norm(cdict_t *c)$/;"	f
 cd_set_lim	cdict.c	/^void cd_set_lim(cdict_t *c, uint32_t n, uint32_t min_wt)$/;"	f
+cd_set_lim	yeast/pins/cdict.c	/^void cd_set_lim(cdict_t *c, uint32_t n, uint32_t min_wt)$/;"	f
 cd_sort	cdict.c	/^void cd_sort(cdict_t *c)$/;"	f
-cdict_t	cdict.h	/^}cdict_t;$/;"	t	typeref:struct:__anon6
+cd_sort	yeast/pins/cdict.c	/^void cd_sort(cdict_t *c)$/;"	f
+cdict_t	cdict.h	/^}cdict_t;$/;"	t	typeref:struct:__anon36
+cdict_t	yeast/pins/cdict.h	/^}cdict_t;$/;"	t	typeref:struct:__anon7
+check22	yeast/ld_exp/LDhat/seqtools.c	/^int check22(s1,s2,nall) $/;"	f
 check_left_half	col_10x_lnks.c	/^uint32_t check_left_half(uint32_t le, uint32_t rs, uint32_t p) \/\/ 1 for left half 0 for right half 2 for middle$/;"	f
 check_left_half	col_hic_lnks.c	/^uint32_t check_left_half(uint32_t le, uint32_t rs, uint32_t p) \/\/ 1 for left half 0 for right half 2 for middle$/;"	f
 check_left_half	col_ld_lnks.c	/^uint32_t check_left_half(uint32_t le, uint32_t rs, uint32_t p) \/\/ 1 for left half 0 for right half 2 for middle$/;"	f
-chiSqFisher	ld.h	/^	double		chiSqFisher;$/;"	m	struct:__anon15
-chiSqModel	ld.h	/^	double		chiSqModel;		$/;"	m	struct:__anon15
+check_left_half	yeast/pins/col_10x_lnks.c	/^uint32_t check_left_half(uint32_t le, uint32_t rs, uint32_t p) \/\/ 1 for left half 0 for right half 2 for middle$/;"	f
+check_left_half	yeast/pins/col_hic_lnks.c	/^uint32_t check_left_half(uint32_t le, uint32_t rs, uint32_t p) \/\/ 1 for left half 0 for right half 2 for middle$/;"	f
+check_left_half	yeast/pins/col_ld_lnks.c	/^uint32_t check_left_half(uint32_t le, uint32_t rs, uint32_t p) \/\/ 1 for left half 0 for right half 2 for middle$/;"	f
+chiSqFisher	ld.h	/^	double		chiSqFisher;$/;"	m	struct:__anon45
+chiSqFisher	yeast/pins/ld.h	/^	double		chiSqFisher;$/;"	m	struct:__anon16
+chiSqModel	ld.h	/^	double		chiSqModel;		$/;"	m	struct:__anon45
+chiSqModel	yeast/pins/ld.h	/^	double		chiSqModel;		$/;"	m	struct:__anon16
 chl_col_ctgs	col_hic_lnks.c	/^int chl_col_ctgs(char *bam_fn, sdict_t *ctgs, uint32_t ws)$/;"	f
+chl_col_ctgs	yeast/pins/col_hic_lnks.c	/^int chl_col_ctgs(char *bam_fn, sdict_t *ctgs, uint32_t ws)$/;"	f
 clean_edges	graph.c	/^int clean_edges(graph_t *g)$/;"	f
+clean_edges	yeast/pins/graph.c	/^int clean_edges(graph_t *g)$/;"	f
 close_ld	ld_io.c	/^int close_ld(ld_file_t *fp)$/;"	f
+close_ld	yeast/pins/ld_io.c	/^int close_ld(ld_file_t *fp)$/;"	f
+cmatrix	yeast/ld_exp/LDhat/tools.c	/^char **cmatrix(nrl,nrh,ncl,nch)$/;"	f
 cmp_cnt	cdict.c	/^int cmp_cnt(const void *a, const void *b) $/;"	f
-cnt	cdict.h	/^	uint32_t cnt:31, is_added:1;	$/;"	m	struct:__anon5
-cnts	cdict.h	/^	cd_cnt_t	*cnts;$/;"	m	struct:__anon6
+cmp_cnt	yeast/pins/cdict.c	/^int cmp_cnt(const void *a, const void *b) $/;"	f
+cnt	cdict.h	/^	uint32_t cnt:31, is_added:1;	$/;"	m	struct:__anon35
+cnt	yeast/pins/cdict.h	/^	uint32_t cnt:31, is_added:1;	$/;"	m	struct:__anon6
+cnts	cdict.h	/^	cd_cnt_t	*cnts;$/;"	m	struct:__anon36
+cnts	yeast/pins/cdict.h	/^	cd_cnt_t	*cnts;$/;"	m	struct:__anon7
 col_10x_lnks	col_10x_lnks.c	/^int col_10x_lnks(char *bam_fn[], int n_bam, int min_mq,  uint32_t win_s, uint32_t max_is, int min_bc, int max_bc, uint32_t min_inner_bcn, int opt)$/;"	f
+col_10x_lnks	yeast/pins/col_10x_lnks.c	/^int col_10x_lnks(char *bam_fn[], int n_bam, int min_mq,  uint32_t win_s, uint32_t max_is, int min_bc, int max_bc, uint32_t min_inner_bcn, int opt)$/;"	f
 col_bcnt	col_10x_lnks.c	/^int col_bcnt(aln_inf_t  *fal, uint32_t bc, int min_mq, uint32_t max_is, bc_ary_t *l)$/;"	f
+col_bcnt	yeast/pins/col_10x_lnks.c	/^int col_bcnt(aln_inf_t  *fal, uint32_t bc, int min_mq, uint32_t max_is, bc_ary_t *l)$/;"	f
 col_cds	col_10x_lnks.c	/^cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_inner_bcn, int n_targets, sdict_t *ctgs)$/;"	f
+col_cds	yeast/pins/col_10x_lnks.c	/^cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_inner_bcn, int n_targets, sdict_t *ctgs)$/;"	f
 col_ctgs	build_graph.c	/^sdict_t *col_ctgs(char *fn)$/;"	f
+col_ctgs	yeast/pins/build_graph.c	/^sdict_t *col_ctgs(char *fn)$/;"	f
 col_ctgs_from_graph	build_graph.c	/^sdict_t *col_ctgs_from_graph(graph_t *g)$/;"	f
+col_ctgs_from_graph	yeast/pins/build_graph.c	/^sdict_t *col_ctgs_from_graph(graph_t *g)$/;"	f
 col_gm_lnks	col_ld_lnks.c	/^int col_gm_lnks(char *snps_fn, char **ld_fn, int n_ld, double pv) \/\/will be changed into two_fn$/;"	f
-col_hic_lnks	col_hic_lnks.c	/^int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t win_s)$/;"	f
+col_gm_lnks	yeast/pins/col_ld_lnks.c	/^int col_gm_lnks(char *snps_fn, char **ld_fn, int n_ld, double pv) \/\/will be changed into two_fn$/;"	f
+col_hic_lnks	col_hic_lnks.c	/^int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t win_s, char *out_fn)$/;"	f
+col_hic_lnks	yeast/pins/col_hic_lnks.c	/^int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t win_s)$/;"	f
 col_joints	col_10x_lnks.c	/^int col_joints(uint32_t ind1l, uint32_t ind2l, sdict_t *ctgs, cdict_t *cs)$/;"	f
 col_joints	col_hic_lnks.c	/^int col_joints(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, sdict_t *scfs, cdict_t *cs)$/;"	f
+col_joints	yeast/pins/col_10x_lnks.c	/^int col_joints(uint32_t ind1l, uint32_t ind2l, sdict_t *ctgs, cdict_t *cs)$/;"	f
+col_joints	yeast/pins/col_hic_lnks.c	/^int col_joints(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, sdict_t *scfs, cdict_t *cs)$/;"	f
 col_pos	aa_hic.c	/^void col_pos(aln_inf_t  *fal, int min_mq, uint32_t max_ins_len, ns_t *ns, ctg_pos_t *d)$/;"	f
+col_pos	yeast/pins/aa_hic.c	/^void col_pos(aln_inf_t  *fal, int min_mq, uint32_t max_ins_len, ns_t *ns, ctg_pos_t *d)$/;"	f
 col_snp_distri	col_ld_lnks.c	/^sdict_t *col_snp_distri(char *fn)$/;"	f
-core	bamlite.h	/^	bam1_core_t core;$/;"	m	struct:__anon14
+col_snp_distri	yeast/pins/col_ld_lnks.c	/^sdict_t *col_snp_distri(char *fn)$/;"	f
+core	bamlite.h	/^	bam1_core_t core;$/;"	m	struct:__anon44
+core	yeast/pins/bamlite.h	/^	bam1_core_t core;$/;"	m	struct:__anon15
 cp_seq	graph.c	/^int cp_seq(char *s, char *t, uint32_t len, int is_rc)$/;"	f
-ct	aa_hic.c	/^	cord_t *ct;$/;"	m	struct:__anon3	file:
-ctgn	bed.h	/^	char		*ctgn;$/;"	m	struct:__anon27
-ctgn	bed.h	/^	char *ctgn, *ctgn2;$/;"	m	struct:__anon29
-ctgn	bed.h	/^	char *ctgn;$/;"	m	struct:__anon28
-ctgn1	ld.h	/^	char		*ctgn1;$/;"	m	struct:__anon15
-ctgn2	bed.h	/^	char *ctgn, *ctgn2;$/;"	m	struct:__anon29
-ctgn2	ld.h	/^	char		*ctgn2;$/;"	m	struct:__anon15
-d	ld.h	/^	float		d, dprime; \/\/ D and D'$/;"	m	struct:__anon15
-data	bamlite.h	/^	uint8_t *data;$/;"	m	struct:__anon14
+cp_seq	yeast/pins/graph.c	/^int cp_seq(char *s, char *t, uint32_t len, int is_rc)$/;"	f
+ct	aa_hic.c	/^	cord_t *ct;$/;"	m	struct:__anon33	file:
+ct	yeast/pins/aa_hic.c	/^	cord_t *ct;$/;"	m	struct:__anon4	file:
+ctgn	bed.h	/^	char		*ctgn;$/;"	m	struct:__anon57
+ctgn	bed.h	/^	char *ctgn, *ctgn2;$/;"	m	struct:__anon59
+ctgn	bed.h	/^	char *ctgn;$/;"	m	struct:__anon58
+ctgn	yeast/pins/bed.h	/^	char		*ctgn;$/;"	m	struct:__anon28
+ctgn	yeast/pins/bed.h	/^	char *ctgn, *ctgn2;$/;"	m	struct:__anon30
+ctgn	yeast/pins/bed.h	/^	char *ctgn;$/;"	m	struct:__anon29
+ctgn1	ld.h	/^	char		*ctgn1;$/;"	m	struct:__anon45
+ctgn1	yeast/pins/ld.h	/^	char		*ctgn1;$/;"	m	struct:__anon16
+ctgn2	bed.h	/^	char *ctgn, *ctgn2;$/;"	m	struct:__anon59
+ctgn2	ld.h	/^	char		*ctgn2;$/;"	m	struct:__anon45
+ctgn2	yeast/pins/bed.h	/^	char *ctgn, *ctgn2;$/;"	m	struct:__anon30
+ctgn2	yeast/pins/ld.h	/^	char		*ctgn2;$/;"	m	struct:__anon16
+d	ld.h	/^	float		d, dprime; \/\/ D and D'$/;"	m	struct:__anon45
+d	yeast/pins/ld.h	/^	float		d, dprime; \/\/ D and D'$/;"	m	struct:__anon16
+data	bamlite.h	/^	uint8_t *data;$/;"	m	struct:__anon44
+data	yeast/ld_exp/LDhat/rtest.cc	/^struct data_sum *data;$/;"	v	typeref:struct:data_sum
+data	yeast/pins/bamlite.h	/^	uint8_t *data;$/;"	m	struct:__anon15
+data_sum	yeast/ld_exp/LDhat/header.h	/^struct data_sum {$/;"	s
 del_r	graph.c	/^int del_r(graph_t *g, edge_t *a) \/\/ remove reverse edge$/;"	f
-depth	ksort.h	/^	int depth;$/;"	m	struct:__anon30
-desc	bed.h	/^	char *desc;$/;"	m	struct:__anon26
-dprime	ld.h	/^	float		d, dprime; \/\/ D and D'$/;"	m	struct:__anon15
-dump_sat	graph.c	/^int dump_sat(graph_t *g)$/;"	f
-e	aa_hic.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon2	file:
-e	bed.h	/^	uint32_t s, e;$/;"	m	struct:__anon28
-e	col_10x_lnks.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon9	file:
-e	col_10x_lnks.c	/^	uint32_t s, e; \/\/no more than $/;"	m	struct:__anon10	file:
-edge_idx	graph.h	/^	uint64_t *edge_idx; \/\/ idx + num $/;"	m	struct:__anon19
+del_r	yeast/pins/graph.c	/^int del_r(graph_t *g, edge_t *a) \/\/ remove reverse edge$/;"	f
+depth	ksort.h	/^	int depth;$/;"	m	struct:__anon60
+depth	yeast/pins/ksort.h	/^	int depth;$/;"	m	struct:__anon31
+desc	bed.h	/^	char *desc;$/;"	m	struct:__anon56
+desc	yeast/pins/bed.h	/^	char *desc;$/;"	m	struct:__anon27
+dmatrix	yeast/ld_exp/LDhat/tools.c	/^double **dmatrix(nrl,nrh,ncl,nch)$/;"	f
+dou_vec_init	yeast/ld_exp/LDhat/pairlk.c	/^double *dou_vec_init(const size_t num)$/;"	f
+dprime	ld.h	/^	float		d, dprime; \/\/ D and D'$/;"	m	struct:__anon45
+dprime	yeast/pins/ld.h	/^	float		d, dprime; \/\/ D and D'$/;"	m	struct:__anon16
+dump_sat	graph.c	/^int dump_sat(graph_t *g, char *fn)$/;"	f
+dump_sat	yeast/pins/graph.c	/^int dump_sat(graph_t *g)$/;"	f
+dvector	yeast/ld_exp/LDhat/tools.c	/^double *dvector(nl,nh)$/;"	f
+e	aa_hic.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon32	file:
+e	bed.h	/^	uint32_t s, e;$/;"	m	struct:__anon58
+e	col_10x_lnks.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon39	file:
+e	col_10x_lnks.c	/^	uint32_t s, e; \/\/no more than $/;"	m	struct:__anon40	file:
+e	yeast/pins/aa_hic.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon3	file:
+e	yeast/pins/bed.h	/^	uint32_t s, e;$/;"	m	struct:__anon29
+e	yeast/pins/col_10x_lnks.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon10	file:
+e	yeast/pins/col_10x_lnks.c	/^	uint32_t s, e; \/\/no more than $/;"	m	struct:__anon11	file:
+edge_idx	graph.h	/^	uint64_t *edge_idx; \/\/ idx + num $/;"	m	struct:__anon49
+edge_idx	yeast/pins/graph.h	/^	uint64_t *edge_idx; \/\/ idx + num $/;"	m	struct:__anon20
 edge_key	graph.c	37;"	d	file:
+edge_key	yeast/pins/graph.c	37;"	d	file:
 edge_n	graph.h	81;"	d
-edge_t	graph.h	/^}edge_t;$/;"	t	typeref:struct:__anon18
-edges	graph.h	/^	edge_t *edges;$/;"	m	struct:__anon19
+edge_n	yeast/pins/graph.h	81;"	d
+edge_t	graph.h	/^}edge_t;$/;"	t	typeref:struct:__anon48
+edge_t	yeast/pins/graph.h	/^}edge_t;$/;"	t	typeref:struct:__anon19
+edges	graph.h	/^	edge_t *edges;$/;"	m	struct:__anon49
 edges	graph.h	80;"	d
-edges_t	graph.h	/^}edges_t;$/;"	t	typeref:struct:__anon19
-eg	graph.h	/^	edges_t eg;$/;"	m	struct:__anon24
-flag	bamlite.h	/^	uint32_t flag:16, n_cigar:16;$/;"	m	struct:__anon13
-flags	ld.h	/^	uint16_t    flags;$/;"	m	struct:__anon15
-fp	bed.h	/^	void *fp;$/;"	m	struct:__anon25
-fp	ld_io.h	/^	void *fp;$/;"	m	struct:__anon4
+edges	yeast/pins/graph.h	/^	edge_t *edges;$/;"	m	struct:__anon20
+edges	yeast/pins/graph.h	80;"	d
+edges_t	graph.h	/^}edges_t;$/;"	t	typeref:struct:__anon49
+edges_t	yeast/pins/graph.h	/^}edges_t;$/;"	t	typeref:struct:__anon20
+eg	graph.h	/^	edges_t eg;$/;"	m	struct:__anon54
+eg	yeast/pins/graph.h	/^	edges_t eg;$/;"	m	struct:__anon25
+exp_matrix	yeast/ld_exp/LDhat/pairlk.c	/^void exp_matrix(double **out, double a,int K, double **P)$/;"	f
+flag	bamlite.h	/^	uint32_t flag:16, n_cigar:16;$/;"	m	struct:__anon43
+flag	yeast/pins/bamlite.h	/^	uint32_t flag:16, n_cigar:16;$/;"	m	struct:__anon14
+flags	ld.h	/^	uint16_t    flags;$/;"	m	struct:__anon45
+flags	yeast/pins/ld.h	/^	uint16_t    flags;$/;"	m	struct:__anon16
+fp	bed.h	/^	void *fp;$/;"	m	struct:__anon55
+fp	ld_io.h	/^	void *fp;$/;"	m	struct:__anon34
+fp	yeast/pins/bed.h	/^	void *fp;$/;"	m	struct:__anon26
+fp	yeast/pins/ld_io.h	/^	void *fp;$/;"	m	struct:__anon5
+free_cmatrix	yeast/ld_exp/LDhat/tools.c	/^void free_cmatrix(m,nrl,nrh,ncl,nch)$/;"	f
+free_dmatrix	yeast/ld_exp/LDhat/tools.c	/^void free_dmatrix(m,nrl,nrh,ncl,nch)$/;"	f
+free_dvector	yeast/ld_exp/LDhat/tools.c	/^void free_dvector(v,nl,nh)$/;"	f
+free_imatrix	yeast/ld_exp/LDhat/tools.c	/^void free_imatrix(m,nrl,nrh,ncl,nch)$/;"	f
+free_ivector	yeast/ld_exp/LDhat/tools.c	/^void free_ivector(v,nl,nh)$/;"	f
+free_matrix	yeast/ld_exp/LDhat/tools.c	/^void free_matrix(m,nrl,nrh,ncl,nch)$/;"	f
 free_node	graph.c	/^void free_node(vertex_t *n)$/;"	f
-gap_rec_t	bed.h	/^}gap_rec_t;$/;"	t	typeref:struct:__anon28
+free_node	yeast/pins/graph.c	/^void free_node(vertex_t *n)$/;"	f
+free_vector	yeast/ld_exp/LDhat/tools.c	/^void free_vector(v,nl,nh)$/;"	f
+gap_rec_t	bed.h	/^}gap_rec_t;$/;"	t	typeref:struct:__anon58
+gap_rec_t	yeast/pins/bed.h	/^}gap_rec_t;$/;"	t	typeref:struct:__anon29
 get_aux_type2size	bamlite.c	/^int get_aux_type2size(uint8_t t)$/;"	f
+get_aux_type2size	yeast/pins/bamlite.c	/^int get_aux_type2size(uint8_t t)$/;"	f
 get_links	build_graph.c	/^int get_links(char *links_fn, cdict_t *cds, sdict_t *ctgs)$/;"	f
+get_links	yeast/pins/build_graph.c	/^int get_links(char *links_fn, cdict_t *cds, sdict_t *ctgs)$/;"	f
 get_name2id	graph.c	/^uint32_t get_name2id(graph_t *g, char *nm)$/;"	f
-get_path	graph.c	/^int get_path(graph_t *g, uint32_t min_l)$/;"	f
+get_name2id	yeast/pins/graph.c	/^uint32_t get_name2id(graph_t *g, char *nm)$/;"	f
+get_path	graph.c	/^int get_path(graph_t *g, uint32_t min_l, char *fn)$/;"	f
+get_path	yeast/pins/graph.c	/^int get_path(graph_t *g, uint32_t min_l)$/;"	f
+get_seq	get_seq.c	/^int get_seq(char *sat_fn, char *seq_fn, uint32_t min_l, char *out_fn)$/;"	f
 get_target_end	aa_hic.c	/^uint32_t get_target_end(uint32_t *cigar, int n_cigar, uint32_t s)$/;"	f
 get_target_end	col_10x_lnks.c	/^uint32_t get_target_end(uint32_t *cigar, int n_cigar, uint32_t s)$/;"	f
+get_target_end	yeast/pins/aa_hic.c	/^uint32_t get_target_end(uint32_t *cigar, int n_cigar, uint32_t s)$/;"	f
+get_target_end	yeast/pins/col_10x_lnks.c	/^uint32_t get_target_end(uint32_t *cigar, int n_cigar, uint32_t s)$/;"	f
 graph_destroy	graph.c	/^void graph_destroy(graph_t *g)$/;"	f
+graph_destroy	yeast/pins/graph.c	/^void graph_destroy(graph_t *g)$/;"	f
 graph_init	graph.c	/^graph_t *graph_init(void) $/;"	f
-graph_t	graph.h	/^} graph_t;$/;"	t	typeref:struct:__anon24
-h	cdict.h	/^	void		*h;$/;"	m	struct:__anon6
-h	graph.h	/^	void *h;$/;"	m	struct:__anon23
-h	graph.h	/^	void *h;\/\/namespace for vertices edges and paths$/;"	m	struct:__anon24
-h	sdict.h	/^	void *h;$/;"	m	struct:__anon8
+graph_init	yeast/pins/graph.c	/^graph_t *graph_init(void) $/;"	f
+graph_t	graph.h	/^} graph_t;$/;"	t	typeref:struct:__anon54
+graph_t	yeast/pins/graph.h	/^} graph_t;$/;"	t	typeref:struct:__anon25
+h	cdict.h	/^	void		*h;$/;"	m	struct:__anon36
+h	graph.h	/^	void *h;$/;"	m	struct:__anon53
+h	graph.h	/^	void *h;\/\/namespace for vertices edges and paths$/;"	m	struct:__anon54
+h	sdict.h	/^	void *h;$/;"	m	struct:__anon38
+h	yeast/pins/cdict.h	/^	void		*h;$/;"	m	struct:__anon7
+h	yeast/pins/graph.h	/^	void *h;$/;"	m	struct:__anon24
+h	yeast/pins/graph.h	/^	void *h;\/\/namespace for vertices edges and paths$/;"	m	struct:__anon25
+h	yeast/pins/sdict.h	/^	void *h;$/;"	m	struct:__anon9
+idum	yeast/ld_exp/LDhat/pairwise.c	/^long *idum;$/;"	v
+idum	yeast/ld_exp/LDhat/permute.c	/^long *idum;$/;"	v
 idx_edge	graph.c	/^int idx_edge(graph_t *g)$/;"	f
+idx_edge	yeast/pins/graph.c	/^int idx_edge(graph_t *g)$/;"	f
+imatrix	yeast/ld_exp/LDhat/tools.c	/^int **imatrix(nrl,nrh,ncl,nch)$/;"	f
 init_ctgs	col_hic_lnks.c	/^int init_ctgs(graph_t *g, sdict_t* ctgs) $/;"	f
+init_ctgs	yeast/pins/col_hic_lnks.c	/^int init_ctgs(graph_t *g, sdict_t* ctgs) $/;"	f
 init_gaps	aa_hic.c	/^void init_gaps(char *gap_fn, ns_t *ns, sdict_t *ctgs, uint32_t max_ins_len)$/;"	f
+init_gaps	yeast/pins/aa_hic.c	/^void init_gaps(char *gap_fn, ns_t *ns, sdict_t *ctgs, uint32_t max_ins_len)$/;"	f
+init_pset	yeast/ld_exp/LDhat/seqtools.c	/^struct site_type ** init_pset(pset,lkf,ifp,npt,nseq) $/;"	f
 init_scaffs	col_hic_lnks.c	/^int init_scaffs(graph_t *g, sdict_t *ctgs, sdict_t *scfs)$/;"	f
+init_scaffs	yeast/pins/col_hic_lnks.c	/^int init_scaffs(graph_t *g, sdict_t *ctgs, sdict_t *scfs)$/;"	f
 init_seqs	col_hic_lnks.c	/^int init_seqs(char *fn, sdict_t *ctgs, sdict_t *scfs)$/;"	f
+init_seqs	yeast/pins/col_hic_lnks.c	/^int init_seqs(char *fn, sdict_t *ctgs, sdict_t *scfs)$/;"	f
 insert_sort	col_10x_lnks.c	/^void insert_sort(bc_t *b, bc_t *e)$/;"	f
-is_added	cdict.h	/^	uint32_t cnt:31, is_added:1;	$/;"	m	struct:__anon5
-is_circ	graph.h	/^	uint32_t n:31, is_circ:1; \/\/be careful with these uint32_t $/;"	m	struct:__anon20
-is_del	graph.h	/^	uint32_t wt:30, is_vis:1, is_del:1;$/;"	m	struct:__anon18
-is_eof	bed.h	/^	int is_eof;$/;"	m	struct:__anon25
-is_l	bed.h	/^	uint32_t wt:30, is_l:1, is_l2:1;$/;"	m	struct:__anon29
-is_l	cdict.h	/^	uint32_t snp_n:31, is_l:1;$/;"	m	struct:__anon5
-is_l2	bed.h	/^	uint32_t wt:30, is_l:1, is_l2:1;$/;"	m	struct:__anon29
-is_srt	graph.h	/^	uint32_t is_srt;$/;"	m	struct:__anon19
-is_vis	graph.h	/^	uint32_t wt:30, is_vis:1, is_del:1;$/;"	m	struct:__anon18
-isize	bamlite.h	/^	int32_t isize;$/;"	m	struct:__anon13
+insert_sort	yeast/pins/col_10x_lnks.c	/^void insert_sort(bc_t *b, bc_t *e)$/;"	f
+is_added	cdict.h	/^	uint32_t cnt:31, is_added:1;	$/;"	m	struct:__anon35
+is_added	yeast/pins/cdict.h	/^	uint32_t cnt:31, is_added:1;	$/;"	m	struct:__anon6
+is_circ	graph.h	/^	uint32_t n:31, is_circ:1; \/\/be careful with these uint32_t $/;"	m	struct:__anon50
+is_circ	yeast/pins/graph.h	/^	uint32_t n:31, is_circ:1; \/\/be careful with these uint32_t $/;"	m	struct:__anon21
+is_del	graph.h	/^	uint32_t wt:30, is_vis:1, is_del:1;$/;"	m	struct:__anon48
+is_del	yeast/pins/graph.h	/^	uint32_t wt:30, is_vis:1, is_del:1;$/;"	m	struct:__anon19
+is_eof	bed.h	/^	int is_eof;$/;"	m	struct:__anon55
+is_eof	yeast/pins/bed.h	/^	int is_eof;$/;"	m	struct:__anon26
+is_l	bed.h	/^	uint32_t wt:30, is_l:1, is_l2:1;$/;"	m	struct:__anon59
+is_l	cdict.h	/^	uint32_t snp_n:31, is_l:1;$/;"	m	struct:__anon35
+is_l	yeast/pins/bed.h	/^	uint32_t wt:30, is_l:1, is_l2:1;$/;"	m	struct:__anon30
+is_l	yeast/pins/cdict.h	/^	uint32_t snp_n:31, is_l:1;$/;"	m	struct:__anon6
+is_l2	bed.h	/^	uint32_t wt:30, is_l:1, is_l2:1;$/;"	m	struct:__anon59
+is_l2	yeast/pins/bed.h	/^	uint32_t wt:30, is_l:1, is_l2:1;$/;"	m	struct:__anon30
+is_srt	graph.h	/^	uint32_t is_srt;$/;"	m	struct:__anon49
+is_srt	yeast/pins/graph.h	/^	uint32_t is_srt;$/;"	m	struct:__anon20
+is_vis	graph.h	/^	uint32_t wt:30, is_vis:1, is_del:1;$/;"	m	struct:__anon48
+is_vis	yeast/pins/graph.h	/^	uint32_t wt:30, is_vis:1, is_del:1;$/;"	m	struct:__anon19
+isize	bamlite.h	/^	int32_t isize;$/;"	m	struct:__anon43
+isize	yeast/pins/bamlite.h	/^	int32_t isize;$/;"	m	struct:__anon14
+ivector	yeast/ld_exp/LDhat/tools.c	/^int *ivector(nl,nh)$/;"	f
 join_ends	graph.c	/^int join_ends(graph_t *g)$/;"	f
+join_ends	yeast/pins/graph.c	/^int join_ends(graph_t *g)$/;"	f
+kall_l	yeast/ld_exp/LDhat/pairlk.c	/^int kall_l(int *type, int *nd,double *rho,double theta[2], double *logq, double *logp,double *rem_p,int kk, int n_pts,int K,int L,int M,double *mu,double **P, double ****Q, double *****Qb)$/;"	f
 kcalloc	khash.h	180;"	d
-kdq_at	kdq.h	17;"	d
-kdq_destroy	kdq.h	119;"	d
+kcalloc	yeast/pins/khash.h	180;"	d
+kdq_at	kdq.h	18;"	d
+kdq_at	yeast/pins/kdq.h	18;"	d
+kdq_clean	kdq.h	17;"	d
+kdq_clean	yeast/pins/kdq.h	17;"	d
+kdq_destroy	kdq.h	121;"	d
+kdq_destroy	yeast/pins/kdq.h	121;"	d
 kdq_first	kdq.h	15;"	d
-kdq_init	kdq.h	118;"	d
+kdq_first	yeast/pins/kdq.h	15;"	d
+kdq_init	kdq.h	120;"	d
+kdq_init	yeast/pins/kdq.h	120;"	d
 kdq_last	kdq.h	16;"	d
-kdq_pop	kdq.h	123;"	d
-kdq_push	kdq.h	122;"	d
-kdq_pushp	kdq.h	121;"	d
-kdq_resize	kdq.h	120;"	d
-kdq_shift	kdq.h	126;"	d
+kdq_last	yeast/pins/kdq.h	16;"	d
+kdq_pop	kdq.h	125;"	d
+kdq_pop	yeast/pins/kdq.h	125;"	d
+kdq_push	kdq.h	124;"	d
+kdq_push	yeast/pins/kdq.h	124;"	d
+kdq_pushp	kdq.h	123;"	d
+kdq_pushp	yeast/pins/kdq.h	123;"	d
+kdq_resize	kdq.h	122;"	d
+kdq_resize	yeast/pins/kdq.h	122;"	d
+kdq_shift	kdq.h	128;"	d
+kdq_shift	yeast/pins/kdq.h	128;"	d
 kdq_size	kdq.h	14;"	d
+kdq_size	yeast/pins/kdq.h	14;"	d
 kdq_t	kdq.h	13;"	d
-kdq_unshift	kdq.h	125;"	d
-kdq_unshiftp	kdq.h	124;"	d
+kdq_t	yeast/pins/kdq.h	13;"	d
+kdq_unshift	kdq.h	127;"	d
+kdq_unshift	yeast/pins/kdq.h	127;"	d
+kdq_unshiftp	kdq.h	126;"	d
+kdq_unshiftp	yeast/pins/kdq.h	126;"	d
 kfree	khash.h	189;"	d
+kfree	yeast/pins/khash.h	189;"	d
 kh_begin	khash.h	528;"	d
+kh_begin	yeast/pins/khash.h	528;"	d
 kh_clear	khash.h	453;"	d
+kh_clear	yeast/pins/khash.h	453;"	d
 kh_cstr_t	khash.h	/^typedef const char *kh_cstr_t;$/;"	t
+kh_cstr_t	yeast/pins/khash.h	/^typedef const char *kh_cstr_t;$/;"	t
 kh_del	khash.h	491;"	d
+kh_del	yeast/pins/khash.h	491;"	d
 kh_destroy	khash.h	446;"	d
+kh_destroy	yeast/pins/khash.h	446;"	d
 kh_end	khash.h	535;"	d
+kh_end	yeast/pins/khash.h	535;"	d
 kh_exist	khash.h	499;"	d
+kh_exist	yeast/pins/khash.h	499;"	d
 kh_foreach	khash.h	558;"	d
+kh_foreach	yeast/pins/khash.h	558;"	d
 kh_foreach_value	khash.h	572;"	d
+kh_foreach_value	yeast/pins/khash.h	572;"	d
 kh_get	khash.h	483;"	d
+kh_get	yeast/pins/khash.h	483;"	d
 kh_init	khash.h	439;"	d
+kh_init	yeast/pins/khash.h	439;"	d
 kh_inline	khash.h	148;"	d
 kh_inline	khash.h	150;"	d
+kh_inline	yeast/pins/khash.h	148;"	d
+kh_inline	yeast/pins/khash.h	150;"	d
 kh_int64_hash_equal	khash.h	389;"	d
+kh_int64_hash_equal	yeast/pins/khash.h	389;"	d
 kh_int64_hash_func	khash.h	385;"	d
+kh_int64_hash_func	yeast/pins/khash.h	385;"	d
 kh_int_hash_equal	khash.h	379;"	d
+kh_int_hash_equal	yeast/pins/khash.h	379;"	d
 kh_int_hash_func	khash.h	375;"	d
+kh_int_hash_func	yeast/pins/khash.h	375;"	d
 kh_int_hash_func2	khash.h	422;"	d
+kh_int_hash_func2	yeast/pins/khash.h	422;"	d
 kh_key	khash.h	507;"	d
+kh_key	yeast/pins/khash.h	507;"	d
 kh_n_buckets	khash.h	549;"	d
+kh_n_buckets	yeast/pins/khash.h	549;"	d
 kh_put	khash.h	474;"	d
+kh_put	yeast/pins/khash.h	474;"	d
 kh_resize	khash.h	461;"	d
+kh_resize	yeast/pins/khash.h	461;"	d
 kh_size	khash.h	542;"	d
+kh_size	yeast/pins/khash.h	542;"	d
 kh_str_hash_equal	khash.h	410;"	d
+kh_str_hash_equal	yeast/pins/khash.h	410;"	d
 kh_str_hash_func	khash.h	406;"	d
+kh_str_hash_func	yeast/pins/khash.h	406;"	d
 kh_val	khash.h	516;"	d
+kh_val	yeast/pins/khash.h	516;"	d
 kh_value	khash.h	521;"	d
+kh_value	yeast/pins/khash.h	521;"	d
 khash_t	khash.h	432;"	d
+khash_t	yeast/pins/khash.h	432;"	d
 khint32_t	khash.h	/^typedef unsigned int khint32_t;$/;"	t
 khint32_t	khash.h	/^typedef unsigned long khint32_t;$/;"	t
+khint32_t	yeast/pins/khash.h	/^typedef unsigned int khint32_t;$/;"	t
+khint32_t	yeast/pins/khash.h	/^typedef unsigned long khint32_t;$/;"	t
 khint64_t	khash.h	/^typedef unsigned long khint64_t;$/;"	t
 khint64_t	khash.h	/^typedef unsigned long long khint64_t;$/;"	t
+khint64_t	yeast/pins/khash.h	/^typedef unsigned long khint64_t;$/;"	t
+khint64_t	yeast/pins/khash.h	/^typedef unsigned long long khint64_t;$/;"	t
 khint_t	khash.h	/^typedef khint32_t khint_t;$/;"	t
+khint_t	yeast/pins/khash.h	/^typedef khint32_t khint_t;$/;"	t
 khiter_t	khash.h	/^typedef khint_t khiter_t;$/;"	t
+khiter_t	yeast/pins/khash.h	/^typedef khint_t khiter_t;$/;"	t
 klib_unused	kdq.h	100;"	d
-klib_unused	kdq.h	98;"	d
+klib_unused	kdq.h	102;"	d
 klib_unused	khash.h	156;"	d
 klib_unused	khash.h	158;"	d
 klib_unused	kseq.h	54;"	d
 klib_unused	kseq.h	56;"	d
+klib_unused	yeast/pins/kdq.h	100;"	d
+klib_unused	yeast/pins/kdq.h	102;"	d
+klib_unused	yeast/pins/khash.h	156;"	d
+klib_unused	yeast/pins/khash.h	158;"	d
+klib_unused	yeast/pins/kseq.h	54;"	d
+klib_unused	yeast/pins/kseq.h	56;"	d
 kmalloc	khash.h	183;"	d
+kmalloc	yeast/pins/khash.h	183;"	d
 krealloc	khash.h	186;"	d
+krealloc	yeast/pins/khash.h	186;"	d
 kroundup32	bamlite.h	85;"	d
 kroundup32	khash.h	176;"	d
 kroundup32	kseq.h	104;"	d
+kroundup32	yeast/pins/bamlite.h	85;"	d
+kroundup32	yeast/pins/khash.h	176;"	d
+kroundup32	yeast/pins/kseq.h	104;"	d
 ks_eof	kseq.h	48;"	d
-ks_isort_stack_t	ksort.h	/^} ks_isort_stack_t;$/;"	t	typeref:struct:__anon30
+ks_eof	yeast/pins/kseq.h	48;"	d
+ks_isort_stack_t	ksort.h	/^} ks_isort_stack_t;$/;"	t	typeref:struct:__anon60
+ks_isort_stack_t	yeast/pins/ksort.h	/^} ks_isort_stack_t;$/;"	t	typeref:struct:__anon31
 ks_lt_generic	ksort.h	124;"	d
+ks_lt_generic	yeast/pins/ksort.h	124;"	d
 ks_lt_str	ksort.h	125;"	d
+ks_lt_str	yeast/pins/ksort.h	125;"	d
 ks_rewind	kseq.h	49;"	d
+ks_rewind	yeast/pins/kseq.h	49;"	d
 kseq_rewind	kseq.h	180;"	d
+kseq_rewind	yeast/pins/kseq.h	180;"	d
 ksstr_t	ksort.h	/^typedef const char *ksstr_t;$/;"	t
+ksstr_t	yeast/pins/ksort.h	/^typedef const char *ksstr_t;$/;"	t
 kstring_t	bed.h	/^} kstring_t;$/;"	t	typeref:struct:__kstring_t
 kstring_t	kseq.h	/^} kstring_t;$/;"	t	typeref:struct:__kstring_t
 kstring_t	ld_io.h	/^} kstring_t;$/;"	t	typeref:struct:__kstring_t
+kstring_t	yeast/pins/bed.h	/^} kstring_t;$/;"	t	typeref:struct:__kstring_t
+kstring_t	yeast/pins/kseq.h	/^} kstring_t;$/;"	t	typeref:struct:__kstring_t
+kstring_t	yeast/pins/ld_io.h	/^} kstring_t;$/;"	t	typeref:struct:__kstring_t
 kv_A	kvec.h	58;"	d
+kv_A	yeast/pins/kvec.h	58;"	d
 kv_a	kvec.h	94;"	d
+kv_a	yeast/pins/kvec.h	94;"	d
 kv_copy	kvec.h	72;"	d
+kv_copy	yeast/pins/kvec.h	72;"	d
 kv_destroy	kvec.h	57;"	d
+kv_destroy	yeast/pins/kvec.h	57;"	d
 kv_init	kvec.h	56;"	d
+kv_init	yeast/pins/kvec.h	56;"	d
 kv_max	kvec.h	61;"	d
+kv_max	yeast/pins/kvec.h	61;"	d
 kv_pop	kvec.h	59;"	d
+kv_pop	yeast/pins/kvec.h	59;"	d
 kv_push	kvec.h	78;"	d
+kv_push	yeast/pins/kvec.h	78;"	d
 kv_pushp	kvec.h	86;"	d
+kv_pushp	yeast/pins/kvec.h	86;"	d
 kv_reset	kvec.h	62;"	d
+kv_reset	yeast/pins/kvec.h	62;"	d
 kv_resize	kvec.h	64;"	d
+kv_resize	yeast/pins/kvec.h	64;"	d
 kv_reverse	kvec.h	100;"	d
+kv_reverse	yeast/pins/kvec.h	100;"	d
 kv_roundup32	kvec.h	53;"	d
+kv_roundup32	yeast/pins/kvec.h	53;"	d
 kv_size	kvec.h	60;"	d
+kv_size	yeast/pins/kvec.h	60;"	d
 kvec_t	kvec.h	55;"	d
+kvec_t	yeast/pins/kvec.h	55;"	d
 l	bed.h	/^	size_t l, m;$/;"	m	struct:__kstring_t
 l	kseq.h	/^	size_t l, m;$/;"	m	struct:__kstring_t
 l	ld_io.h	/^	size_t l, m;$/;"	m	struct:__kstring_t
-l_aux	bamlite.h	/^	int l_aux, l_data, m_data;$/;"	m	struct:__anon14
-l_data	bamlite.h	/^	int l_aux, l_data, m_data;$/;"	m	struct:__anon14
-l_qname	bamlite.h	/^	uint32_t bin:16, qual:8, l_qname:8;$/;"	m	struct:__anon13
-l_qseq	bamlite.h	/^	int32_t l_qseq;$/;"	m	struct:__anon13
-l_snp_n	bed.h	/^	uint32_t    l_snp_n, r_snp_n;$/;"	m	struct:__anon27
-l_snp_n	sdict.h	/^	uint32_t l_snp_n, r_snp_n;$/;"	m	struct:__anon7
-l_text	bamlite.h	/^	size_t l_text, n_text;$/;"	m	struct:__anon12
-ld_file_t	ld_io.h	/^} ld_file_t;$/;"	t	typeref:struct:__anon4
-ld_t	ld.h	/^} ld_t;$/;"	t	typeref:struct:__anon15
-le	bed.h	/^	uint32_t	rs, le;$/;"	m	struct:__anon27
-le	sdict.h	/^	uint32_t le, rs;$/;"	m	struct:__anon7
-left	ksort.h	/^	void *left, *right;$/;"	m	struct:__anon30
-len	bed.h	/^	uint32_t	len;$/;"	m	struct:__anon27
-len	graph.h	/^	uint32_t len;$/;"	m	struct:__anon16
-len	sdict.h	/^	uint32_t len;$/;"	m	struct:__anon7
-lim	cdict.h	/^	size_t		lim;$/;"	m	struct:__anon6
-llen	bed.h	/^	uint32_t llen, rlen;$/;"	m	struct:__anon29
+l	yeast/pins/bed.h	/^	size_t l, m;$/;"	m	struct:__kstring_t
+l	yeast/pins/kseq.h	/^	size_t l, m;$/;"	m	struct:__kstring_t
+l	yeast/pins/ld_io.h	/^	size_t l, m;$/;"	m	struct:__kstring_t
+l_aux	bamlite.h	/^	int l_aux, l_data, m_data;$/;"	m	struct:__anon44
+l_aux	yeast/pins/bamlite.h	/^	int l_aux, l_data, m_data;$/;"	m	struct:__anon15
+l_data	bamlite.h	/^	int l_aux, l_data, m_data;$/;"	m	struct:__anon44
+l_data	yeast/pins/bamlite.h	/^	int l_aux, l_data, m_data;$/;"	m	struct:__anon15
+l_qname	bamlite.h	/^	uint32_t bin:16, qual:8, l_qname:8;$/;"	m	struct:__anon43
+l_qname	yeast/pins/bamlite.h	/^	uint32_t bin:16, qual:8, l_qname:8;$/;"	m	struct:__anon14
+l_qseq	bamlite.h	/^	int32_t l_qseq;$/;"	m	struct:__anon43
+l_qseq	yeast/pins/bamlite.h	/^	int32_t l_qseq;$/;"	m	struct:__anon14
+l_snp_n	bed.h	/^	uint32_t    l_snp_n, r_snp_n;$/;"	m	struct:__anon57
+l_snp_n	sdict.h	/^	uint32_t l_snp_n, r_snp_n;$/;"	m	struct:__anon37
+l_snp_n	yeast/pins/bed.h	/^	uint32_t    l_snp_n, r_snp_n;$/;"	m	struct:__anon28
+l_snp_n	yeast/pins/sdict.h	/^	uint32_t l_snp_n, r_snp_n;$/;"	m	struct:__anon8
+l_text	bamlite.h	/^	size_t l_text, n_text;$/;"	m	struct:__anon42
+l_text	yeast/pins/bamlite.h	/^	size_t l_text, n_text;$/;"	m	struct:__anon13
+lc	yeast/ld_exp/LDhat/header.h	/^	char lc;$/;"	m	struct:data_sum
+ld	yeast/ld_exp/LDhat/header.h	/^	double ld[4];$/;"	m	struct:data_sum
+ld_calc2	yeast/ld_exp/LDhat/permute.c	/^void ld_calc2(pset,pijs,lseq,locs,ldv,inf,data) $/;"	f
+ld_file_t	ld_io.h	/^} ld_file_t;$/;"	t	typeref:struct:__anon34
+ld_file_t	yeast/pins/ld_io.h	/^} ld_file_t;$/;"	t	typeref:struct:__anon5
+ld_stat	yeast/ld_exp/LDhat/header.h	/^	float ld_stat[3];$/;"	m	struct:site_type
+ld_t	ld.h	/^} ld_t;$/;"	t	typeref:struct:__anon45
+ld_t	yeast/pins/ld.h	/^} ld_t;$/;"	t	typeref:struct:__anon16
+ld_test	yeast/ld_exp/LDhat/permute.c	/^void ld_test(data,pij,locs,lkmat,pset,npt,rcat,rmax,lkf) $/;"	f
+ldv	yeast/ld_exp/LDhat/rtest.cc	/^double ldv[3];$/;"	v
+le	bed.h	/^	uint32_t	rs, le;$/;"	m	struct:__anon57
+le	sdict.h	/^	uint32_t le, rs;$/;"	m	struct:__anon37
+le	yeast/pins/bed.h	/^	uint32_t	rs, le;$/;"	m	struct:__anon28
+le	yeast/pins/sdict.h	/^	uint32_t le, rs;$/;"	m	struct:__anon8
+left	ksort.h	/^	void *left, *right;$/;"	m	struct:__anon60
+left	yeast/pins/ksort.h	/^	void *left, *right;$/;"	m	struct:__anon31
+len	bed.h	/^	uint32_t	len;$/;"	m	struct:__anon57
+len	graph.h	/^	uint32_t len;$/;"	m	struct:__anon46
+len	sdict.h	/^	uint32_t len;$/;"	m	struct:__anon37
+len	yeast/pins/bed.h	/^	uint32_t	len;$/;"	m	struct:__anon28
+len	yeast/pins/graph.h	/^	uint32_t len;$/;"	m	struct:__anon17
+len	yeast/pins/sdict.h	/^	uint32_t len;$/;"	m	struct:__anon8
+lim	cdict.h	/^	size_t		lim;$/;"	m	struct:__anon36
+lim	yeast/pins/cdict.h	/^	size_t		lim;$/;"	m	struct:__anon7
+lk_calc	yeast/ld_exp/LDhat/pairwise.c	/^int lk_calc(pars,pij,data,tcat,rcat,rmax,lkrun,locs,ct,lkmat) $/;"	f
+lk_est	yeast/ld_exp/LDhat/pairwise.c	/^void lk_est(pset,npt,new,lkmat,tcat,stheta,rcat,rmax) $/;"	f
+lk_surf	yeast/ld_exp/LDhat/pairwise.c	/^void lk_surf(pset,pij,data,lkmat,tcat,theta,rcat,rmax,locs) $/;"	f
+lkmat	yeast/ld_exp/LDhat/rtest.cc	/^float **lkmat, rmax;$/;"	v
+lkmax	yeast/ld_exp/LDhat/header.h	/^	float lkmax;$/;"	m	struct:data_sum
+llen	bed.h	/^	uint32_t llen, rlen;$/;"	m	struct:__anon59
+llen	yeast/pins/bed.h	/^	uint32_t llen, rlen;$/;"	m	struct:__anon30
 lnk_read	bed.c	/^int lnk_read(bed_file_t *pf, lnk_rec_t *r)$/;"	f
-lnk_rec_t	bed.h	/^}lnk_rec_t;$/;"	t	typeref:struct:__anon29
+lnk_read	yeast/pins/bed.c	/^int lnk_read(bed_file_t *pf, lnk_rec_t *r)$/;"	f
+lnk_rec_t	bed.h	/^}lnk_rec_t;$/;"	t	typeref:struct:__anon59
+lnk_rec_t	yeast/pins/bed.h	/^}lnk_rec_t;$/;"	t	typeref:struct:__anon30
 load_gfa	graph.c	/^graph_t  *load_gfa(char *fn)$/;"	f
+load_gfa	yeast/pins/graph.c	/^graph_t  *load_gfa(char *fn)$/;"	f
 load_sat	graph.c	/^graph_t *load_sat(char *fn) $/;"	f
-m	aa_hic.c	/^	size_t n, m;	$/;"	m	struct:__anon3	file:
+load_sat	yeast/pins/graph.c	/^graph_t *load_sat(char *fn) $/;"	f
+locs	yeast/ld_exp/LDhat/rtest.cc	/^int **pij, *locs, npt, tcat, rcat;$/;"	v
+locs	yeast/ld_exp/LDhat/rtest.cc	/^int **pij,*locs,tcat,rcat;$/;"	v
+locs	yeast/ld_exp/LDhat/rtest.cc	/^int **pijs,*locs;$/;"	v
+lseq	yeast/ld_exp/LDhat/header.h	/^	int lseq;$/;"	m	struct:data_sum
+m	aa_hic.c	/^	size_t n, m;	$/;"	m	struct:__anon33	file:
 m	bed.h	/^	size_t l, m;$/;"	m	struct:__kstring_t
-m	col_10x_lnks.c	/^	uint32_t n, m;$/;"	m	struct:__anon11	file:
-m	graph.h	/^	uint32_t n, m;	$/;"	m	struct:__anon17
-m	graph.h	/^	uint32_t n, m;$/;"	m	struct:__anon19
-m	graph.h	/^	uint32_t n, m;$/;"	m	struct:__anon22
-m	graph.h	/^	uint32_t n, m;$/;"	m	struct:__anon23
-m	graph.h	/^	uint32_t n,m; \/\/be careful with these uint32_t$/;"	m	struct:__anon21
+m	col_10x_lnks.c	/^	uint32_t n, m;$/;"	m	struct:__anon41	file:
+m	graph.h	/^	uint32_t n, m;	$/;"	m	struct:__anon47
+m	graph.h	/^	uint32_t n, m;$/;"	m	struct:__anon49
+m	graph.h	/^	uint32_t n, m;$/;"	m	struct:__anon52
+m	graph.h	/^	uint32_t n, m;$/;"	m	struct:__anon53
+m	graph.h	/^	uint32_t n,m; \/\/be careful with these uint32_t$/;"	m	struct:__anon51
 m	kseq.h	/^	size_t l, m;$/;"	m	struct:__kstring_t
 m	ld_io.h	/^	size_t l, m;$/;"	m	struct:__kstring_t
-m_cnt	cdict.h	/^	size_t		n_cnt, m_cnt;$/;"	m	struct:__anon6
-m_data	bamlite.h	/^	int l_aux, l_data, m_data;$/;"	m	struct:__anon14
-m_seq	sdict.h	/^	uint32_t n_seq, m_seq;$/;"	m	struct:__anon8
+m	yeast/pins/aa_hic.c	/^	size_t n, m;	$/;"	m	struct:__anon4	file:
+m	yeast/pins/bed.h	/^	size_t l, m;$/;"	m	struct:__kstring_t
+m	yeast/pins/col_10x_lnks.c	/^	uint32_t n, m;$/;"	m	struct:__anon12	file:
+m	yeast/pins/graph.h	/^	uint32_t n, m;	$/;"	m	struct:__anon18
+m	yeast/pins/graph.h	/^	uint32_t n, m;$/;"	m	struct:__anon20
+m	yeast/pins/graph.h	/^	uint32_t n, m;$/;"	m	struct:__anon23
+m	yeast/pins/graph.h	/^	uint32_t n, m;$/;"	m	struct:__anon24
+m	yeast/pins/graph.h	/^	uint32_t n,m; \/\/be careful with these uint32_t$/;"	m	struct:__anon22
+m	yeast/pins/kseq.h	/^	size_t l, m;$/;"	m	struct:__kstring_t
+m	yeast/pins/ld_io.h	/^	size_t l, m;$/;"	m	struct:__kstring_t
+m_cnt	cdict.h	/^	size_t		n_cnt, m_cnt;$/;"	m	struct:__anon36
+m_cnt	yeast/pins/cdict.h	/^	size_t		n_cnt, m_cnt;$/;"	m	struct:__anon7
+m_data	bamlite.h	/^	int l_aux, l_data, m_data;$/;"	m	struct:__anon44
+m_data	yeast/pins/bamlite.h	/^	int l_aux, l_data, m_data;$/;"	m	struct:__anon15
+m_seq	sdict.h	/^	uint32_t n_seq, m_seq;$/;"	m	struct:__anon38
+m_seq	yeast/pins/sdict.h	/^	uint32_t n_seq, m_seq;$/;"	m	struct:__anon9
 main	aa_hic.c	/^int main(int argc, char *argv[])$/;"	f
 main	pin_10x.c	/^int main(int argc, char *argv[])$/;"	f
 main	pin_hic.c	/^int main(int argc, char *argv[])$/;"	f
+main	pin_hic_it.c	/^int main(int argc, char *argv[])$/;"	f
 main	pin_ld.c	/^int main(int argc, char *argv[])$/;"	f
+main	yeast/ld_exp/LDhat/convert.c	/^main (int argc, char *argv[]) {$/;"	f
+main	yeast/ld_exp/LDhat/pairwise.c	/^main (int argc, char *argv[]) {$/;"	f
+main	yeast/ld_exp/LDhat/permute.c	/^main (int argc, char *argv[]) {$/;"	f
+main	yeast/pins/aa_hic.c	/^int main(int argc, char *argv[])$/;"	f
+main	yeast/pins/pin_10x.c	/^int main(int argc, char *argv[])$/;"	f
+main	yeast/pins/pin_hic.c	/^int main(int argc, char *argv[])$/;"	f
+main	yeast/pins/pin_ld.c	/^int main(int argc, char *argv[])$/;"	f
 main_10x_lnks	col_10x_lnks.c	/^int main_10x_lnks(int argc, char *argv[])$/;"	f
+main_10x_lnks	yeast/pins/col_10x_lnks.c	/^int main_10x_lnks(int argc, char *argv[])$/;"	f
 main_bldg	build_graph.c	/^int main_bldg(int argc, char *argv[])$/;"	f
+main_bldg	yeast/pins/build_graph.c	/^int main_bldg(int argc, char *argv[])$/;"	f
 main_get_seq	get_seq.c	/^int main_get_seq(int argc, char *argv[])$/;"	f
+main_get_seq	yeast/pins/get_seq.c	/^int main_get_seq(int argc, char *argv[])$/;"	f
 main_gm_lnks	col_ld_lnks.c	/^int main_gm_lnks(int argc, char *argv[]) $/;"	f
+main_gm_lnks	yeast/pins/col_ld_lnks.c	/^int main_gm_lnks(int argc, char *argv[]) $/;"	f
 main_hic_lnks	col_hic_lnks.c	/^int main_hic_lnks(int argc, char *argv[])$/;"	f
+main_hic_lnks	yeast/pins/col_hic_lnks.c	/^int main_hic_lnks(int argc, char *argv[])$/;"	f
+matrix	yeast/ld_exp/LDhat/tools.c	/^float **matrix(nrl,nrh,ncl,nch)$/;"	f
+matrix_inverse_new	yeast/ld_exp/LDhat/pairlk.c	/^void matrix_inverse_new(double **a,long n)$/;"	f
+max	pin_hic_it.c	24;"	d	file:
+maxi	yeast/ld_exp/LDhat/tools.c	/^int maxi(i,j) $/;"	f
 merge_graph	graph.c	/^int merge_graph(graph_t *g, graph_t *c, int all)$/;"	f
-mpos	bamlite.h	/^	int32_t mpos;$/;"	m	struct:__anon13
-mq	aa_hic.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon2	file:
-mq	col_10x_lnks.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon9	file:
-mtid	bamlite.h	/^	int32_t mtid;$/;"	m	struct:__anon13
-n	aa_hic.c	/^	size_t n, m;	$/;"	m	struct:__anon3	file:
-n	col_10x_lnks.c	/^	uint32_t n, m;$/;"	m	struct:__anon11	file:
-n	graph.h	/^	uint32_t n, m;	$/;"	m	struct:__anon17
-n	graph.h	/^	uint32_t n, m;$/;"	m	struct:__anon19
-n	graph.h	/^	uint32_t n, m;$/;"	m	struct:__anon22
-n	graph.h	/^	uint32_t n, m;$/;"	m	struct:__anon23
-n	graph.h	/^	uint32_t n,m; \/\/be careful with these uint32_t$/;"	m	struct:__anon21
-n	graph.h	/^	uint32_t n:31, is_circ:1; \/\/be careful with these uint32_t $/;"	m	struct:__anon20
-n_cigar	bamlite.h	/^	uint32_t flag:16, n_cigar:16;$/;"	m	struct:__anon13
-n_cnt	cdict.h	/^	size_t		n_cnt, m_cnt;$/;"	m	struct:__anon6
-n_del	graph.h	/^	uint32_t n_del;$/;"	m	struct:__anon19
-n_seq	sdict.h	/^	uint32_t n_seq, m_seq;$/;"	m	struct:__anon8
-n_targets	bamlite.h	/^	int32_t n_targets;$/;"	m	struct:__anon12
-n_text	bamlite.h	/^	size_t l_text, n_text;$/;"	m	struct:__anon12
-name	cdict.h	/^	char	*name; $/;"	m	struct:__anon5
-name	graph.h	/^	char *name;$/;"	m	struct:__anon16
-name	graph.h	/^	char *name;$/;"	m	struct:__anon20
-name	graph.h	/^	char *name;$/;"	m	struct:__anon22
-name	sdict.h	/^	char *name;$/;"	m	struct:__anon7
+merge_graph	yeast/pins/graph.c	/^int merge_graph(graph_t *g, graph_t *c, int all)$/;"	f
+minc	yeast/ld_exp/LDhat/tools.c	/^int minc(l1,l2,ls) $/;"	f
+mini	yeast/ld_exp/LDhat/tools.c	/^int mini(i,j) $/;"	f
+mpos	bamlite.h	/^	int32_t mpos;$/;"	m	struct:__anon43
+mpos	yeast/pins/bamlite.h	/^	int32_t mpos;$/;"	m	struct:__anon14
+mq	aa_hic.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon32	file:
+mq	col_10x_lnks.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon39	file:
+mq	yeast/pins/aa_hic.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon3	file:
+mq	yeast/pins/col_10x_lnks.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon10	file:
+mtid	bamlite.h	/^	int32_t mtid;$/;"	m	struct:__anon43
+mtid	yeast/pins/bamlite.h	/^	int32_t mtid;$/;"	m	struct:__anon14
+n	aa_hic.c	/^	size_t n, m;	$/;"	m	struct:__anon33	file:
+n	col_10x_lnks.c	/^	uint32_t n, m;$/;"	m	struct:__anon41	file:
+n	graph.h	/^	uint32_t n, m;	$/;"	m	struct:__anon47
+n	graph.h	/^	uint32_t n, m;$/;"	m	struct:__anon49
+n	graph.h	/^	uint32_t n, m;$/;"	m	struct:__anon52
+n	graph.h	/^	uint32_t n, m;$/;"	m	struct:__anon53
+n	graph.h	/^	uint32_t n,m; \/\/be careful with these uint32_t$/;"	m	struct:__anon51
+n	graph.h	/^	uint32_t n:31, is_circ:1; \/\/be careful with these uint32_t $/;"	m	struct:__anon50
+n	yeast/pins/aa_hic.c	/^	size_t n, m;	$/;"	m	struct:__anon4	file:
+n	yeast/pins/col_10x_lnks.c	/^	uint32_t n, m;$/;"	m	struct:__anon12	file:
+n	yeast/pins/graph.h	/^	uint32_t n, m;	$/;"	m	struct:__anon18
+n	yeast/pins/graph.h	/^	uint32_t n, m;$/;"	m	struct:__anon20
+n	yeast/pins/graph.h	/^	uint32_t n, m;$/;"	m	struct:__anon23
+n	yeast/pins/graph.h	/^	uint32_t n, m;$/;"	m	struct:__anon24
+n	yeast/pins/graph.h	/^	uint32_t n,m; \/\/be careful with these uint32_t$/;"	m	struct:__anon22
+n	yeast/pins/graph.h	/^	uint32_t n:31, is_circ:1; \/\/be careful with these uint32_t $/;"	m	struct:__anon21
+n_cigar	bamlite.h	/^	uint32_t flag:16, n_cigar:16;$/;"	m	struct:__anon43
+n_cigar	yeast/pins/bamlite.h	/^	uint32_t flag:16, n_cigar:16;$/;"	m	struct:__anon14
+n_cnt	cdict.h	/^	size_t		n_cnt, m_cnt;$/;"	m	struct:__anon36
+n_cnt	yeast/pins/cdict.h	/^	size_t		n_cnt, m_cnt;$/;"	m	struct:__anon7
+n_del	graph.h	/^	uint32_t n_del;$/;"	m	struct:__anon49
+n_del	yeast/pins/graph.h	/^	uint32_t n_del;$/;"	m	struct:__anon20
+n_seq	sdict.h	/^	uint32_t n_seq, m_seq;$/;"	m	struct:__anon38
+n_seq	yeast/pins/sdict.h	/^	uint32_t n_seq, m_seq;$/;"	m	struct:__anon9
+n_targets	bamlite.h	/^	int32_t n_targets;$/;"	m	struct:__anon42
+n_targets	yeast/pins/bamlite.h	/^	int32_t n_targets;$/;"	m	struct:__anon13
+n_text	bamlite.h	/^	size_t l_text, n_text;$/;"	m	struct:__anon42
+n_text	yeast/pins/bamlite.h	/^	size_t l_text, n_text;$/;"	m	struct:__anon13
+name	cdict.h	/^	char	*name; $/;"	m	struct:__anon35
+name	graph.h	/^	char *name;$/;"	m	struct:__anon46
+name	graph.h	/^	char *name;$/;"	m	struct:__anon50
+name	graph.h	/^	char *name;$/;"	m	struct:__anon52
+name	sdict.h	/^	char *name;$/;"	m	struct:__anon37
+name	yeast/pins/cdict.h	/^	char	*name; $/;"	m	struct:__anon6
+name	yeast/pins/graph.h	/^	char *name;$/;"	m	struct:__anon17
+name	yeast/pins/graph.h	/^	char *name;$/;"	m	struct:__anon21
+name	yeast/pins/graph.h	/^	char *name;$/;"	m	struct:__anon23
+name	yeast/pins/sdict.h	/^	char *name;$/;"	m	struct:__anon8
 norm_cdf	col_10x_lnks.c	/^float norm_cdf(int x, float p, int n) {$/;"	f
+norm_cdf	yeast/pins/col_10x_lnks.c	/^float norm_cdf(int x, float p, int n) {$/;"	f
+npt	yeast/ld_exp/LDhat/rtest.cc	/^int **pij, *locs, npt, tcat, rcat;$/;"	v
+nrerror	yeast/ld_exp/LDhat/tools.c	/^void nrerror(error_text)$/;"	f
 ns	col_hic_lnks.c	/^	uint32_t s, ns;$/;"	m	struct:__anon1	file:
-ns	graph.h	/^	uint32_t *ns;$/;"	m	struct:__anon20
-ns_t	aa_hic.c	/^}ns_t;$/;"	t	typeref:struct:__anon3	file:
+ns	graph.h	/^	uint32_t *ns;$/;"	m	struct:__anon50
+ns	yeast/pins/col_hic_lnks.c	/^	uint32_t s, ns;$/;"	m	struct:__anon2	file:
+ns	yeast/pins/graph.h	/^	uint32_t *ns;$/;"	m	struct:__anon21
+ns_t	aa_hic.c	/^}ns_t;$/;"	t	typeref:struct:__anon33	file:
+ns_t	yeast/pins/aa_hic.c	/^}ns_t;$/;"	t	typeref:struct:__anon4	file:
+nseq	yeast/ld_exp/LDhat/header.h	/^	int nseq;$/;"	m	struct:data_sum
+nt	yeast/ld_exp/LDhat/header.h	/^	int nt;$/;"	m	struct:site_type
 open_ld	ld_io.c	/^ld_file_t * open_ld(const char *ld_fn)$/;"	f
-out_asms	graph.c	/^int out_asms(graph_t *g)$/;"	f
-out_edges	graph.c	/^int out_edges(graph_t *g, int all)$/;"	f
+open_ld	yeast/pins/ld_io.c	/^ld_file_t * open_ld(const char *ld_fn)$/;"	f
+order_pt	yeast/ld_exp/LDhat/seqtools.c	/^int * order_pt(pt,nsamp) $/;"	f
+out_asms	graph.c	/^int out_asms(graph_t *g, FILE *fout)$/;"	f
+out_asms	yeast/pins/graph.c	/^int out_asms(graph_t *g)$/;"	f
+out_edges	graph.c	/^int out_edges(graph_t *g, int all, FILE *fout)$/;"	f
+out_edges	yeast/pins/graph.c	/^int out_edges(graph_t *g, int all)$/;"	f
 out_graph	graph.c	/^int out_graph(graph_t *g)$/;"	f
+out_graph	yeast/pins/graph.c	/^int out_graph(graph_t *g)$/;"	f
 out_matrix	col_10x_lnks.c	/^void out_matrix(cdict_t *cds, sdict_t *ctgs, uint32_t n)$/;"	f
-out_matrix	col_hic_lnks.c	/^void out_matrix(cdict_t *cds, sdict_t *ctgs, uint32_t n)$/;"	f
-out_paths	graph.c	/^int out_paths(graph_t *g)$/;"	f
+out_matrix	col_hic_lnks.c	/^void out_matrix(cdict_t *cds, sdict_t *ctgs, uint32_t n, char *out_fn)$/;"	f
+out_matrix	yeast/pins/col_10x_lnks.c	/^void out_matrix(cdict_t *cds, sdict_t *ctgs, uint32_t n)$/;"	f
+out_matrix	yeast/pins/col_hic_lnks.c	/^void out_matrix(cdict_t *cds, sdict_t *ctgs, uint32_t n)$/;"	f
+out_paths	graph.c	/^int out_paths(graph_t *g, FILE *fout)$/;"	f
+out_paths	yeast/pins/graph.c	/^int out_paths(graph_t *g)$/;"	f
 out_record	col_ld_lnks.c	/^void out_record(cdict_t *cds, sdict_t *ctgs, uint32_t n)$/;"	f
-out_vetices	graph.c	/^int out_vetices(graph_t *g)$/;"	f
-p	ld.h	/^	double		p;         \/\/ P-value$/;"	m	struct:__anon15
-p1	ld.h	/^	float		p1, p2, q1, q2;$/;"	m	struct:__anon15
-p2	ld.h	/^	float		p1, p2, q1, q2;$/;"	m	struct:__anon15
+out_record	yeast/pins/col_ld_lnks.c	/^void out_record(cdict_t *cds, sdict_t *ctgs, uint32_t n)$/;"	f
+out_vetices	graph.c	/^int out_vetices(graph_t *g, FILE *fout)$/;"	f
+out_vetices	yeast/pins/graph.c	/^int out_vetices(graph_t *g)$/;"	f
+p	ld.h	/^	double		p;         \/\/ P-value$/;"	m	struct:__anon45
+p	yeast/pins/ld.h	/^	double		p;         \/\/ P-value$/;"	m	struct:__anon16
+p1	ld.h	/^	float		p1, p2, q1, q2;$/;"	m	struct:__anon45
+p1	yeast/pins/ld.h	/^	float		p1, p2, q1, q2;$/;"	m	struct:__anon16
+p2	ld.h	/^	float		p1, p2, q1, q2;$/;"	m	struct:__anon45
+p2	yeast/pins/ld.h	/^	float		p1, p2, q1, q2;$/;"	m	struct:__anon16
+pair_spectrum	yeast/ld_exp/LDhat/seqtools.c	/^struct site_type ** pair_spectrum(seqs,data,nall,pset,npt,new,anc,pij) $/;"	f
+pairs	yeast/ld_exp/LDhat/pairlk.c	/^void pairs(int nd_store, int *data, int K, double **P, double *mu, double theta[2], double rho_max, int n_pts, int NRUN, double *log_lik)$/;"	f
 parse_ld_t	ld_io.c	/^int parse_ld_t(kstring_t *buf, ld_t *t)$/;"	f
-parse_path	col_hic_lnks.c	/^uint32_t *parse_path(graph_t *g, uint32_t pid, uint32_t *n)$/;"	f
-path_t	graph.h	/^}path_t;$/;"	t	typeref:struct:__anon20
-paths	graph.h	/^	path_t *paths;$/;"	m	struct:__anon21
-paths_t	graph.h	/^}paths_t;$/;"	t	typeref:struct:__anon21
-pn	graph.h	/^	uint32_t *pn;$/;"	m	struct:__anon22
-pos	bamlite.h	/^	int32_t pos;$/;"	m	struct:__anon13
-pos1	ld.h	/^	uint32_t	pos1;$/;"	m	struct:__anon15
-pos2	ld.h	/^	uint32_t	pos2;$/;"	m	struct:__anon15
+parse_ld_t	yeast/pins/ld_io.c	/^int parse_ld_t(kstring_t *buf, ld_t *t)$/;"	f
+parse_path	graph.c	/^uint32_t *parse_path(graph_t *g, uint32_t pid, uint32_t *n)$/;"	f
+parse_path	yeast/pins/graph.c	/^uint32_t *parse_path(graph_t *g, uint32_t pid, uint32_t *n)$/;"	f
+path_t	graph.h	/^}path_t;$/;"	t	typeref:struct:__anon50
+path_t	yeast/pins/graph.h	/^}path_t;$/;"	t	typeref:struct:__anon21
+paths	graph.h	/^	path_t *paths;$/;"	m	struct:__anon51
+paths	yeast/pins/graph.h	/^	path_t *paths;$/;"	m	struct:__anon22
+paths_t	graph.h	/^}paths_t;$/;"	t	typeref:struct:__anon51
+paths_t	yeast/pins/graph.h	/^}paths_t;$/;"	t	typeref:struct:__anon22
+pi	yeast/ld_exp/LDhat/pairlk.c	/^double ***pi; \/* prob -factor into pis *\/$/;"	v
+pical	yeast/ld_exp/LDhat/pairlk.c	/^double pical(int *type,int k, int *new, int nt, int nd,double rho,int L,double ****Q, double *****Qb)$/;"	f
+pij	yeast/ld_exp/LDhat/rtest.cc	/^int **pij, *locs, npt, tcat, rcat;$/;"	v
+pij	yeast/ld_exp/LDhat/rtest.cc	/^int **pij,*locs,tcat,rcat;$/;"	v
+pijs	yeast/ld_exp/LDhat/rtest.cc	/^int **pijs,*locs;$/;"	v
+pn	graph.h	/^	uint32_t *pn;$/;"	m	struct:__anon52
+pn	yeast/pins/graph.h	/^	uint32_t *pn;$/;"	m	struct:__anon23
+pos	bamlite.h	/^	int32_t pos;$/;"	m	struct:__anon43
+pos	yeast/pins/bamlite.h	/^	int32_t pos;$/;"	m	struct:__anon14
+pos1	ld.h	/^	uint32_t	pos1;$/;"	m	struct:__anon45
+pos1	yeast/pins/ld.h	/^	uint32_t	pos1;$/;"	m	struct:__anon16
+pos2	ld.h	/^	uint32_t	pos2;$/;"	m	struct:__anon45
+pos2	yeast/pins/ld.h	/^	uint32_t	pos2;$/;"	m	struct:__anon16
+print_lks	yeast/ld_exp/LDhat/pairwise.c	/^void print_lks(pset,nseq,npt,lkmat,tcat,theta,rcat,rmax) $/;"	f
+print_pairs	yeast/ld_exp/LDhat/seqtools.c	/^void print_pairs(ofp,pset,nt) $/;"	f
+priorpr_l_imp	yeast/ld_exp/LDhat/pairlk.c	/^void priorpr_l_imp(double *logp, double *rem_p,int nt, int *n, int *rec,double *m,int n_pts,double *rho,double theta[2])$/;"	f
 proc_bam	aa_hic.c	/^int proc_bam(char *bam_fn, int min_mq, uint32_t max_ins_len, sdict_t *ctgs, ctg_pos_t *d, char *gap_fn, ns_t *ns)$/;"	f
 proc_bam	col_10x_lnks.c	/^int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ctgs, int opt, bc_ary_t *bc_l)$/;"	f
 proc_bam	col_hic_lnks.c	/^int proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, cdict_t **cs)$/;"	f
+proc_bam	yeast/pins/aa_hic.c	/^int proc_bam(char *bam_fn, int min_mq, uint32_t max_ins_len, sdict_t *ctgs, ctg_pos_t *d, char *gap_fn, ns_t *ns)$/;"	f
+proc_bam	yeast/pins/col_10x_lnks.c	/^int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ctgs, int opt, bc_ary_t *bc_l)$/;"	f
+proc_bam	yeast/pins/col_hic_lnks.c	/^int proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, cdict_t **cs)$/;"	f
 proc_ld	col_ld_lnks.c	/^int proc_ld(char *ld_fn, double pv, sdict_t *ctgs, cdict_t *cds)$/;"	f
+proc_ld	yeast/pins/col_ld_lnks.c	/^int proc_ld(char *ld_fn, double pv, sdict_t *ctgs, cdict_t *cds)$/;"	f
+procal_l	yeast/ld_exp/LDhat/pairlk.c	/^void procal_l(int *type, int nd, int k, int *n, int K, int L, double *mu,double ****Q, double *****Qb)$/;"	f
 process_graph	graph.c	/^int process_graph(graph_t *g)$/;"	f
-pt	graph.h	/^	paths_t pt;$/;"	m	struct:__anon24
-q1	ld.h	/^	float		p1, p2, q1, q2;$/;"	m	struct:__anon15
-q2	ld.h	/^	float		p1, p2, q1, q2;$/;"	m	struct:__anon15
-qual	bamlite.h	/^	uint32_t bin:16, qual:8, l_qname:8;$/;"	m	struct:__anon13
-r	ld.h	/^	float		r, r2;     \/\/ Correlation coefficient$/;"	m	struct:__anon15
-r2	ld.h	/^	float		r, r2;     \/\/ Correlation coefficient$/;"	m	struct:__anon15
-r_snp_n	bed.h	/^	uint32_t    l_snp_n, r_snp_n;$/;"	m	struct:__anon27
-r_snp_n	sdict.h	/^	uint32_t l_snp_n, r_snp_n;$/;"	m	struct:__anon7
+process_graph	yeast/pins/graph.c	/^int process_graph(graph_t *g)$/;"	f
+pset	yeast/ld_exp/LDhat/rtest.cc	/^struct site_type **pset;$/;"	v	typeref:struct:site_type
+pswap	yeast/ld_exp/LDhat/tools.c	/^void pswap(pt,s1,s2) $/;"	f
+pt	graph.h	/^	paths_t pt;$/;"	m	struct:__anon54
+pt	yeast/ld_exp/LDhat/header.h	/^	int pt[4];$/;"	m	struct:site_type
+pt	yeast/pins/graph.h	/^	paths_t pt;$/;"	m	struct:__anon25
+q1	ld.h	/^	float		p1, p2, q1, q2;$/;"	m	struct:__anon45
+q1	yeast/pins/ld.h	/^	float		p1, p2, q1, q2;$/;"	m	struct:__anon16
+q2	ld.h	/^	float		p1, p2, q1, q2;$/;"	m	struct:__anon45
+q2	yeast/pins/ld.h	/^	float		p1, p2, q1, q2;$/;"	m	struct:__anon16
+qual	bamlite.h	/^	uint32_t bin:16, qual:8, l_qname:8;$/;"	m	struct:__anon43
+qual	yeast/pins/bamlite.h	/^	uint32_t bin:16, qual:8, l_qname:8;$/;"	m	struct:__anon14
+r	ld.h	/^	float		r, r2;     \/\/ Correlation coefficient$/;"	m	struct:__anon45
+r	yeast/pins/ld.h	/^	float		r, r2;     \/\/ Correlation coefficient$/;"	m	struct:__anon16
+r2	ld.h	/^	float		r, r2;     \/\/ Correlation coefficient$/;"	m	struct:__anon45
+r2	yeast/pins/ld.h	/^	float		r, r2;     \/\/ Correlation coefficient$/;"	m	struct:__anon16
+r_snp_n	bed.h	/^	uint32_t    l_snp_n, r_snp_n;$/;"	m	struct:__anon57
+r_snp_n	sdict.h	/^	uint32_t l_snp_n, r_snp_n;$/;"	m	struct:__anon37
+r_snp_n	yeast/pins/bed.h	/^	uint32_t    l_snp_n, r_snp_n;$/;"	m	struct:__anon28
+r_snp_n	yeast/pins/sdict.h	/^	uint32_t l_snp_n, r_snp_n;$/;"	m	struct:__anon8
+ran2	yeast/ld_exp/LDhat/random.cc	/^float ran2(void) {$/;"	f
 rc_table	graph.c	/^uint8_t rc_table[128]={$/;"	v
+rc_table	yeast/pins/graph.c	/^uint8_t rc_table[128]={$/;"	v
+rcat	yeast/ld_exp/LDhat/rtest.cc	/^int **pij, *locs, npt, tcat, rcat;$/;"	v
+rcat	yeast/ld_exp/LDhat/rtest.cc	/^int **pij,*locs,tcat,rcat;$/;"	v
+rce	yeast/ld_exp/LDhat/header.h	/^	int rce;$/;"	m	struct:data_sum
+read_fasta	yeast/ld_exp/LDhat/seqtools.c	/^int read_fasta(seqs,ifp,nseq,lseq,seqnames) $/;"	f
 read_ld1	ld_io.c	/^int read_ld1(ld_file_t *ld_fp, ld_t *t)$/;"	f
+read_ld1	yeast/pins/ld_io.c	/^int read_ld1(ld_file_t *ld_fp, ld_t *t)$/;"	f
+read_lk	yeast/ld_exp/LDhat/seqtools.c	/^void read_lk(ifp,lkmat,npt,tcat,rcat) $/;"	f
+read_pars	yeast/ld_exp/LDhat/seqtools.c	/^float * read_pars(ifp,tcat,theta,rcat,rmax) $/;"	f
+read_pt	yeast/ld_exp/LDhat/seqtools.c	/^void read_pt(ifp,pset,npt) $/;"	f
 read_seq	graph.c	/^int read_seq(graph_t *g, char *seqfn)$/;"	f
-rev	aa_hic.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon2	file:
-rev	col_10x_lnks.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon9	file:
+read_seq	yeast/pins/graph.c	/^int read_seq(graph_t *g, char *seqfn)$/;"	f
+remov	yeast/ld_exp/LDhat/pairlk.c	/^void remov(int *type, int *nd, int c)$/;"	f
+rev	aa_hic.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon32	file:
+rev	col_10x_lnks.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon39	file:
 rev	col_hic_lnks.c	/^   	uint32_t tid:31, rev:1;$/;"	m	struct:__anon1	file:
-right	ksort.h	/^	void *left, *right;$/;"	m	struct:__anon30
-rlen	bed.h	/^	uint32_t llen, rlen;$/;"	m	struct:__anon29
-rs	bed.h	/^	uint32_t	rs, le;$/;"	m	struct:__anon27
-rs	sdict.h	/^	uint32_t le, rs;$/;"	m	struct:__anon7
-s	aa_hic.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon2	file:
+rev	yeast/pins/aa_hic.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon3	file:
+rev	yeast/pins/col_10x_lnks.c	/^	int mq:15, rev:1, as:16;$/;"	m	struct:__anon10	file:
+rev	yeast/pins/col_hic_lnks.c	/^   	uint32_t tid:31, rev:1;$/;"	m	struct:__anon2	file:
+rho	yeast/ld_exp/LDhat/header.h	/^	float rho;$/;"	m	struct:data_sum
+right	ksort.h	/^	void *left, *right;$/;"	m	struct:__anon60
+right	yeast/pins/ksort.h	/^	void *left, *right;$/;"	m	struct:__anon31
+rlen	bed.h	/^	uint32_t llen, rlen;$/;"	m	struct:__anon59
+rlen	yeast/pins/bed.h	/^	uint32_t llen, rlen;$/;"	m	struct:__anon30
+rmax	yeast/ld_exp/LDhat/rtest.cc	/^float **lkmat, rmax;$/;"	v
+rme	yeast/ld_exp/LDhat/header.h	/^	float rme;$/;"	m	struct:data_sum
+rs	bed.h	/^	uint32_t	rs, le;$/;"	m	struct:__anon57
+rs	sdict.h	/^	uint32_t le, rs;$/;"	m	struct:__anon37
+rs	yeast/pins/bed.h	/^	uint32_t	rs, le;$/;"	m	struct:__anon28
+rs	yeast/pins/sdict.h	/^	uint32_t le, rs;$/;"	m	struct:__anon8
+runif	yeast/ld_exp/LDhat/pairlk.c	/^double runif(void)$/;"	f
+s	aa_hic.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon32	file:
 s	bed.h	/^	char *s;$/;"	m	struct:__kstring_t
-s	bed.h	/^	uint32_t s, e;$/;"	m	struct:__anon28
-s	col_10x_lnks.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon9	file:
-s	col_10x_lnks.c	/^	uint32_t s, e; \/\/no more than $/;"	m	struct:__anon10	file:
+s	bed.h	/^	uint32_t s, e;$/;"	m	struct:__anon58
+s	col_10x_lnks.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon39	file:
+s	col_10x_lnks.c	/^	uint32_t s, e; \/\/no more than $/;"	m	struct:__anon40	file:
 s	col_hic_lnks.c	/^	uint32_t s, ns;$/;"	m	struct:__anon1	file:
 s	kseq.h	/^	char *s;$/;"	m	struct:__kstring_t
 s	ld_io.h	/^	char *s;$/;"	m	struct:__kstring_t
+s	yeast/pins/aa_hic.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon3	file:
+s	yeast/pins/bed.h	/^	char *s;$/;"	m	struct:__kstring_t
+s	yeast/pins/bed.h	/^	uint32_t s, e;$/;"	m	struct:__anon29
+s	yeast/pins/col_10x_lnks.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon10	file:
+s	yeast/pins/col_10x_lnks.c	/^	uint32_t s, e; \/\/no more than $/;"	m	struct:__anon11	file:
+s	yeast/pins/col_hic_lnks.c	/^	uint32_t s, ns;$/;"	m	struct:__anon2	file:
+s	yeast/pins/kseq.h	/^	char *s;$/;"	m	struct:__kstring_t
+s	yeast/pins/ld_io.h	/^	char *s;$/;"	m	struct:__kstring_t
 sd_destroy	sdict.c	/^void sd_destroy(sdict_t *d)$/;"	f
+sd_destroy	yeast/pins/sdict.c	/^void sd_destroy(sdict_t *d)$/;"	f
 sd_get	sdict.c	/^int32_t sd_get(const sdict_t *d, const char *name)$/;"	f
+sd_get	yeast/pins/sdict.c	/^int32_t sd_get(const sdict_t *d, const char *name)$/;"	f
 sd_hash	sdict.c	/^void sd_hash(sdict_t *d)$/;"	f
+sd_hash	yeast/pins/sdict.c	/^void sd_hash(sdict_t *d)$/;"	f
 sd_init	sdict.c	/^sdict_t *sd_init(void)$/;"	f
+sd_init	yeast/pins/sdict.c	/^sdict_t *sd_init(void)$/;"	f
 sd_put	sdict.c	/^int32_t sd_put(sdict_t *d, const char *name)$/;"	f
+sd_put	yeast/pins/sdict.c	/^int32_t sd_put(sdict_t *d, const char *name)$/;"	f
 sd_put2	sdict.c	/^int32_t sd_put2(sdict_t *d, const char *name, uint32_t len, uint32_t le, uint32_t rs, uint32_t l_snp_n, uint32_t r_snp_n)$/;"	f
-sd_seq_t	sdict.h	/^} sd_seq_t;$/;"	t	typeref:struct:__anon7
+sd_put2	yeast/pins/sdict.c	/^int32_t sd_put2(sdict_t *d, const char *name, uint32_t len, uint32_t le, uint32_t rs, uint32_t l_snp_n, uint32_t r_snp_n)$/;"	f
+sd_seq_t	sdict.h	/^} sd_seq_t;$/;"	t	typeref:struct:__anon37
+sd_seq_t	yeast/pins/sdict.h	/^} sd_seq_t;$/;"	t	typeref:struct:__anon8
 sd_squeeze	sdict.c	/^int32_t *sd_squeeze(sdict_t *d)$/;"	f
-sdict_t	sdict.h	/^} sdict_t;$/;"	t	typeref:struct:__anon8
-seq	graph.h	/^	char *seq;$/;"	m	struct:__anon16
-seq	sdict.h	/^	sd_seq_t *seq;$/;"	m	struct:__anon8
+sd_squeeze	yeast/pins/sdict.c	/^int32_t *sd_squeeze(sdict_t *d)$/;"	f
+sdict_t	sdict.h	/^} sdict_t;$/;"	t	typeref:struct:__anon38
+sdict_t	yeast/pins/sdict.h	/^} sdict_t;$/;"	t	typeref:struct:__anon9
+seed	yeast/ld_exp/LDhat/pairlk.c	/^unsigned long seed[2];$/;"	v
+seed_put	yeast/ld_exp/LDhat/pairlk.c	/^void seed_put(FILE *file_w)$/;"	f
+seed_set	yeast/ld_exp/LDhat/pairlk.c	/^void seed_set(FILE *file)$/;"	f
+seq	graph.h	/^	char *seq;$/;"	m	struct:__anon46
+seq	sdict.h	/^	sd_seq_t *seq;$/;"	m	struct:__anon38
+seq	yeast/pins/graph.h	/^	char *seq;$/;"	m	struct:__anon17
+seq	yeast/pins/sdict.h	/^	sd_seq_t *seq;$/;"	m	struct:__anon9
 set_c	graph.c	/^int set_c(graph_t *g, char *s)$/;"	f
+set_c	yeast/pins/graph.c	/^int set_c(graph_t *g, char *s)$/;"	f
+setseed	yeast/ld_exp/LDhat/random.cc	/^long setseed(void) {$/;"	f
+sh_vec_init	yeast/ld_exp/LDhat/pairlk.c	/^short *sh_vec_init(const size_t num)$/;"	f
 shash_t	cdict.c	/^typedef khash_t(str) shash_t;$/;"	t	file:
 shash_t	graph.c	/^typedef khash_t(str) shash_t;$/;"	t	file:
 shash_t	sdict.c	/^typedef khash_t(str) shash_t;$/;"	t	file:
-snp_n	cdict.h	/^	uint32_t snp_n:31, is_l:1;$/;"	m	struct:__anon5
+shash_t	yeast/pins/cdict.c	/^typedef khash_t(str) shash_t;$/;"	t	file:
+shash_t	yeast/pins/graph.c	/^typedef khash_t(str) shash_t;$/;"	t	file:
+shash_t	yeast/pins/sdict.c	/^typedef khash_t(str) shash_t;$/;"	t	file:
+site_type	yeast/ld_exp/LDhat/header.h	/^struct site_type {$/;"	s
+sizeofpset	yeast/ld_exp/LDhat/seqtools.c	/^int sizeofpset=100;$/;"	v
+snp_n	cdict.h	/^	uint32_t snp_n:31, is_l:1;$/;"	m	struct:__anon35
+snp_n	yeast/pins/cdict.h	/^	uint32_t snp_n:31, is_l:1;$/;"	m	struct:__anon6
 srch_path	graph.c	/^int srch_path(graph_t *g)$/;"	f
+srch_path	yeast/pins/graph.c	/^int srch_path(graph_t *g)$/;"	f
 srt_by_nm_loc	col_10x_lnks.c	/^void srt_by_nm_loc(bc_t *s, bc_t *e)$/;"	f
+srt_by_nm_loc	yeast/pins/col_10x_lnks.c	/^void srt_by_nm_loc(bc_t *s, bc_t *e)$/;"	f
 swap_endian_data	bamlite.c	/^static void swap_endian_data(const bam1_core_t *c, int l_data, uint8_t *data)$/;"	f	file:
-target_len	bamlite.h	/^	uint32_t *target_len;$/;"	m	struct:__anon12
-target_name	bamlite.h	/^	char **target_name;$/;"	m	struct:__anon12
-text	bamlite.h	/^	char *text;$/;"	m	struct:__anon12
-tid	aa_hic.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon2	file:
-tid	bamlite.h	/^	int32_t tid;$/;"	m	struct:__anon13
-tid	col_10x_lnks.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon9	file:
+swap_endian_data	yeast/pins/bamlite.c	/^static void swap_endian_data(const bam1_core_t *c, int l_data, uint8_t *data)$/;"	f	file:
+target_len	bamlite.h	/^	uint32_t *target_len;$/;"	m	struct:__anon42
+target_len	yeast/pins/bamlite.h	/^	uint32_t *target_len;$/;"	m	struct:__anon13
+target_name	bamlite.h	/^	char **target_name;$/;"	m	struct:__anon42
+target_name	yeast/pins/bamlite.h	/^	char **target_name;$/;"	m	struct:__anon13
+tcat	yeast/ld_exp/LDhat/rtest.cc	/^int **pij, *locs, npt, tcat, rcat;$/;"	v
+tcat	yeast/ld_exp/LDhat/rtest.cc	/^int **pij,*locs,tcat,rcat;$/;"	v
+text	bamlite.h	/^	char *text;$/;"	m	struct:__anon42
+text	yeast/pins/bamlite.h	/^	char *text;$/;"	m	struct:__anon13
+tid	aa_hic.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon32	file:
+tid	bamlite.h	/^	int32_t tid;$/;"	m	struct:__anon43
+tid	col_10x_lnks.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon39	file:
 tid	col_hic_lnks.c	/^   	uint32_t tid:31, rev:1;$/;"	m	struct:__anon1	file:
-type	bed.h	/^	char *type;$/;"	m	struct:__anon26
+tid	yeast/pins/aa_hic.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon3	file:
+tid	yeast/pins/bamlite.h	/^	int32_t tid;$/;"	m	struct:__anon14
+tid	yeast/pins/col_10x_lnks.c	/^	uint32_t s, e, tid;$/;"	m	struct:__anon10	file:
+tid	yeast/pins/col_hic_lnks.c	/^   	uint32_t tid:31, rev:1;$/;"	m	struct:__anon2	file:
+tlseq	yeast/ld_exp/LDhat/header.h	/^	int tlseq;$/;"	m	struct:data_sum
+type	bed.h	/^	char *type;$/;"	m	struct:__anon56
+type	yeast/pins/bed.h	/^	char *type;$/;"	m	struct:__anon27
+type_print	yeast/ld_exp/LDhat/seqtools.c	/^void type_print(pij,lseq) $/;"	f
+update	yeast/ld_exp/LDhat/pairlk.c	/^void update(int *type, double rho, double theta[2],int k, int *nd, int *nt, int *n,double *logq,double *m,int *rec,int K,int L, double **P,double ****Q, double *****Qb)$/;"	f
 update_graph	graph.c	/^int update_graph(graph_t *g) \/\/ update index$/;"	f
-v	graph.h	/^	uint32_t v; \/\/$/;"	m	struct:__anon18
-vertex_t	graph.h	/^}vertex_t;$/;"	t	typeref:struct:__anon16
-vertices	graph.h	/^	vertex_t *vertices;$/;"	m	struct:__anon17
-vertices_t	graph.h	/^}vertices_t;$/;"	t	typeref:struct:__anon17
+update_graph	yeast/pins/graph.c	/^int update_graph(graph_t *g) \/\/ update index$/;"	f
+v	graph.h	/^	uint32_t v; \/\/$/;"	m	struct:__anon48
+v	yeast/pins/graph.h	/^	uint32_t v; \/\/$/;"	m	struct:__anon19
+vector	yeast/ld_exp/LDhat/tools.c	/^float *vector(nl,nh)$/;"	f
+vertex_t	graph.h	/^}vertex_t;$/;"	t	typeref:struct:__anon46
+vertex_t	yeast/pins/graph.h	/^}vertex_t;$/;"	t	typeref:struct:__anon17
+vertices	graph.h	/^	vertex_t *vertices;$/;"	m	struct:__anon47
+vertices	yeast/pins/graph.h	/^	vertex_t *vertices;$/;"	m	struct:__anon18
+vertices_t	graph.h	/^}vertices_t;$/;"	t	typeref:struct:__anon47
+vertices_t	yeast/pins/graph.h	/^}vertices_t;$/;"	t	typeref:struct:__anon18
 vis_r	graph.c	/^int vis_r(graph_t *g, edge_t *a)$/;"	f
-vtx	graph.h	/^	vertices_t vtx;$/;"	m	struct:__anon24
-w	graph.h	/^	uint32_t w; \/\/$/;"	m	struct:__anon18
-wt	bed.h	/^	uint32_t wt:30, is_l:1, is_l2:1;$/;"	m	struct:__anon29
-wt	graph.h	/^	uint32_t wt:30, is_vis:1, is_del:1;$/;"	m	struct:__anon18
+vis_r	yeast/pins/graph.c	/^int vis_r(graph_t *g, edge_t *a)$/;"	f
+vtx	graph.h	/^	vertices_t vtx;$/;"	m	struct:__anon54
+vtx	yeast/pins/graph.h	/^	vertices_t vtx;$/;"	m	struct:__anon25
+vtx_idx	graph.h	82;"	d
+vtx_idx	yeast/pins/graph.h	82;"	d
+w	graph.h	/^	uint32_t w; \/\/$/;"	m	struct:__anon48
+w	yeast/pins/graph.h	/^	uint32_t w; \/\/$/;"	m	struct:__anon19
+watterson	yeast/ld_exp/LDhat/seqtools.c	/^float watterson(n) $/;"	f
+wt	bed.h	/^	uint32_t wt:30, is_l:1, is_l2:1;$/;"	m	struct:__anon59
+wt	graph.h	/^	uint32_t wt:30, is_vis:1, is_del:1;$/;"	m	struct:__anon48
+wt	yeast/pins/bed.h	/^	uint32_t wt:30, is_l:1, is_l2:1;$/;"	m	struct:__anon30
+wt	yeast/pins/graph.h	/^	uint32_t wt:30, is_vis:1, is_del:1;$/;"	m	struct:__anon19

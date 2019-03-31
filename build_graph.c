@@ -135,7 +135,7 @@ graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)
 
 
 
-int buildg(char *fn, char *edge_fn, int min_wt, int use_sat)
+int buildg(char *fn, char *edge_fn, int min_wt, int use_sat, char *out_fn)
 {
 	graph_t *og; 
 	sdict_t *ctgs = 0;
@@ -190,7 +190,7 @@ int buildg(char *fn, char *edge_fn, int min_wt, int use_sat)
 	fprintf(stderr, "[M::%s] output graph\n", __func__);
 #endif
 
-	dump_sat(og);
+	dump_sat(og, out_fn);
 
 	for (i = 0; i < n_cds; ++i) {
 		/*fprintf(stderr, "%s\n", ctgs->seq[i>>1].name);*/
@@ -211,10 +211,10 @@ int main_bldg(int argc, char *argv[])
 {
 	int c;
 	uint32_t min_wt = 5; char *program = argv[0];
-	char *sat_fn = 0, *ctg_fn = 0;
+	char *sat_fn = 0, *ctg_fn = 0, *out_fn = 0;
 	int use_sat = 0;
 	--argc, ++argv;
-	while (~(c=getopt(argc, argv, "w:s:c:h"))) {
+	while (~(c=getopt(argc, argv, "w:o:s:c:h"))) {
 		switch (c) {
 			case 'w': 
 				min_wt = atoi(optarg);
@@ -226,14 +226,18 @@ int main_bldg(int argc, char *argv[])
 			case 'c': 
 				ctg_fn = optarg;
 				break;
+			case 'o': 
+				out_fn = optarg;
+				break;
 			default:
 				if (c != 'h') fprintf(stderr, "[E::%s] undefined option %c\n", __func__, c);
 help:	
 				fprintf(stderr, "\nUsage: %s %s [<options>] <LINKS_MATRIX> \n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
 				fprintf(stderr, "         -w    INT      minimum weight for links [5]\n");
-				fprintf(stderr, "         -c    FILE     reference index file\n");
-				fprintf(stderr, "         -s    FILE     sat file\n");
+				fprintf(stderr, "         -c    FILE     reference index file [nul]\n");
+				fprintf(stderr, "         -s    FILE     sat file [nul]\n");
+				fprintf(stderr, "         -o    FILE     output file [nul]\n");
 				fprintf(stderr, "         -h             help\n");
 				return 1;	
 		}		
@@ -243,11 +247,9 @@ help:
 	}
 	char *lnk_fn = argv[optind];
 	fprintf(stderr, "Program starts\n");	
+	if (!sat_fn) sat_fn = ctg_fn;
 	int ret;
-	if (use_sat) 
-		ret = buildg(sat_fn, lnk_fn, min_wt, 1);
-	else  
-		ret = buildg(ctg_fn, lnk_fn, min_wt, 0);
+	ret = buildg(sat_fn, lnk_fn, min_wt, use_sat, out_fn);
 
 	fprintf(stderr, "Program ends\n");	
 	return ret;	

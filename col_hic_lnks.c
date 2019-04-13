@@ -158,7 +158,7 @@ int col_joints(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, 
 			/*fprintf(stderr, "%s\t%s\t%u\t%u\n", sq1->name, sq2->name, ind1, ind2);*/
 			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
 			uint32_t a0s = sq1->l_snp_n == a[0].rev ? sq1->rs + a[0].s : sq1->rs + sq1->len - a[0].s; 
-			uint32_t a1s = sq1->l_snp_n == a[1].rev ? sq1->rs + a[1].s : sq1->rs + sq1->len - a[1].s; 
+			uint32_t a1s = sq2->l_snp_n == a[1].rev ? sq2->rs + a[1].s : sq2->rs + sq2->len - a[1].s; 
 			uint32_t is_l1 = check_left_half(scfs->seq[ind1].le, scfs->seq[ind1].rs, a0s);
 			if (is_l1 > 1) return 1; //middle won't be added
 			uint32_t is_l2 = check_left_half(scfs->seq[ind2].le, scfs->seq[ind2].rs, a1s);
@@ -176,7 +176,7 @@ int col_joints(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, 
 			/*fprintf(stderr, "%u\t%u\n", ind1, ind2);*/
 			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
 			uint32_t f0s = sq1->l_snp_n == f[0].rev ? sq1->rs + f[0].s : sq1->rs + sq1->len - f[0].s; 
-			uint32_t f1s = sq1->l_snp_n == f[1].rev ? sq1->rs + f[1].s : sq1->rs + sq1->len - f[1].s; 
+			uint32_t f1s = sq1->l_snp_n == f[1].rev ? sq2->rs + f[1].s : sq2->rs + sq2->len - f[1].s; 
 			uint32_t is_l1 = check_left_half(scfs->seq[ind1].le, scfs->seq[ind1].rs, f0s);
 			if (is_l1 > 1) return 1; //middle won't be added
 			uint32_t is_l2 = check_left_half(scfs->seq[ind2].le, scfs->seq[ind2].rs, f1s);
@@ -350,7 +350,7 @@ int init_scaffs(graph_t *g, sdict_t *ctgs, sdict_t *scfs)
 		uint32_t m;
 		/*fprintf(stderr, "%d\n", as->pn[i]); */
 		uint32_t *p = parse_path(g, as->pn[i], &m);
-		uint32_t j, len, len_ctg;
+		uint32_t j, len = 0, len_ctg;
 		//push scaffold name to scfs 
 		int32_t scf_id =sd_put2(scfs, pt[as->pn[i]>>1].name, 0, 0, 0, 0, 0);
 		for ( j = 0; j < m; ++j ) { // pid, length,   
@@ -359,7 +359,7 @@ int init_scaffs(graph_t *g, sdict_t *ctgs, sdict_t *scfs)
 			//contig points to scaffold and set its start and direction
 			/*fprintf(stderr, "sid: %u\t%s\t%s\n", sid, pt[as->pn[i]>>1].name, vt[p[j]>>2].name);*/
 			ctgs->seq[sid].le = scf_id;
-			ctgs->seq[sid].rs = len_ctg;
+			ctgs->seq[sid].rs = len;
 			ctgs->seq[sid].l_snp_n = p[j] & 1;	
 			if (j == m - 1) 
 				len += len_ctg;
@@ -477,6 +477,8 @@ int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t wi
 	out_matrix(cds, _sd, n_cds, out_fn);
 	for (i = 0; i < n_cds; ++i)  cd_destroy(cds +i);	
 	if (cds) free(cds);
+	sd_destroy(ctgs);
+	sd_destroy(scfs);
 	return 0;
 
 }

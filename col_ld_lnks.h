@@ -19,11 +19,12 @@
 #ifndef _COL_GM_LNKS_H
 #define _COL_GM_LNKS_H
 
-
+//#include <stdint.h>
 #ifdef __cplusplus 
 extern "C" {
 #endif
-int main_gm_lnks(int argc, char *argv[]);
+int main_ld_lnks(int argc, char *argv[]);
+//int col_ld_lnks(char *bcf_fn, char *sat_fn, char **ld_fn, int n_ld, double pv, uint32_t ws, char *out_fn); //will be changed into two_fn
 #ifdef __cplusplus
 }
 #endif

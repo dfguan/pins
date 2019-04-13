@@ -34,7 +34,7 @@ help:
 		fprintf(stderr, "           getc        get contigs from graph\n");
 		return 1;
 	} else {
-		if (!strcmp(argv[1], "link")) main_gm_lnks(argc , argv);
+		if (!strcmp(argv[1], "link")) main_ld_lnks(argc , argv);
 	   	else if (!strcmp(argv[1], "build")) main_bldg(argc , argv);	
 		else if (!strcmp(argv[1], "getc")) main_get_seq(argc, argv);
 	   	else if (!strcmp(argv[1], "-h")) goto help;	

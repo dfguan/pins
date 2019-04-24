@@ -782,13 +782,14 @@ int read_seq(graph_t *g, char *seqfn)
 }
 
 
-int cp_seq(char *s, char *t, uint32_t len, int is_rc)
+int cp_seq(char *s, char *t, uint32_t len, int is_not_rc)
 {
-	if (is_rc) {
+	if (is_not_rc) {
+		memcpy(s, t, len * sizeof(char));
+	} else {
 		uint32_t i;
 		for ( i = 0; i < len; ++i) s[i] = rc_table[t[len -i - 1]];	
-	} else 
-		memcpy(s, t, len * sizeof(char));
+	} 
 	return 0;
 }
 

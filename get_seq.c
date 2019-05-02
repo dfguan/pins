@@ -57,9 +57,9 @@ int main_get_seq(int argc, char *argv[])
 		help:	
 				fprintf(stderr, "\nUsage: %s %s [<options>] <SAT> ...\n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
-				fprintf(stderr, "         -s    STR      sequence source file\n");
+				fprintf(stderr, "         -s    STR      fasta file\n");
 				fprintf(stderr, "         -o    STR      output file [stdout]\n");
-				fprintf(stderr, "         -l    STR      minimum output sequence length [stdout]\n");
+				fprintf(stderr, "         -l    STR      minimum output scaffolds length [0]\n");
 				fprintf(stderr, "         -h             help\n");
 				return 1;	
 		

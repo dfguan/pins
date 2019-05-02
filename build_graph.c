@@ -237,7 +237,7 @@ help:
 				fprintf(stderr, "         -w    INT      minimum weight for links [5]\n");
 				fprintf(stderr, "         -c    FILE     reference index file [nul]\n");
 				fprintf(stderr, "         -s    FILE     sat file [nul]\n");
-				fprintf(stderr, "         -o    FILE     output file [nul]\n");
+				fprintf(stderr, "         -o    FILE     output file [stdout]\n");
 				fprintf(stderr, "         -h             help\n");
 				return 1;	
 		}		

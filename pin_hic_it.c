@@ -26,18 +26,22 @@
 int main(int argc, char *argv[])
 {
 	int c;
-	int  min_mq = 10;
+	int  min_mq = 0;
 	int  iter = 3;
 	char *program;
 	char *sat_fn = 0, *faidx_fn = 0, *seq_fn = 0;
 	int use_sat = 0;
+	char *outdir = ".";
 	int min_wt = 5;
 	uint32_t min_l  = 0;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
-	while (~(c=getopt(argc, argv, "q:w:s:r:i:l:x:h"))) {
+	while (~(c=getopt(argc, argv, "O:q:w:s:r:i:l:x:h"))) {
 		switch (c) {
 			case 'q':
 				min_mq = atoi(optarg);
+				break;
+			case 'O':
+				outdir = optarg;
 				break;
 			case 'w': 
 				min_wt = atoi(optarg);
@@ -64,6 +68,7 @@ help:
 				fprintf(stderr, "\nUsage: %s [options] <BAM_FILE>\n", program);
 				fprintf(stderr, "Options:\n");
 				fprintf(stderr, "         -i    INT      iteration times\n");
+				fprintf(stderr, "         -O    STR      output directory [.]\n");
 				fprintf(stderr, "         -q    INT      minimum alignment quality [10]\n");
 				fprintf(stderr, "         -w    INT      minimum linkage weight [5]\n");
 				fprintf(stderr, "         -s    STR      sat file [nul]\n");
@@ -90,34 +95,44 @@ help:
 	}
 	fprintf(stderr, "Program starts\n");
 	//start iteration
-	int sat_fnl = sat_fn ? strlen(sat_fn) : 0;
-	char mat_fn[] = "links.01.mat";
+	int loutdir = strlen(outdir);
+	int sat_nfnl = loutdir + 1 + strlen("scaffs.01.sat");
+	int sat_fnl = sat_fn ? max(strlen(sat_fn), sat_nfnl) : sat_nfnl;
+	int scf_fnl = loutdir + 1 + strlen("scaffolds_final.fa");
+	int mat_fnl = loutdir + 1 + strlen("links.01.mat");
 	/*char mat_fn[] = "links.01.mat";*/
 	//scaffs.01.sat 14
-	char *sat_ofn = malloc(sizeof(char) * (max(sat_fnl, 13) + 1));
-	char *sat_nfn = malloc(sizeof(char) * 14);
-
+	char *sat_ofn = malloc(sizeof(char) * (sat_fnl + 1));
+	char *sat_nfn = malloc(sizeof(char) * (sat_nfnl + 1));
+	char *mat_fn = malloc(sizeof(char) * (mat_fnl + 1));
+	char *scf_fn = malloc(sizeof(char) * (scf_fnl + 1));
 	if (sat_fn) 
 		strcpy(sat_ofn, sat_fn);
 	else
 		sat_ofn[0] = 0;
-
+		
 	//scaffs.01.fa
 	
 	int i;
 	for ( i = 1; i <= iter; ++i) {
 		//input sat_fn output mat_fn
-		sprintf(sat_nfn, "scaffs.%02d.sat", i);
-		sprintf(mat_fn, "links.%02d.mat", i);
+		sprintf(sat_nfn, "%s/scaffs.%02d.sat", outdir, i);
+		sprintf(mat_fn, "%s/links.%02d.mat", outdir, i);
 		col_hic_lnks(sat_ofn, bam_fn, n_bam, min_mq, 5000, mat_fn);
 		buildg(use_sat ? sat_ofn : faidx_fn, mat_fn, min_wt, use_sat, sat_nfn);
 		//get seq at the final round
-		if (i == iter) get_seq(sat_nfn, seq_fn, min_l, "scaffolds_final.fa");
+		
+		if (i == iter) {
+			sprintf(scf_fn, "%s/scaffolds_final.fa", outdir);
+			get_seq(sat_nfn, seq_fn, min_l, scf_fn);
+		}
 		strcpy(sat_ofn, sat_nfn);
 		use_sat = 1;
 	}
 	free(sat_ofn);
 	free(sat_nfn);
+	free(scf_fn);
+	free(mat_fn);
 	fprintf(stderr, "Program ends\n");	
 	return 0;	
 }

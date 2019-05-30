@@ -35,6 +35,41 @@ typedef struct {
    	uint32_t tid:31, rev:1;
 }aln_inf_t;
 
+typedef struct {
+	uint64_t c1ns:63, qrev:1;
+	uint64_t c2ns:63, trev:1;
+}hit_t;
+typedef struct {
+	uint32_t n, m;
+	hit_t *ary;
+}hit_ary_t;
+
+void hit_ary_push(hit_ary_t *l, hit_t *z)
+{
+	uint32_t max = -1;
+	if (l->n >= l->m) {
+		if (l->m > (max >> 1)) {
+			fprintf(stderr, "Too many values here\n");
+			exit(1);
+		} else 
+			l->m = l->m ? l->m << 1 : 16;
+		l->ary = realloc(l->ary, sizeof(hit_t) * l->m);//beware of overflow
+	}
+	l->ary[l->n++] = *z;
+}
+
+int cmp_hits(const void *a, const void *b)
+{
+	hit_t *m = (hit_t *)a;
+	hit_t *n = (hit_t *)b; //too many branches
+	if (m->c1ns > n->c1ns) return 1;	
+	else if (m->c1ns < n->c1ns) return -1;
+	else if (m->c2ns > n->c2ns) return 1;	
+	else if (m->c2ns == n->c2ns) return 0;
+	else return -1;
+
+}
+
 uint32_t check_left_half(uint32_t le, uint32_t rs, uint32_t p) // 1 for left half 0 for right half 2 for middle
 {
 	if (p > le && p < rs) return 2;
@@ -144,7 +179,40 @@ int core(char *snps_fn, char *edge_fn)
 
 }
 */
-int col_joints(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, sdict_t *scfs, cdict_t *cs)
+int col_contacts(hit_ary_t *hit_ary, sdict_t *sd, cdict_t **cs)
+{
+	size_t i, j;
+	sdict_t *use_sd = sd;
+	if (!*cs) {
+		*cs = calloc(use_sd->n_seq << 1, sizeof(cdict_t));
+		for ( i = 0; i < use_sd->n_seq << 1; ++i) cd_init(&(*cs)[i]); //be careful with the access way
+	} 
+	hit_t *hs = hit_ary->ary;
+	size_t n = hit_ary->n;
+	for (i = 0, j = 1; j <= n; ++j) {
+		if (j == n || hs[i].c1ns != hs[j].c1ns || hs[i].c2ns != hs[j].c2ns || hs[i].qrev != hs[j].qrev || hs[i].trev != hs[j].trev) {
+			
+			uint32_t ind1 = hs[i].c1ns >> 32; 
+			uint32_t ind2 = hs[i].c2ns >> 32; 
+			uint32_t a0s = (uint32_t) hs[i].c1ns; 
+			uint32_t a1s = (uint32_t) hs[i].c2ns; 
+			
+			uint32_t is_l1 = check_left_half(use_sd->seq[ind1].le, use_sd->seq[ind1].rs, a0s);
+			if (is_l1 > 1) return 1; //middle won't be added
+			uint32_t is_l2 = check_left_half(use_sd->seq[ind2].le, use_sd->seq[ind2].rs, a1s);
+			if (is_l2 > 1) return 1; //middle won't be added
+			
+			cd_add(&cs[ind1<<1|is_l1], use_sd->seq[ind2].name, is_l2, is_l2?use_sd->seq[ind2].l_snp_n:use_sd->seq[ind2].r_snp_n);		
+			cd_add(&cs[ind2<<1|is_l2], use_sd->seq[ind1].name, is_l1, is_l1?use_sd->seq[ind1].l_snp_n:use_sd->seq[ind1].r_snp_n);		
+			
+			i = j;	
+		}
+	}
+}
+
+
+
+int col_hits(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, sdict_t *scfs, hit_ary_t *hit_ary)
 {
 	if (scfs->n_seq) {
 		if (a_cnt == 2) {
@@ -159,13 +227,18 @@ int col_joints(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, 
 			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
 			uint32_t a0s = sq1->l_snp_n == a[0].rev ? sq1->rs + a[0].s : sq1->rs + sq1->len - a[0].s; 
 			uint32_t a1s = sq2->l_snp_n == a[1].rev ? sq2->rs + a[1].s : sq2->rs + sq2->len - a[1].s; 
-			uint32_t is_l1 = check_left_half(scfs->seq[ind1].le, scfs->seq[ind1].rs, a0s);
-			if (is_l1 > 1) return 1; //middle won't be added
-			uint32_t is_l2 = check_left_half(scfs->seq[ind2].le, scfs->seq[ind2].rs, a1s);
-			if (is_l2 > 1) return 1; //middle won't be added
 			
-			cd_add(&cs[ind1<<1|is_l1], scfs->seq[ind2].name, is_l2, is_l2?scfs->seq[ind2].l_snp_n:scfs->seq[ind2].r_snp_n);		
-			cd_add(&cs[ind2<<1|is_l2], scfs->seq[ind1].name, is_l1, is_l1?scfs->seq[ind1].l_snp_n:scfs->seq[ind1].r_snp_n);		
+			if (ind1 < ind2) {
+				uint64_t c1ns = (uint64_t)ind1 << 32 | a0s; //don't think there will be 2G contig, if happends might be a bug 
+				uint64_t c2ns = (uint64_t)ind2 << 32 | a1s; //don't think there will be 2G contig, if happends might be a bug 
+				hit_t h = (hit_t) {c1ns, a[0].rev, c2ns, a[1].rev}; 
+				hit_ary_push(hit_ary, &h);	
+			} else {
+				uint64_t c1ns = (uint64_t)ind2 << 32 | a1s; //don't think there will be 2G contig, if happends might be a bug 
+				uint64_t c2ns = (uint64_t)ind1 << 32 | a0s; //don't think there will be 2G contig, if happends might be a bug 
+				hit_t h = (hit_t) {c1ns, a[0].rev, c2ns, a[1].rev}; 
+				hit_ary_push(hit_ary, &h);	
+			}
 			return 0;
 		} else if (f_cnt == 2){
 			sd_seq_t *sq1 = &ctgs->seq[f[0].tid];
@@ -177,13 +250,17 @@ int col_joints(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, 
 			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
 			uint32_t f0s = sq1->l_snp_n == f[0].rev ? sq1->rs + f[0].s : sq1->rs + sq1->len - f[0].s; 
 			uint32_t f1s = sq1->l_snp_n == f[1].rev ? sq2->rs + f[1].s : sq2->rs + sq2->len - f[1].s; 
-			uint32_t is_l1 = check_left_half(scfs->seq[ind1].le, scfs->seq[ind1].rs, f0s);
-			if (is_l1 > 1) return 1; //middle won't be added
-			uint32_t is_l2 = check_left_half(scfs->seq[ind2].le, scfs->seq[ind2].rs, f1s);
-			if (is_l2 > 1) return 1; //middle won't be added
-			
-			cd_add(&cs[ind1<<1|is_l1], scfs->seq[ind2].name, is_l2, is_l2?scfs->seq[ind2].l_snp_n:scfs->seq[ind2].r_snp_n);		
-			cd_add(&cs[ind2<<1|is_l2], scfs->seq[ind1].name, is_l1, is_l1?scfs->seq[ind1].l_snp_n:scfs->seq[ind1].r_snp_n);		
+			if (ind1 < ind2) {
+				uint64_t c1ns = (uint64_t)ind1 << 32 | f0s; //don't think there will be 2G contig, if happends might be a bug 
+				uint64_t c2ns = (uint64_t)ind2 << 32 | f1s; //don't think there will be 2G contig, if happends might be a bug 
+				hit_t h = (hit_t) {c1ns, f[0].rev, c2ns, f[1].rev}; 
+				hit_ary_push(hit_ary, &h);	
+			} else {
+				uint64_t c1ns = (uint64_t)ind2 << 32 | f1s; //don't think there will be 2G contig, if happends might be a bug 
+				uint64_t c2ns = (uint64_t)ind1 << 32 | f0s; //don't think there will be 2G contig, if happends might be a bug 
+				hit_t h = (hit_t) {c1ns, f[0].rev, c2ns, f[1].rev}; 
+				hit_ary_push(hit_ary, &h);	
+			}
 			return 0;	
 		}
 	} else {
@@ -198,30 +275,41 @@ int col_joints(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, 
 			uint32_t is_l2 = check_left_half(ctgs->seq[ind2].le, ctgs->seq[ind2].rs, a[1].s);
 			if (is_l2 > 1) return 1; //middle won't be added
 			
-			cd_add(&cs[ind1<<1|is_l1], ctgs->seq[ind2].name, is_l2, is_l2?ctgs->seq[ind2].l_snp_n:ctgs->seq[ind2].r_snp_n);		
-			cd_add(&cs[ind2<<1|is_l2], ctgs->seq[ind1].name, is_l1, is_l1?ctgs->seq[ind1].l_snp_n:ctgs->seq[ind1].r_snp_n);		
+			if (ind1 < ind2) {
+				uint64_t c1ns = (uint64_t)ind1 << 32 | a[0].s; //don't think there will be 2G contig, if happends might be a bug 
+				uint64_t c2ns = (uint64_t)ind2 << 32 | a[1].s; //don't think there will be 2G contig, if happends might be a bug 
+				hit_t h = (hit_t) {c1ns, a[0].rev, c2ns, a[1].rev}; 
+				hit_ary_push(hit_ary, &h);	
+			} else {
+				uint64_t c1ns = (uint64_t)ind2 << 32 | a[1].s; //don't think there will be 2G contig, if happends might be a bug 
+				uint64_t c2ns = (uint64_t)ind1 << 32 | a[0].s; //don't think there will be 2G contig, if happends might be a bug 
+				hit_t h = (hit_t) {c1ns, a[0].rev, c2ns, a[1].rev}; 
+				hit_ary_push(hit_ary, &h);	
+			}
 			return 0;
 		} else if (f_cnt == 2){
 			uint32_t ind1 = f[0].tid;
 			uint32_t ind2 = f[1].tid;
 			if (ind1 == ind2) return 1;
 			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
-			uint32_t is_l1 = check_left_half(ctgs->seq[ind1].le, ctgs->seq[ind1].rs, f[0].s);
-			if (is_l1 > 1) return 1; //middle won't be added
-			uint32_t is_l2 = check_left_half(ctgs->seq[ind2].le, ctgs->seq[ind2].rs, f[1].s);
-			if (is_l2 > 1) return 1; //middle won't be added
-			
-			cd_add(&cs[ind1<<1|is_l1], ctgs->seq[ind2].name, is_l2, is_l2?ctgs->seq[ind2].l_snp_n:ctgs->seq[ind2].r_snp_n);		
-			cd_add(&cs[ind2<<1|is_l2], ctgs->seq[ind1].name, is_l1, is_l1?ctgs->seq[ind1].l_snp_n:ctgs->seq[ind1].r_snp_n);		
+			if (ind1 < ind2) {
+				uint64_t c1ns = (uint64_t)ind1 << 32 | f[0].s; //don't think there will be 2G contig, if happends might be a bug 
+				uint64_t c2ns = (uint64_t)ind2 << 32 | f[1].s; //don't think there will be 2G contig, if happends might be a bug 
+				hit_t h = (hit_t) {c1ns, f[0].rev, c2ns, f[1].rev}; 
+				hit_ary_push(hit_ary, &h);	
+			} else {
+				uint64_t c1ns = (uint64_t)ind2 << 32 | f[1].s; //don't think there will be 2G contig, if happends might be a bug 
+				uint64_t c2ns = (uint64_t)ind1 << 32 | f[0].s; //don't think there will be 2G contig, if happends might be a bug 
+				hit_t h = (hit_t) {c1ns, f[0].rev, c2ns, f[1].rev}; 
+				hit_ary_push(hit_ary, &h);	
+			}
 			return 0;	
 		}
-	
-	
 	}
 	return 1;
 }
 
-int proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, cdict_t **cs)
+int proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, hit_ary_t *ha)
 {
 	
 	bamFile fp;
@@ -258,11 +346,6 @@ int proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, cdict_t **c
 		/*lenl = lenr = cur_ws;*/
 		/*sd_put2(ctgs, name, len, le, rs, lenl, lenr);*/
 	/*}*/
-	int i;	
-	if (!*cs) {
-		*cs = calloc(ctgs->n_seq << 1, sizeof(cdict_t));
-		for ( i = 0; i < ctgs->n_seq << 1; ++i) cd_init(&(*cs)[i]); //be careful with the access way
-	} 
 	/*if (!ns->ct) { //not initiate yet*/
 		/*init_gaps(gap_fn, ns, ctgs, max_ins_len);*/
 	/*}*/
@@ -286,7 +369,7 @@ int proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, cdict_t **c
 		//segment were mapped 
 		if (bam_read1(fp, b) >= 0 ) {
 			if (!cur_qn || strcmp(cur_qn, bam1_qname(b)) != 0) {
-				if (!col_joints(all.a, all.n, five.a, five.n, ctgs, scfs, *cs)) ++used_rdp_counter;
+				if (!col_hits(all.a, all.n, five.a, five.n, ctgs, scfs, ha)) ++used_rdp_counter;
 				/*aln_cnt = 0;	*/
 				/*rev = 0;*/
 				/*is_set = 0;*/
@@ -313,7 +396,7 @@ int proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, cdict_t **c
 			/*aln_cnt = (aln_cnt + 1 ) & 1;*/
 			/*if ((++bam_cnt % 1000000) == 0) fprintf(stderr, "[M::%s] processing %ld bams\n", __func__, bam_cnt); */
 		} else {
-			if (!col_joints(all.a, all.n, five.a, five.n, ctgs, scfs, *cs)) ++used_rdp_counter;
+			if (!col_hits(all.a, all.n, five.a, five.n, ctgs, scfs, ha)) ++used_rdp_counter;
 			if (cur_qn) ++rdp_counter, free(cur_qn); 
 			break;	
 		}
@@ -463,15 +546,26 @@ int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t wi
 	fprintf(stderr, "[M::%s] processing bam file\n", __func__);
 #endif
 	
-	cdict_t *cds = 0;
-	
+	hit_ary_t *hit_ary = calloc(1, sizeof(hit_ary_t));
 	int i;	
 	for ( i = 0; i < n_bam; ++i) {
-		if (proc_bam(bam_fn[i], min_mq, ctgs, scfs, &cds)) {
+		if (proc_bam(bam_fn[i], min_mq, ctgs, scfs, hit_ary)) {
 			return 1;	
 		}	
 	}
+	//sort hit_ary
+	if (!hit_ary->ary) {
+		fprintf(stderr, "[W::%s] no qualified hits found in the alignments\n", __func__);
+		return 1;
+	} 
+	qsort(hit_ary->ary, hit_ary->n, sizeof(hit_t), cmp_hits);	
+	//col joints
+	cdict_t *cds = 0;
 	sdict_t *_sd = scfs->n_seq ? scfs : ctgs;
+	col_contacts(hit_ary, _sd, &cds);
+	
+	free(hit_ary->ary); free(hit_ary);
+
 	uint32_t n_cds = _sd->n_seq << 1;
 	/*for (i = 0; i < n_cds; ++i)	cd_norm(cds + i);*/
 	out_matrix(cds, _sd, n_cds, out_fn);

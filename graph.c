@@ -15,6 +15,7 @@
  *
  * =====================================================================================
  */
+#include <math.h>
 #include <zlib.h>
 
 #include "graph.h"
@@ -46,9 +47,9 @@ uint8_t rc_table[128]={
 	4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
 	4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
 	4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,
-	4,84,4,71,4,4,4,67,4,4,4,4,4,4,67,4,
+	4,84,4,71,4,4,4,67,4,4,4,4,4,4,78,4,
 	4,4,4,4,65,4,4,4,4,4,4,4,4,4,4,4,4,
-	84,4,71,4,4,4,67,4,4,4,4,4,4,67,4,4,
+	84,4,71,4,4,4,67,4,4,4,4,4,4,78,4,4,
 	4,4,4,65,4,4,4,4,4,4,4,4,4,4,4
 };
 
@@ -387,18 +388,22 @@ int clean_edges(graph_t *g)
 		edge_t *a;
 		//find maximum weight
 		//if there are mulitple maximum weights break them all we can't decide which way to choose
-		uint32_t mwt = 0;
+		uint32_t mwt = 0, smwt = 0;
 		uint32_t n_mwt = 0;	
 		for ( a = e; a < e + en; ++a) {
 			if (a->is_del) continue;
 			if (a->wt > mwt) {
+				smwt = mwt;
 				mwt = a->wt;
 				n_mwt = 1;	
+			} else if (a->wt > smwt) {
+				smwt = a->wt;
+			/*}*/
 			} else if (a->wt == mwt) {
 				++n_mwt;
 			} 	
 		} 
-
+		/*if (norm_cdf(mwt, 0.5, mwt + smwt) <= 0.95) n_mwt = 2; */
 		for (a = e; a < e + en; ++a) {
 			if (a->is_del) continue;
 			if (n_mwt > 1 || a->wt != mwt) {

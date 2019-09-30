@@ -60,13 +60,13 @@ int get_links(char *links_fn, cdict_t *cds, sdict_t *ctgs)
 	while (lnk_read(bf, &r) >= 0) {
 		uint32_t ind1;
 		if (r.is_l) 
-			ind1 = sd_put2(ctgs, r.ctgn, 0, 0, 0, r.llen, 0);		
+			ind1 = sd_put2(ctgs, r.ctgn, 0, 0, 0, r.rlen, 0); //wrong length add to contig
 		else
-			ind1 = sd_put2(ctgs, r.ctgn, 0, 0, 0, 0, r.llen);		
+			ind1 = sd_put2(ctgs, r.ctgn, 0, 0, 0, 0, r.rlen);		
 		if (r.is_l2)
-			sd_put2(ctgs, r.ctgn2, 0, 0, 0, r.rlen, 0);		
+			sd_put2(ctgs, r.ctgn2, 0, 0, 0, r.llen, 0);		
 		else
-			sd_put2(ctgs, r.ctgn2, 0, 0, 0, 0, r.rlen);		
+			sd_put2(ctgs, r.ctgn2, 0, 0, 0, 0, r.llen);		
 		/*uint32_t ind2 = sd_put2(ctgs, r.ctgn, 0, 0, 0, r.llen, r.rlen);		*/
 		line_n += 1;
 		cd_add2(&cds[ind1<<1|r.is_l], r.ctgn2, r.is_l2, r.wt, r.llen);	//this has been normalized	
@@ -135,7 +135,7 @@ graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)
 
 
 
-int buildg(char *fn, char *edge_fn, int min_wt, int use_sat, char *out_fn)
+int buildg(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min_rat, float min_mdw, int mlc, char *out_fn)
 {
 	graph_t *og; 
 	sdict_t *ctgs = 0;
@@ -170,7 +170,11 @@ int buildg(char *fn, char *edge_fn, int min_wt, int use_sat, char *out_fn)
 	/*anothernorm(cds, ctgs);*/
 	/*return 0;*/
 	for ( i = 0; i < n_cds; ++i) cd_sort(cds+i); 
-	cd_set_lim(cds, n_cds, min_wt); 
+	cd_set_lim(cds, n_cds, min_wt, min_mdw, mlc); 
+	/*if (norm) */
+	if (norm) cd_filt(cds, n_cds, min_rat); 
+	/*if (norm) for (i = 0; i < n_cds; ++i) cd_norm(cds + i);*/
+	/*if (norm) for (i = 0; i < n_cds; ++i) cd_norm(cds + i);*/
 	/*for (i = 0; i < n_cds; ++i)	cd_norm(cds + i);*/
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] building graph\n", __func__);
@@ -212,9 +216,11 @@ int main_bldg(int argc, char *argv[])
 	int c;
 	uint32_t min_wt = 5; char *program = argv[0];
 	char *sat_fn = 0, *ctg_fn = 0, *out_fn = 0;
-	int use_sat = 0;
+	int use_sat = 0, mlc = -1;
+	int norm = 0;
+	float msn = .7, mdw = 0.0;
 	--argc, ++argv;
-	while (~(c=getopt(argc, argv, "w:o:s:c:h"))) {
+	while (~(c=getopt(argc, argv, "w:o:s:c:nm:f:k:h"))) {
 		switch (c) {
 			case 'w': 
 				min_wt = atoi(optarg);
@@ -226,6 +232,18 @@ int main_bldg(int argc, char *argv[])
 			case 'c': 
 				ctg_fn = optarg;
 				break;
+			case 'f': 
+				mdw = atof(optarg);
+				break;
+			case 'k': 
+				mlc = atoi(optarg);
+				break;
+			case 'n': 
+				norm = 1;
+				break;
+			case 'm': 
+				msn = atof(optarg);
+				break;
 			case 'o': 
 				out_fn = optarg;
 				break;
@@ -235,7 +253,11 @@ help:
 				fprintf(stderr, "\nUsage: %s %s [<options>] <LINKS_MATRIX> \n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
 				fprintf(stderr, "         -w    INT      minimum weight for links [5]\n");
+				fprintf(stderr, "         -k    INT      maximum linking candiates [-1, unlimit]\n");
 				fprintf(stderr, "         -c    FILE     reference index file [nul]\n");
+				fprintf(stderr, "         -n    BOOL     normalize weight [0]\n");
+				fprintf(stderr, "         -m    FLOAT    minimum barcode ratio [.7]\n");
+				fprintf(stderr, "         -f    FLOAT    minimum weight difference [0.0]\n");
 				fprintf(stderr, "         -s    FILE     sat file [nul]\n");
 				fprintf(stderr, "         -o    FILE     output file [stdout]\n");
 				fprintf(stderr, "         -h             help\n");
@@ -249,7 +271,7 @@ help:
 	fprintf(stderr, "Program starts\n");	
 	if (!sat_fn) sat_fn = ctg_fn;
 	int ret;
-	ret = buildg(sat_fn, lnk_fn, min_wt, use_sat, out_fn);
+	ret = buildg(sat_fn, lnk_fn, min_wt, use_sat, norm, msn, mdw, mlc, out_fn);
 
 	fprintf(stderr, "Program ends\n");	
 	return ret;	

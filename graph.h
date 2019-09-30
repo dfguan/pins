@@ -102,6 +102,7 @@ extern "C" {
 	int get_path(graph_t *g, uint32_t min_l, char *fn);
 	int read_seq(graph_t *g, char *fn);
 	uint32_t *parse_path(graph_t *g, uint32_t pid, uint32_t *n);
+	float norm_cdf(int x, float p, int n);
 #ifdef __cplusplus
 }
 #endif

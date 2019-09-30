@@ -179,14 +179,10 @@ int core(char *snps_fn, char *edge_fn)
 
 }
 */
-int col_contacts(hit_ary_t *hit_ary, sdict_t *sd, cdict_t **cs)
+int col_contacts(hit_ary_t *hit_ary, sdict_t *sd, cdict_t *cs)
 {
 	size_t i, j;
 	sdict_t *use_sd = sd;
-	if (!*cs) {
-		*cs = calloc(use_sd->n_seq << 1, sizeof(cdict_t));
-		for ( i = 0; i < use_sd->n_seq << 1; ++i) cd_init(&(*cs)[i]); //be careful with the access way
-	} 
 	hit_t *hs = hit_ary->ary;
 	size_t n = hit_ary->n;
 	for (i = 0, j = 1; j <= n; ++j) {
@@ -196,12 +192,10 @@ int col_contacts(hit_ary_t *hit_ary, sdict_t *sd, cdict_t **cs)
 			uint32_t ind2 = hs[i].c2ns >> 32; 
 			uint32_t a0s = (uint32_t) hs[i].c1ns; 
 			uint32_t a1s = (uint32_t) hs[i].c2ns; 
-			
 			uint32_t is_l1 = check_left_half(use_sd->seq[ind1].le, use_sd->seq[ind1].rs, a0s);
 			if (is_l1 > 1) return 1; //middle won't be added
 			uint32_t is_l2 = check_left_half(use_sd->seq[ind2].le, use_sd->seq[ind2].rs, a1s);
 			if (is_l2 > 1) return 1; //middle won't be added
-			
 			cd_add(&cs[ind1<<1|is_l1], use_sd->seq[ind2].name, is_l2, is_l2?use_sd->seq[ind2].l_snp_n:use_sd->seq[ind2].r_snp_n);		
 			cd_add(&cs[ind2<<1|is_l2], use_sd->seq[ind1].name, is_l1, is_l1?use_sd->seq[ind1].l_snp_n:use_sd->seq[ind1].r_snp_n);		
 			
@@ -560,10 +554,13 @@ int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t wi
 	} 
 	qsort(hit_ary->ary, hit_ary->n, sizeof(hit_t), cmp_hits);	
 	//col joints
-	cdict_t *cds = 0;
+	fprintf(stderr, "collect thing");
 	sdict_t *_sd = scfs->n_seq ? scfs : ctgs;
-	col_contacts(hit_ary, _sd, &cds);
+	cdict_t *cds = calloc(_sd->n_seq << 1, sizeof(cdict_t));
+	for ( i = 0; i < _sd->n_seq << 1; ++i) cd_init(&cds[i]); //be careful with the access way
+	col_contacts(hit_ary, _sd, cds);
 	
+	fprintf(stderr, "finish thing");
 	free(hit_ary->ary); free(hit_ary);
 
 	uint32_t n_cds = _sd->n_seq << 1;

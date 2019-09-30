@@ -234,6 +234,19 @@ int bamlite_gzread(gzFile file, void *ptr, unsigned int len) {
 	return ret;
 }
 
+int32_t bam_aux2i(const uint8_t *s)
+{
+	int type;
+	if (s == 0) return 0;
+	type = *s++;
+	if (type == 'c') return (int32_t)*(int8_t*)s;
+	else if (type == 'C') return (int32_t)*(uint8_t*)s;
+	else if (type == 's') return (int32_t)*(int16_t*)s;
+	else if (type == 'S') return (int32_t)*(uint16_t*)s;
+	else if (type == 'i' || type == 'I') return *(int32_t*)s;
+	else return 0;
+}
+
 int bamlite_gzclose(gzFile file) {
 	int ret = gzclose(file);
 	if (Z_OK != ret) {

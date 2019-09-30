@@ -26,12 +26,14 @@
 #include "kvec.h"
 #include "ksort.h"
 #include "cdict.h"
+#include "utls.h"
 
 #define BC_LEN 16
 
 typedef struct {
 	int mq:15, rev:1, as:16;
 	uint32_t s, e, tid;
+	int iden;
 }aln_inf_t;
 
 
@@ -69,6 +71,8 @@ void bc_ary_push(bc_ary_t *l, bc_t *z)
 
 int col_bcnt(aln_inf_t  *fal, uint32_t bc, int min_mq, uint32_t max_is, bc_ary_t *l)
 {
+	/*if (fal->iden < 98)*/
+		/*return 1;*/
 	if (fal->mq > min_mq) {
 		uint32_t s = fal->s;
 		uint32_t e = fal->e;
@@ -113,6 +117,18 @@ uint32_t check_left_half(uint32_t le, uint32_t rs, uint32_t p) // 1 for left hal
 	if (p > le && p < rs) return 2;
 	else if (p <= le) return 1;
 	else return 0;	
+}
+
+int get_identity(uint32_t *cigar, int n_cigar, int len, int ed)
+{
+	int i, s = 0;
+	for ( i = 0; i < n_cigar; ++i) {
+		uint8_t c  = bam_cigar_opchr(cigar[i]);
+		if (c == 'M' || c == '=' || c == 'X' || c == 'I') 
+			s += bam_cigar_oplen(cigar[i]);
+	}	
+	/*fprintf(stderr, "cigar_v: %d\n", s);*/
+	return (int)((float)(s - ed)/len * 100);
 }
 
 uint32_t get_target_end(uint32_t *cigar, int n_cigar, uint32_t s)
@@ -210,9 +226,15 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ct
 			if (b->core.flag & 0x4) continue; //not aligned
 			++aln_cnt;
 			rev = (rev << 1) | !!(b->core.flag & 0x10);
+		
 			if (b->core.isize > 0 && !is_set) {
-				uint8_t *s = bam_aux_get(b, "AS");
-				if (s) aln.as = *(int32_t *)(s+1); else aln.as = -1;	
+				uint8_t *s; //= bam_aux_get(b, "AS");
+				/*if (s) aln.as = bam_aux2i(s); else aln.as = -1;	*/
+				s = bam_aux_get(b, "NM");
+				if (s) aln.iden = bam_aux2i(s); else aln.iden = 0;	
+				/*fprintf(stderr, "%s %d %d\n", cur_qn,aln.as, aln.iden);*/
+				/*aln.iden = get_identity(bam1_cigar(b), b->core.n_cigar, b->core.l_qseq, aln.iden);*/
+				/*fprintf(stderr, "%s %d\n", cur_qn, aln.iden);*/
 				aln.s = opt ? get_target_end(bam1_cigar(b), b->core.n_cigar, b->core.pos) :  b->core.pos + 1;
 				aln.mq = b->core.qual;
 				aln.tid = b->core.tid;
@@ -267,11 +289,11 @@ int col_joints(uint32_t ind1l, uint32_t ind2l, sdict_t *ctgs, cdict_t *cs)
 
 //from  https://github.com/bcgsc/arcs
 //
-float norm_cdf(int x, float p, int n) {
-    float mean = n * p;
-    float sd = sqrt(n * p * (1 - p));
-    return 0.5 * (1 + erf((x - mean)/(sd * sqrt(2))));
-}
+/*float norm_cdf(int x, float p, int n) {*/
+    /*float mean = n * p;*/
+    /*float sd = sqrt(n * p * (1 - p));*/
+    /*return 0.5 * (1 + erf((x - mean)/(sd * sqrt(2))));*/
+/*}*/
 
 
 /*ctg_pos_t *col_pos(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_inner_bcn, uint32_t min_mol_len, int n_targets)*/
@@ -294,6 +316,7 @@ cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_
 		uint32_t z;
 		for ( z = i; z < n && (p[z].bctn >> 32) == (p[i].bctn >> 32); ++z);
 		uint32_t n_bc = z - i;
+		/*fprintf(stderr, "enter a new barcode\n");*/
 		if (n_bc > min_bc && n_bc < max_bc) {
 			srt_by_nm_loc(p+i, p+z); //sort by ctg name and locus
 			kv_reset(ctgl);
@@ -309,9 +332,11 @@ cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_
 				if (j == z || p[j].bctn != p[i].bctn) {
 					uint32_t is_hd = lt_cnt > re_cnt ? 1 : 0;//is_head
 
-					fprintf(stderr, "%s\t%u\t%u\t%u\n",ctgs->seq[p[i].bctn&0xFFFF].name, lt_cnt,re_cnt, mid_cnt);
-					if (j - i > min_inner_bcn && lt_cnt != re_cnt && 1 - norm_cdf(is_hd ? lt_cnt : re_cnt, 0.5, j - i) < 0.05) 
+					if (j - i > min_inner_bcn && lt_cnt != re_cnt && 1 - norm_cdf(is_hd ? lt_cnt : re_cnt, 0.5, lt_cnt + re_cnt) < 0.05)  {
+					
+					fprintf(stderr, "%s\t%u\t%u\t%u\t%u\n",ctgs->seq[p[i].bctn&0xFFFF].name, lt_cnt,re_cnt, mid_cnt, j - i);
 						kv_push(uint32_t, ctgl, (p[i].bctn & 0xFFFF) << 1 | is_hd);
+					}
 					 					
 					if (j == z) break; //without this will lead to infinate loop
 					i = j;
@@ -331,13 +356,13 @@ cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_
 			}
 			uint32_t ctgl_s = kv_size(ctgl);
 		/*fprintf(stderr, "enter\n");*/
-			if (ctgl_s > 1) 
-				for ( j = 0; j < ctgl_s; ++j) fprintf(stderr, "%s%c,",ctgs->seq[ctgl.a[j]>>1].name, ctgl.a[j]&1 ? '+':'-');
-				fprintf(stderr, "\n");	
-				for (j = 0; j < ctgl_s; ++j) {
-						uint32_t w;
-						for ( w = j + 1; w < ctgl_s; ++w) col_joints(ctgl.a[j], ctgl.a[w], ctgs, cs); 
-				}
+			/*if (ctgl_s > 1) */
+				/*for ( j = 0; j < ctgl_s; ++j) fprintf(stderr, "%s%c,",ctgs->seq[ctgl.a[j]>>1].name, ctgl.a[j]&1 ? '+':'-');*/
+			/*fprintf(stderr, "\n");	*/
+			for (j = 0; j < ctgl_s; ++j) {
+					uint32_t w;
+					for ( w = j + 1; w < ctgl_s; ++w) col_joints(ctgl.a[j], ctgl.a[w], ctgs, cs); 
+			}
 		/*fprintf(stderr, "leave\n");*/
 		}	
 		i = z;	
@@ -393,9 +418,9 @@ int col_10x_lnks(char *bam_fn[], int n_bam, int min_mq,  uint32_t win_s, uint32_
 int main_10x_lnks(int argc, char *argv[])
 {
 	int c;
-	int  min_mq = 30;
-	uint32_t win_s = 50000, min_inner_bcn = 3; 
-	uint32_t min_bc = 5, max_bc = 1000000, max_is=1000;
+	int  min_mq = 20;
+	uint32_t win_s = 50000, min_inner_bcn = 8; 
+	uint32_t min_bc = 20, max_bc = 100000, max_is=1000;
 	char *r;
 	
 	int option = 0; //the way to calculate molecule length //internal parameters not allowed to adjust by users
@@ -429,12 +454,12 @@ int main_10x_lnks(int argc, char *argv[])
 help:	
 				fprintf(stderr, "\nUsage: %s %s [<options>] <BAM_FILE> ...\n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
-				fprintf(stderr, "         -b    INT      minimum barcode number for each molecule [5]\n");	
-				fprintf(stderr, "         -B    INT      maximum barcode number for each molecule [1000]\n");
-				fprintf(stderr, "         -q    INT      minimum alignment quality [0]\n");
-				fprintf(stderr, "         -w    INT      window size [50000]\n");
-				fprintf(stderr, "         -L    INT      maximum insertion length [10000]\n");
-				fprintf(stderr, "         -a    INT      minimum barcode for contig [1]\n");
+				fprintf(stderr, "         -b    INT      minimum barcode number for each molecule [20]\n");	
+				fprintf(stderr, "         -B    INT      maximum barcode number for each molecule [100000]\n");
+				fprintf(stderr, "         -q    INT      minimum mapping quality [20]\n");
+				fprintf(stderr, "         -w    INT      edge length [50000]\n");
+				fprintf(stderr, "         -L    INT      maximum insertion length [1000]\n");
+				fprintf(stderr, "         -a    INT      minimum barcode for contig [8]\n");
 				fprintf(stderr, "         -h             help\n");
 				return 1;	
 		}		

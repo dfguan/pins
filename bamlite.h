@@ -111,6 +111,7 @@ extern "C" {
 	bam_header_t *bam_header_read(bamFile fp);
 	int bam_read1(bamFile fp, bam1_t *b);
 	uint8_t *bam_aux_get(const bam1_t *b, const char tag[2]);
+	int32_t bam_aux2i(const uint8_t *s);
 #ifdef USE_VERBOSE_ZLIB_WRAPPERS
 	gzFile bamlite_gzopen(const char *fn, const char *mode);
 	int bamlite_gzread(gzFile file, void *ptr, unsigned int len);

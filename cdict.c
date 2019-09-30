@@ -20,8 +20,9 @@
 #include <stdlib.h>
 
 #include "khash.h"
-
 #include "cdict.h"
+#include "utls.h"
+
 
 KHASH_MAP_INIT_STR(str, uint32_t)
 typedef khash_t(str) shash_t;
@@ -44,26 +45,65 @@ void cd_destroy(cdict_t *c)
 	}
 }
 
-void cd_set_lim(cdict_t *c, uint32_t n, uint32_t min_wt)
+void cd_filt(cdict_t *c, uint32_t n, float min_rat)
 {
 	cdict_t *t;
 	uint32_t i, j;
 	for (i = 0; i < n; ++i)  {
 		t = c + i;
 		//maximum weight
-		t->lim = 1;
-		if (!t->n_cnt)  continue;
-		/*uint32_t max = 5; */
-			/*= t->cnts[0].cnt;*/
+		/*t->lim = t->n_cnt ? 1 : 0;*/
+		if (!t->n_cnt || !t->lim)  continue;
+
+		uint32_t max_wt = t->cnts[0].cnt;
 		/*fprintf(stderr, "%u\t", max);*/
 		/*if (max <= 2) continue;*/
-		/*max >>= 1;*/
-		/*for(j = 0; j < t->n_cnt; ++j) {*/
-			/*if (t->cnts[j].cnt >= min_wt)*/
-				/*++t->lim;*/
-			/*else*/
-				/*break;				*/
-		/*}	*/
+		/*max_wt >>= 2;*/
+		uint32_t sum_wt = 0;
+		for(j = 0; j < t->lim; ++j) sum_wt += t->cnts[j].cnt;
+	  	if ((float) max_wt / sum_wt < min_rat) t->lim = 0;	
+		fprintf(stderr, "%d\t%d\t%d\n", t->lim, max_wt, sum_wt);
+	}
+}
+
+
+
+
+void cd_set_lim(cdict_t *c, uint32_t n, uint32_t min_wt, float min_rat, int max_cand)
+{
+	cdict_t *t;
+
+	uint32_t i, j;
+
+	for (i = 0; i < n; ++i)  {
+		t = c + i;
+		//maximum weight
+		/*t->lim = t->n_cnt ? 1 : 0;*/
+		t->lim = 0;
+
+		if (!t->n_cnt)  continue;
+		if (~max_cand) {
+			t->lim = max_cand <  t->n_cnt ? max_cand : t->n_cnt;
+		} else {
+		
+			/*fprintf(stderr, "%u\t", max);*/
+			/*if (max <= 2) continue;*/
+			/*max_wt >>= 2;*/
+			
+			for(j = 0; j < t->n_cnt; ++j) {
+				if (t->cnts[j].cnt >= min_wt) 
+					++t->lim;
+				else
+					break;
+				/*if (t->cnts[j].cnt >= 0.1 * max_wt)*/
+					/*++t->lim;*/
+				/*else*/
+					/*break;				*/
+			}
+		
+		}
+		//the first candiate is not significantly better than the second 
+		if (t->n_cnt > 1 && norm_cdf(t->cnts[0].cnt, 0.5, t->cnts[1].cnt + t->cnts[0].cnt) <= min_rat && strcmp(t->cnts[0].name, t->cnts[1].name)) t->lim = 0; 
 	}
 }
 

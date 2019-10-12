@@ -1,2 +1,3 @@
-# scaffs
-scaffolding based on 10x and hic data
+# pins
+LD, linked reads, Hi-C scaffolding toolkit
+ 

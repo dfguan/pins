@@ -554,13 +554,11 @@ int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t wi
 	} 
 	qsort(hit_ary->ary, hit_ary->n, sizeof(hit_t), cmp_hits);	
 	//col joints
-	fprintf(stderr, "collect thing");
 	sdict_t *_sd = scfs->n_seq ? scfs : ctgs;
 	cdict_t *cds = calloc(_sd->n_seq << 1, sizeof(cdict_t));
 	for ( i = 0; i < _sd->n_seq << 1; ++i) cd_init(&cds[i]); //be careful with the access way
 	col_contacts(hit_ary, _sd, cds);
 	
-	fprintf(stderr, "finish thing");
 	free(hit_ary->ary); free(hit_ary);
 
 	uint32_t n_cds = _sd->n_seq << 1;
@@ -607,7 +605,6 @@ help:
 				fprintf(stderr, "\nUsage: %s %s [options] <BAM_FILE>\n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
 				fprintf(stderr, "         -q    INT      minimum alignment quality [0]\n");
-				fprintf(stderr, "         -w    INT      window size [50000]\n");
 				fprintf(stderr, "         -s    STR      sat file\n");
 				fprintf(stderr, "         -o    STR      output file\n");
 				fprintf(stderr, "         -h             help\n");

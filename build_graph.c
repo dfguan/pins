@@ -216,9 +216,9 @@ int main_bldg(int argc, char *argv[])
 	int c;
 	uint32_t min_wt = 5; char *program = argv[0];
 	char *sat_fn = 0, *ctg_fn = 0, *out_fn = 0;
-	int use_sat = 0, mlc = -1;
+	int use_sat = 0, mlc = 1;
 	int norm = 0;
-	float msn = .7, mdw = 0.0;
+	float msn = .7, mdw = 0.95;
 	--argc, ++argv;
 	while (~(c=getopt(argc, argv, "w:o:s:c:nm:f:k:h"))) {
 		switch (c) {
@@ -252,12 +252,12 @@ int main_bldg(int argc, char *argv[])
 help:	
 				fprintf(stderr, "\nUsage: %s %s [<options>] <LINKS_MATRIX> \n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
-				fprintf(stderr, "         -w    INT      minimum weight for links [5]\n");
-				fprintf(stderr, "         -k    INT      maximum linking candiates [-1, unlimit]\n");
+				fprintf(stderr, "         -w    INT      minimum weight for links [10]\n");
+				fprintf(stderr, "         -k    INT      maximum linking candiates [1]\n");
 				fprintf(stderr, "         -c    FILE     reference index file [nul]\n");
-				fprintf(stderr, "         -n    BOOL     normalize weight [0]\n");
-				fprintf(stderr, "         -m    FLOAT    minimum barcode ratio [.7]\n");
-				fprintf(stderr, "         -f    FLOAT    minimum weight difference [0.0]\n");
+				fprintf(stderr, "         -n    BOOL     normalize weight [false]\n");
+				/*fprintf(stderr, "         -m    FLOAT    minimum barcode ratio [.7]\n");*/
+				fprintf(stderr, "         -f    FLOAT    minimum weight difference [0.95]\n");
 				fprintf(stderr, "         -s    FILE     sat file [nul]\n");
 				fprintf(stderr, "         -o    FILE     output file [stdout]\n");
 				fprintf(stderr, "         -h             help\n");

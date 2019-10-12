@@ -41,9 +41,9 @@ int main_get_seq(int argc, char *argv[])
 	
 	--argc, ++argv;
 	int c;
-	while (~(c = getopt(argc, argv, "s:o:l:h"))) {
+	while (~(c = getopt(argc, argv, "c:o:l:h"))) {
 		switch (c) {
-			case 's':
+			case 'c':
 				seq_fn = optarg;
 				break;
 			case 'o':
@@ -57,7 +57,7 @@ int main_get_seq(int argc, char *argv[])
 		help:	
 				fprintf(stderr, "\nUsage: %s %s [<options>] <SAT> ...\n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
-				fprintf(stderr, "         -s    STR      fasta file\n");
+				fprintf(stderr, "         -c    STR      fasta file\n");
 				fprintf(stderr, "         -o    STR      output file [stdout]\n");
 				fprintf(stderr, "         -l    STR      minimum output scaffolds length [0]\n");
 				fprintf(stderr, "         -h             help\n");

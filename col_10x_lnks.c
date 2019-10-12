@@ -51,7 +51,7 @@ KRADIX_SORT_INIT(bct, bc_t, bc_key, 8)
 /*KRADIX_SORT_INIT(cord, cors, cord_key, 4);*/
 	
 typedef struct {
-	uint32_t n, m;
+	uint64_t n, m;
 	bc_t *ary;
 }bc_ary_t;
 
@@ -69,7 +69,7 @@ void bc_ary_push(bc_ary_t *l, bc_t *z)
 	l->ary[l->n++] = *z;
 }
 
-int col_bcnt(aln_inf_t  *fal, uint32_t bc, int min_mq, uint32_t max_is, bc_ary_t *l)
+int col_bcnt(aln_inf_t  *fal, uint32_t bc, int min_mq, uint32_t max_is, bc_ary_t *l, sdict_t *ctgs)
 {
 	/*if (fal->iden < 98)*/
 		/*return 1;*/
@@ -85,6 +85,7 @@ int col_bcnt(aln_inf_t  *fal, uint32_t bc, int min_mq, uint32_t max_is, bc_ary_t
 				/*e = tmp;*/
 			/*}*/
 		if (e - s < max_is) {
+			/*fprintf(stderr, "D\t%u\t%s\t%u\t%u\n", bc, ctgs->seq[fal->tid].name, s, e);*/
 			bc_t t = (bc_t) {s, e, (uint64_t)bc << 32 | fal->tid};
 			
 			bc_ary_push(l, &t);	
@@ -156,7 +157,7 @@ uint32_t get_target_end(uint32_t *cigar, int n_cigar, uint32_t s)
 /*}*/
 
 
-int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ctgs, int opt, bc_ary_t *bc_l)
+int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ctgs, sdict_t *bc_n, int opt, bc_ary_t *bc_l)
 {
 	bamFile fp;
 	bam_header_t *h;
@@ -200,7 +201,6 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ct
 	/*}*/
 	char *cur_qn = NULL, *cur_bc = NULL;
 	/*int32_t cur_l = 0;*/
-	sdict_t* bc_n = sd_init();
 	long rdp_cnt = 0;
 	long used_rdp_cnt = 0;
 	int is_set = 0;
@@ -212,7 +212,7 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ct
 		if (bam_read1(fp, b) >= 0 ) {
 			if (!cur_qn || strcmp(cur_qn, bam1_qname(b)) != 0) {
 				/*fprintf(stderr, "%d\t%d\t%d\n", aln_cnt, rev, aln.mq);*/
-				if (aln_cnt == 2 && (rev == 1 || rev == 2) && !col_bcnt(&aln, sd_put(bc_n, cur_bc), min_mq, max_is, bc_l)) ++used_rdp_cnt;
+				if (aln_cnt == 2 && (rev == 1 || rev == 2) && !col_bcnt(&aln, sd_put(bc_n, cur_bc), min_mq, max_is, bc_l, ctgs)) ++used_rdp_cnt;
 				aln_cnt = 0;	
 				rev = 0;
 				is_set = 0;
@@ -246,7 +246,7 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ct
 				aln.e = b->core.pos + 1;
 		} else {
 			/*fprintf(stderr, "%d\t%d\t%d\n", aln_cnt, rev, aln.mq);*/
-			if (aln_cnt == 2 && (rev == 1 || rev == 2) && !col_bcnt(&aln, sd_put(bc_n, cur_bc), min_mq, max_is, bc_l)) ++used_rdp_cnt;
+			if (aln_cnt == 2 && (rev == 1 || rev == 2) && !col_bcnt(&aln, sd_put(bc_n, cur_bc), min_mq, max_is, bc_l, ctgs)) ++used_rdp_cnt;
 			break;	
 		}
 	}
@@ -254,7 +254,6 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ct
 	bam_destroy1(b);
 	bam_header_destroy(h);
 	bam_close(fp);
-	sd_destroy(bc_n);	
 	return 0;
 }
 
@@ -303,20 +302,20 @@ cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_
 	/*cord_t *cc = calloc(n_targets, sizeof(cord_t));*/
 	
 	radix_sort_bct(bc_l->ary, bc_l->ary + bc_l->n);	
-	uint32_t n = bc_l->n;
+	uint64_t n = bc_l->n;
 	bc_t *p = bc_l->ary;
 	
 	kvec_t(uint32_t) ctgl;	
 	kv_init(ctgl);
-	uint32_t i;
+	uint64_t i;
 	cdict_t *cs = calloc(ctgs->n_seq << 1, sizeof(cdict_t));	
 	for ( i = 0; i < ctgs->n_seq << 1; ++i) cd_init(&cs[i]);
 	i = 0;
 	while (i < n) {
-		uint32_t z;
+		uint64_t z;
 		for ( z = i; z < n && (p[z].bctn >> 32) == (p[i].bctn >> 32); ++z);
 		uint32_t n_bc = z - i;
-		/*fprintf(stderr, "enter a new barcode\n");*/
+		fprintf(stderr, "NEW BARCODE %lu\n", n_bc);
 		if (n_bc > min_bc && n_bc < max_bc) {
 			srt_by_nm_loc(p+i, p+z); //sort by ctg name and locus
 			kv_reset(ctgl);
@@ -332,21 +331,23 @@ cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_
 				if (j == z || p[j].bctn != p[i].bctn) {
 					uint32_t is_hd = lt_cnt > re_cnt ? 1 : 0;//is_head
 
+					fprintf(stderr, "%s\t%u\t%u\t%u\t%u\n",ctgs->seq[p[i].bctn&0xFFFF].name, lt_cnt,re_cnt, mid_cnt, j - i);
 					if (j - i > min_inner_bcn && lt_cnt != re_cnt && 1 - norm_cdf(is_hd ? lt_cnt : re_cnt, 0.5, lt_cnt + re_cnt) < 0.05)  {
 					
-					fprintf(stderr, "%s\t%u\t%u\t%u\t%u\n",ctgs->seq[p[i].bctn&0xFFFF].name, lt_cnt,re_cnt, mid_cnt, j - i);
 						kv_push(uint32_t, ctgl, (p[i].bctn & 0xFFFF) << 1 | is_hd);
 					}
 					 					
 					if (j == z) break; //without this will lead to infinate loop
 					i = j;
 					lt_cnt = re_cnt = mid_cnt = 0;
+					fprintf(stderr, "%s\t%u\n",ctgs->seq[p[i].bctn&0xFFFF].name, p[i].s);
 					is_l = check_left_half(ctgs->seq[p[i].bctn & 0xFFFF].le, ctgs->seq[p[i].bctn & 0xFFFF].rs, p[i].s); 
 					if (is_l == 1) ++lt_cnt;
 					else if (is_l == 0) ++re_cnt;
 					else ++mid_cnt;
 					j = i + 1;
 				} else {
+					fprintf(stderr, "%s\t%u\n",ctgs->seq[p[j].bctn&0xFFFF].name, p[j].s);
 					is_l = check_left_half(ctgs->seq[p[j].bctn & 0xFFFF].le, ctgs->seq[p[j].bctn & 0xFFFF].rs, p[j].s);
 					if (is_l == 1) ++lt_cnt;
 					else if (is_l == 0) ++re_cnt;
@@ -359,6 +360,8 @@ cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_
 			/*if (ctgl_s > 1) */
 				/*for ( j = 0; j < ctgl_s; ++j) fprintf(stderr, "%s%c,",ctgs->seq[ctgl.a[j]>>1].name, ctgl.a[j]&1 ? '+':'-');*/
 			/*fprintf(stderr, "\n");	*/
+			if (ctgl_s > 1) fprintf(stderr, "PASS\n");
+		   	else fprintf(stderr, "NONE\n");
 			for (j = 0; j < ctgl_s; ++j) {
 					uint32_t w;
 					for ( w = j + 1; w < ctgl_s; ++w) col_joints(ctgl.a[j], ctgl.a[w], ctgs, cs); 
@@ -376,17 +379,19 @@ int col_10x_lnks(char *bam_fn[], int n_bam, int min_mq,  uint32_t win_s, uint32_
 {
 	sdict_t *ctgs = sd_init();
 
+	sdict_t* bc_n = sd_init();
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] processing bam file\n", __func__);
 #endif
 	int i;
 	bc_ary_t *bc_l = calloc(1, sizeof(bc_ary_t));
 	for ( i = 0; i < n_bam; ++i) {
-		if (proc_bam(bam_fn[i], min_mq, max_is, win_s, ctgs, opt, bc_l)) {
+		if (proc_bam(bam_fn[i], min_mq, max_is, win_s, ctgs, bc_n, opt, bc_l)) {
 			return -1;	
 		}	
 	}	
 
+	sd_destroy(bc_n);	
 	if (!(bc_l&&bc_l->n)) {
 		fprintf(stderr, "[W::%s] none useful information, quit\n", __func__);
 		return -1;
@@ -420,7 +425,7 @@ int main_10x_lnks(int argc, char *argv[])
 	int c;
 	int  min_mq = 20;
 	uint32_t win_s = 50000, min_inner_bcn = 8; 
-	uint32_t min_bc = 20, max_bc = 100000, max_is=1000;
+	uint32_t min_bc = 20, max_bc = 30000, max_is=1000;
 	char *r;
 	
 	int option = 0; //the way to calculate molecule length //internal parameters not allowed to adjust by users

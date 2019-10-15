@@ -817,12 +817,12 @@ uint32_t *parse_path(graph_t *g, uint32_t pid, uint32_t *n)
 			//is a path
 			path_t *pt = &pts[pid>>2];
 			int i;
-			if (pid & 1)  // == reverse complementary 
+			if (pid & 1)  //forward 
 				for (i = 0; i < pt->n; ++i) 
-					kv_push(uint32_t, eles, pt->ns[i]^1);	
-			 else  //forward
-				for ( i = pt->n - 1; i >= 0; --i) 
 					kv_push(uint32_t, eles, pt->ns[i]);	
+			 else  //reverse complementary 
+				for ( i = pt->n - 1; i >= 0; --i) 
+					kv_push(uint32_t, eles, pt->ns[i]^1);	
 		}else  // is a seq
 			kv_push(uint32_t, ctgids, pid);	
 	}	

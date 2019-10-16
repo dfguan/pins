@@ -118,7 +118,7 @@ void out_mat(cdict_t *cds, sdict_t *ctgs, uint32_t n, char *out_fn)
 		c = cds + i;
 		uint32_t j;
 		for ( j = 0; j < c->n_cnt; ++j) {
-			fprintf(fout, "%s\t%c\t%s\t%c\t%u\t%u\t%u\n", ctgs->seq[i>>1].name, i&1?'+':'-', c->cnts[j].name, j&1?'+':'-',c->cnts[j].cnt, c->cnts[j].snp_n, i&1?ctgs->seq[i>>1].l_snp_n:ctgs->seq[i>>1].r_snp_n);				
+			fprintf(fout, "%s\t%c\t%s\t%c\t%.0f\t%u\t%u\n", ctgs->seq[i>>1].name, i&1?'+':'-', c->cnts[j].name, j&1?'+':'-',c->cnts[j].cnt, c->cnts[j].snp_n, i&1?ctgs->seq[i>>1].l_snp_n:ctgs->seq[i>>1].r_snp_n);				
 		}	
 	}
 	if (out_fn) fclose(fout);

@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 	int min_wt = 5;
 	uint32_t min_l  = 0;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
-	while (~(c=getopt(argc, argv, "O:q:w:s:r:i:l:x:h"))) {
+	while (~(c=getopt(argc, argv, "O:q:c:s:r:i:l:x:h"))) {
 		switch (c) {
 			case 'q':
 				min_mq = atoi(optarg);
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 			case 'O':
 				outdir = optarg;
 				break;
-			case 'w': 
+			case 'c': 
 				min_wt = atoi(optarg);
 				break;
 			case 's': 
@@ -70,7 +70,7 @@ help:
 				fprintf(stderr, "         -i    INT      iteration times\n");
 				fprintf(stderr, "         -O    STR      output directory [.]\n");
 				fprintf(stderr, "         -q    INT      minimum alignment quality [10]\n");
-				fprintf(stderr, "         -w    INT      minimum linkage weight [5]\n");
+				fprintf(stderr, "         -c    INT      candidate number [5]\n");
 				fprintf(stderr, "         -s    STR      sat file [nul]\n");
 				fprintf(stderr, "         -x    STR      reference fa index file [nul]\n");
 				fprintf(stderr, "         -r    STR      reference file [nul]\n");
@@ -119,7 +119,7 @@ help:
 		sprintf(sat_nfn, "%s/scaffs.%02d.sat", outdir, i);
 		sprintf(mat_fn, "%s/links.%02d.mat", outdir, i);
 		col_hic_lnks(sat_ofn, bam_fn, n_bam, min_mq, 5000, mat_fn);
-		buildg(use_sat ? sat_ofn : faidx_fn, mat_fn, min_wt, use_sat, sat_nfn);
+		buildg(use_sat ? sat_ofn : faidx_fn, mat_fn, 0, use_sat,1, 0.95, min_wt, sat_nfn);
 		//get seq at the final round
 		
 		if (i == iter) {

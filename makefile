@@ -3,7 +3,7 @@ CFLAGS  =  -g -Wall -D VERBOSE -D PRINT_COVERAGE #-O2
 LDFLAGS = -lz -lm
 
 #OBJS = gfa.o opt.o paf.o sdict.o eg.o 
-PROG = pin_10x  pin_hic pin_ld pin_hic_it  pin_ld_it
+PROG = pin_10x  pin_hic  pin_hic_it  pin_ld pin_ld_it
 
 .SUFFIXS:.c .o
 

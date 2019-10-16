@@ -122,7 +122,7 @@ int out_edges(graph_t *g, int all, FILE *fout)
 	uint32_t i;
 	for ( i = 0; i < n_edges; ++i) {
 		uint32_t v = edg[i].v, w = edg[i].w;
-		if (v>>2 > w >> 2) fprintf(fout, "L\t%s\t%c\t%s\t%c\t%s\twt:%u\n", v>>1 & 1 ? pt[v>>2].name : vs[v>>2].name, v&1?'+':'-', w>>1 & 1 ? pt[w>>2].name : vs[w>>2].name, w&1?'+':'-', "*", edg[i].wt); // + head of sequence - tail of sequqnce	
+		if (v>>2 > w >> 2) fprintf(fout, "L\t%s\t%c\t%s\t%c\t%s\twt:%.2f\n", v>>1 & 1 ? pt[v>>2].name : vs[v>>2].name, v&1?'+':'-', w>>1 & 1 ? pt[w>>2].name : vs[w>>2].name, w&1?'+':'-', "*", edg[i].wt); // + head of sequence - tail of sequqnce	
 	}
 	return 0;
 }
@@ -253,13 +253,13 @@ int add_edge1(graph_t *g, edge_t *e)
 	es->edges[es->n++] = *e;
 }
 
-int add_udedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, uint32_t wt)
+int add_udedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, float wt)
 {
 	uint32_t sind = add_node(g, sname, 0, 0);
 	uint32_t eind = add_node(g, ename, 0, 0);
 	
-	edge_t e = (edge_t) {sind << 1 | sl, eind << 1 | er, wt, 0, 0};
-	edge_t re = (edge_t) {eind << 1 | er, sind << 1 | sl, wt, 0, 0}; //undirect graph
+	edge_t e = (edge_t) {sind << 1 | sl, 0, eind << 1 | er, 0, wt};
+	edge_t re = (edge_t) {eind << 1 | er, 0, sind << 1 | sl, 0, wt}; //undirect graph
 	
 	add_edge1(g, &e);
 	add_edge1(g, &re);
@@ -267,11 +267,11 @@ int add_udedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, u
 }
 
 
-int add_dedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, uint32_t wt)
+int add_dedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, float wt)
 {
 	uint32_t sind = add_node(g, sname, 0, 0);
 	uint32_t eind = add_node(g, ename, 0, 0);
-	edge_t e = (edge_t) {sind << 1 | sl, eind << 1 | er, wt, 0, 0};
+	edge_t e = (edge_t) {sind << 1 | sl, 0,  eind << 1 | er, 0, wt};
 	/*edge_t re = (edge_t) {eind << 1 | er, sind << 1 | sl, wt, 0, 0}; //undirect graph*/
 	/*fprintf(stderr, "%s %s\n", sname, ename);	*/
 	/*fprintf(stderr, "EDGE %u\t%u\n",sind<<1|sl, eind << 1 | er);	*/
@@ -424,9 +424,9 @@ int join_ends(graph_t *g)
 	
 	uint32_t i;
 	for ( i = 0; i < n_vtx << 1; i+=2) {
-		edge_t e = (edge_t) {(i<<1), (i<<1)+1, 1000, 0, 0};	
+		edge_t e = (edge_t) {(i<<1), 0, (i<<1)+1, 0,1000};	
 		add_edge1(g, &e);
-		edge_t re = (edge_t) {(i<<1)+1, i<<1, 1000, 0, 0};
+		edge_t re = (edge_t) {(i<<1)+1, 0, i<<1, 0, 1000};
 		add_edge1(g, &re);
 	}
 	fprintf(stderr, "[M::%s] %u edges\n", __func__, g->eg.n);
@@ -649,7 +649,7 @@ int add_e(graph_t *g, char *s)
 	char d1, d2;
 	char *p, *q;
 	int i;
-	uint32_t wt;
+	float wt;
 	for (i = 0, p = q = s + 2;; ++p) {
 		if (*p == 0 || *p == '\t') {
 			int c = *p;
@@ -658,7 +658,7 @@ int add_e(graph_t *g, char *s)
 			else if (i == 1) d1 = q[0];
 		   	else if (i == 2) n2 = q;
 			else if (i == 3) d2 = q[0];
-			else if (i == 5) wt = strtoul(q+3, NULL, 10);	
+			else if (i == 5) wt = strtof(q+3, NULL);	
 			++i, q = p + 1;	
 			if (c == 0) break;	
 		}

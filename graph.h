@@ -33,9 +33,10 @@ typedef struct {
 }vertices_t;
 
 typedef struct {
-	uint32_t v; //
-	uint32_t w; //
-	uint32_t wt:30, is_vis:1, is_del:1;
+	uint32_t v:31, is_vis:1; //
+	uint32_t w:31, is_del:1; //
+	float wt;
+	//uint32_t wt:30, is_vis:1, is_del:1;
 }edge_t;
 typedef struct {
 	uint32_t n, m;
@@ -86,8 +87,8 @@ extern "C" {
 #endif
 	graph_t *graph_init(void);
 	void graph_destroy(graph_t *g);
-	int add_udedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, uint32_t wt);
-	int add_dedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, uint32_t wt);
+	int add_udedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, float wt);
+	int add_dedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, float wt);
 	uint32_t add_node(graph_t *g, char* name, char *seq, uint32_t len);
 	int srch_path(graph_t *g);
 	int out_graph(graph_t *g); // print path

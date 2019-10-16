@@ -69,7 +69,7 @@ int get_links(char *links_fn, cdict_t *cds, sdict_t *ctgs)
 			sd_put2(ctgs, r.ctgn2, 0, 0, 0, 0, r.llen);		
 		/*uint32_t ind2 = sd_put2(ctgs, r.ctgn, 0, 0, 0, r.llen, r.rlen);		*/
 		line_n += 1;
-		cd_add2(&cds[ind1<<1|r.is_l], r.ctgn2, r.is_l2, r.wt, r.llen);	//this has been normalized	
+		cd_add2(&cds[ind1<<1|r.is_l], r.ctgn2, r.is_l2, r.fwt, r.llen);	//this has been normalized	
 	} 
 	bed_close(bf);
 	return 0;	
@@ -117,7 +117,7 @@ graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)
 			uint32_t ind = sd_get(ctgs, name2) << 1 | c->cnts[j].is_l;
 			uint32_t k;
 			uint8_t hand_shaking = 0;
-			uint32_t ocnt = 0;
+			float ocnt = 0;
 			for ( k = 0; k < cds[ind].lim; ++k) {
 					if (strcmp(name1, cds[ind].cnts[k].name) == 0 && cds[ind].cnts[k].is_l == is_l) {
 						hand_shaking = 1;
@@ -126,7 +126,7 @@ graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)
 					}
 			}	
 			/*if (hand_shaking) fprintf(stderr, "I hand shaking\n");*/
-			ocnt = 1;
+			/*ocnt = 1;*/
 			if (hand_shaking) add_dedge(g, name1, is_l, name2, c->cnts[j].is_l, ocnt * c->cnts[j].cnt);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.
 		}		
 	}	
@@ -135,7 +135,7 @@ graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)
 
 
 
-int buildg(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min_rat, float min_mdw, int mlc, char *out_fn)
+int buildg(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min_mdw, int mlc, char *out_fn)
 {
 	graph_t *og; 
 	sdict_t *ctgs = 0;
@@ -169,6 +169,7 @@ int buildg(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min
 	get_links(edge_fn, cds, ctgs);
 	/*anothernorm(cds, ctgs);*/
 	/*return 0;*/
+	if (norm) for (i = 0; i < n_cds; ++i) cd_norm(cds + i);
 	for ( i = 0; i < n_cds; ++i) cd_sort(cds+i); 
 	cd_set_lim(cds, n_cds, min_wt, min_mdw, mlc); 
 	/*if (norm) */
@@ -241,9 +242,9 @@ int main_bldg(int argc, char *argv[])
 			case 'n': 
 				norm = 1;
 				break;
-			case 'm': 
-				msn = atof(optarg);
-				break;
+			/*case 'm': */
+				/*msn = atof(optarg);*/
+				/*break;*/
 			case 'o': 
 				out_fn = optarg;
 				break;
@@ -271,7 +272,7 @@ help:
 	fprintf(stderr, "Program starts\n");	
 	if (!sat_fn) sat_fn = ctg_fn;
 	int ret;
-	ret = buildg(sat_fn, lnk_fn, min_wt, use_sat, norm, msn, mdw, mlc, out_fn);
+	ret = buildg(sat_fn, lnk_fn, min_wt, use_sat, norm, mdw, mlc, out_fn);
 
 	fprintf(stderr, "Program ends\n");	
 	return ret;	

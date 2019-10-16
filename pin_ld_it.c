@@ -32,12 +32,12 @@ int main(int argc, char *argv[])
 	uint32_t ws = 50000;
 	char *program, *sat_fn = 0, *faidx_fn= 0, *seq_fn = 0;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
-	while (~(c=getopt(argc, argv, "p:l:i:s:x:r:w:h"))) {
+	while (~(c=getopt(argc, argv, "p:l:i:s:x:r:c:h"))) {
 		switch (c) {
 			case 'p': 
 				pv = atof(optarg);
 				break;
-			case 'w': 
+			case 'c': 
 				min_wt = atoi(optarg);
 				break;
 			case 'l': 
@@ -64,7 +64,7 @@ help:
 				fprintf(stderr, "         -p    FLOAT    maximum p value [1e-6]\n");
 				fprintf(stderr, "         -i    INT      iteration times [3]\n");
 				fprintf(stderr, "         -l    INT      windows size [50K]\n");
-				fprintf(stderr, "         -w    INT      minimum linkage weight [5]\n");
+				fprintf(stderr, "         -c    INT      candidate number [5]\n");
 				fprintf(stderr, "         -s    STR      sat file [nul]\n");
 				fprintf(stderr, "         -x    STR      reference fa index file [nul]\n");
 				fprintf(stderr, "         -h             help\n");
@@ -94,7 +94,7 @@ help:
 		sprintf(sat_nfn, "scaffs.%02d.sat", i);
 		sprintf(mat_fn, "links.%02d.mat", i);
 		col_ld_lnks(bcf_fn, sat_ofn, ld_fn, n_ld, pv, ws, mat_fn);
-		buildg(use_sat ? sat_ofn : faidx_fn, mat_fn, min_wt, use_sat, sat_nfn);
+		buildg(use_sat ? sat_ofn : faidx_fn, mat_fn, 0, use_sat,1, 0.95, min_wt, sat_nfn);
 		if (i == iter) get_seq(sat_nfn, seq_fn, min_l, "scaffolds_final.fa");
 		strcpy(sat_ofn, sat_nfn);
 		use_sat = 1;

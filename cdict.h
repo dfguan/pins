@@ -23,7 +23,8 @@
 
 typedef struct {
 	char	*name; 
-	uint32_t cnt:31, is_added:1;	
+	float cnt;
+	//uint32_t cnt:31, is_added:1;	
 	uint32_t snp_n:31, is_l:1;
 } cd_cnt_t;
 
@@ -43,7 +44,7 @@ extern "C" {
 	void cd_norm(cdict_t *c);
 
 	void cd_add(cdict_t *c, const char *name, uint32_t is_l, uint32_t snp_n);
-void cd_add2(cdict_t *c, const char *name, uint32_t is_l, uint32_t cnt, uint32_t snp_n);
+void cd_add2(cdict_t *c, const char *name, uint32_t is_l, float cnt, uint32_t snp_n);
 void cd_set_lim(cdict_t *c, uint32_t n, uint32_t min_wt, float min_rat, int max_cand);
 	//void cd_add(cdict_t *c, char *name, int is_l);
 	void cd_sort(cdict_t *c);

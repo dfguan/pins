@@ -139,7 +139,7 @@ void out_matrix(cdict_t *cds, sdict_t *ctgs, uint32_t n, char *out_fn)
 		c = cds + i;
 		uint32_t j;
 		for ( j = 0; j < c->n_cnt; ++j) {
-			if (c->cnts[j].cnt) fprintf(fout, "%s\t%c\t%s\t%c\t%u\t%u\t%u\n", ctgs->seq[i>>1].name, i&1?'+':'-', c->cnts[j].name, j&1?'+':'-', c->cnts[j].cnt, c->cnts[j].snp_n, ctgs->seq[i>>1].l_snp_n);				
+			if (c->cnts[j].cnt) fprintf(fout, "%s\t%c\t%s\t%c\t%.0f\t%u\t%u\n", ctgs->seq[i>>1].name, i&1?'+':'-', c->cnts[j].name, j&1?'+':'-', c->cnts[j].cnt, c->cnts[j].snp_n, ctgs->seq[i>>1].l_snp_n);				
 		}	
 	}
 	if (out_fn) fclose(fout);
@@ -374,7 +374,7 @@ int proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, hit_ary_t *
 			}
 			if (b->core.flag & 0x4 || b->core.qual < min_mq) continue; //not aligned
 			aln_inf_t tmp;
-			tmp.rev = !!(b->core.flag & 0x10);
+			rev = tmp.rev = !!(b->core.flag & 0x10);
 			/*tmp.nrev = !!(b->core.flag & 0x20);*/
 			//only collects five prime
 			tmp.tid = b->core.tid;

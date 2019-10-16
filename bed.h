@@ -55,6 +55,7 @@ typedef struct {
 
 typedef struct {
 	char *ctgn, *ctgn2;
+	float fwt;
 	uint32_t wt:30, is_l:1, is_l2:1;
 	uint32_t llen, rlen;
 }lnk_rec_t;

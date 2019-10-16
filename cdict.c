@@ -107,7 +107,7 @@ void cd_set_lim(cdict_t *c, uint32_t n, uint32_t min_wt, float min_rat, int max_
 	}
 }
 
-void cd_add2(cdict_t *c, const char *name, uint32_t is_l, uint32_t cnt, uint32_t snp_n)
+void cd_add2(cdict_t *c, const char *name, uint32_t is_l, float cnt, uint32_t snp_n)
 {
 	shash_t *h = (shash_t *)c->h;
 	khint_t k;
@@ -238,7 +238,7 @@ void cd_norm(cdict_t *c)
 		uint32_t i;
 		cd_cnt_t *t = c->cnts;
 		for ( i = 0; i < c->n_cnt; ++i) 
-			if (t[i].snp_n) t[i].cnt = t[i].cnt * 50000 / t[i].snp_n;
+			if (t[i].snp_n) t[i].cnt = t[i].cnt / t[i].snp_n;
 			else t[i].cnt = 0;	
 		
 	}	

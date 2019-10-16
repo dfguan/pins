@@ -172,7 +172,7 @@ int buildg(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min
 	for ( i = 0; i < n_cds; ++i) cd_sort(cds+i); 
 	cd_set_lim(cds, n_cds, min_wt, min_mdw, mlc); 
 	/*if (norm) */
-	if (norm) cd_filt(cds, n_cds, min_rat); 
+	/*if (norm) cd_filt(cds, n_cds, min_rat); */
 	/*if (norm) for (i = 0; i < n_cds; ++i) cd_norm(cds + i);*/
 	/*if (norm) for (i = 0; i < n_cds; ++i) cd_norm(cds + i);*/
 	/*for (i = 0; i < n_cds; ++i)	cd_norm(cds + i);*/

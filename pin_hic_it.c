@@ -119,7 +119,7 @@ help:
 		sprintf(sat_nfn, "%s/scaffs.%02d.sat", outdir, i);
 		sprintf(mat_fn, "%s/links.%02d.mat", outdir, i);
 		col_hic_lnks(sat_ofn, bam_fn, n_bam, min_mq, 5000, mat_fn);
-		buildg(use_sat ? sat_ofn : faidx_fn, mat_fn, 0, use_sat,1, 0.95, min_wt, sat_nfn);
+		buildg(use_sat ? sat_ofn : faidx_fn, mat_fn, 0, use_sat,1, 0, min_wt, sat_nfn);
 		//get seq at the final round
 		
 		if (i == iter) {

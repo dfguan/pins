@@ -103,7 +103,7 @@ void cd_set_lim(cdict_t *c, uint32_t n, uint32_t min_wt, float min_rat, int max_
 		
 		}
 		//the first candiate is not significantly better than the second 
-		if (t->n_cnt > 1 && norm_cdf(t->cnts[0].cnt, 0.5, t->cnts[1].cnt + t->cnts[0].cnt) <= min_rat && strcmp(t->cnts[0].name, t->cnts[1].name)) t->lim = 0; 
+		if (t->n_cnt > 1 && norm_cdf(t->cnts[0].cnt, 0.5, t->cnts[1].cnt + t->cnts[0].cnt) < min_rat && strcmp(t->cnts[0].name, t->cnts[1].name)) t->lim = 0; 
 	}
 }
 

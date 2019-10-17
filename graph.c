@@ -107,7 +107,7 @@ int out_vetices(graph_t *g, FILE *fout)
 	uint32_t n_vs = g->vtx.n;
 	uint32_t i;
 	for ( i = 0; i < n_vs; ++i) 
-		fprintf(fout, "S\t%s\t%s\n",  vs[i].name, vs[i].seq ? vs[i].seq : "*");
+		fprintf(fout, "S\t%s\t%u\t%s\n",  vs[i].name, vs[i].len, vs[i].seq ? vs[i].seq : "*");
 	
 	return 0;
 }
@@ -615,7 +615,8 @@ int process_graph(graph_t *g)
 	return 0;
 }
 
-// GFA IO
+// SAT IO 
+// Sequence: S<TAB>ID<TAB>LEN<TAB>SEQ
 int add_s(graph_t *g, char *s)
 {	
 	/*fprintf(stderr, "enters\n");*/
@@ -623,12 +624,15 @@ int add_s(graph_t *g, char *s)
 	char *seq = 0;
 	char *p, *q;
 	int i;
+	uint32_t len = 0;
 	for (i = 0, p = q = s + 2;; ++p) {
 		if (*p == 0 || *p == '\t') {
 			int c = *p;
 			*p = 0;
 			if (i == 0) name = q;
 			else if (i == 1) {
+				len = strtoul(q, NULL, 10);			
+			} else if (i == 2) {
 				seq = q[0] == '*' ? 0 : strdup(q);
 				break;
 			}	
@@ -636,7 +640,8 @@ int add_s(graph_t *g, char *s)
 			if (c == 0) break;	
 		}
 	}	
-	uint32_t len = seq == 0 ? 0 : strlen(seq);
+	if (!len)
+		   len = seq == 0 ? 0 : strlen(seq);
 	add_node(g, name, seq, len);
 	/*fprintf(stderr, "leaves\n");*/
 	return 0;

@@ -23,6 +23,10 @@
 #include <math.h>
 #include <getopt.h>
 
+#include "col_ld_lnks.h"
+#include "build_graph.h"
+#include "get_seq.h"
+
 #define max(a, b) ((a) > (b) ? (a) : (b))
 int main(int argc, char *argv[]) 
 {

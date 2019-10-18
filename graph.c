@@ -388,7 +388,7 @@ int clean_edges(graph_t *g)
 		edge_t *a;
 		//find maximum weight
 		//if there are mulitple maximum weights break them all we can't decide which way to choose
-		uint32_t mwt = 0, smwt = 0;
+		float mwt = 0, smwt = 0;
 		uint32_t n_mwt = 0;	
 		for ( a = e; a < e + en; ++a) {
 			if (a->is_del) continue;

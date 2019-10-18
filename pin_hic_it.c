@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 	char *sat_fn = 0, *faidx_fn = 0, *seq_fn = 0;
 	int use_sat = 0;
 	char *outdir = ".";
-	int min_wt = 5;
+	int cann = 5;
 	uint32_t min_l  = 0;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
 	while (~(c=getopt(argc, argv, "O:q:c:s:r:i:l:x:h"))) {
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 				outdir = optarg;
 				break;
 			case 'c': 
-				min_wt = atoi(optarg);
+				cann = atoi(optarg);
 				break;
 			case 's': 
 				sat_fn = optarg;
@@ -119,7 +119,7 @@ help:
 		sprintf(sat_nfn, "%s/scaffs.%02d.sat", outdir, i);
 		sprintf(mat_fn, "%s/links.%02d.mat", outdir, i);
 		col_hic_lnks(sat_ofn, bam_fn, n_bam, min_mq, 5000, mat_fn);
-		buildg(use_sat ? sat_ofn : faidx_fn, mat_fn, 0, use_sat,1, 0, min_wt, sat_nfn);
+		buildg(use_sat ? sat_ofn : faidx_fn, mat_fn, 0, use_sat,1, 0, cann, sat_nfn);
 		//get seq at the final round
 		
 		if (i == iter) {

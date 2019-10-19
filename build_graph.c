@@ -134,9 +134,13 @@ graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)
 }
 
 
-
 int buildg(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min_mdw, int mlc, char *out_fn)
 {
+	fprintf(stderr, "%s %s\n", fn, edge_fn);
+	fprintf(stderr, "%d %d\n", min_wt, use_sat);
+	fprintf(stderr, "%d %f\n", norm, min_mdw);
+	fprintf(stderr, "%d\n", mlc);
+	fprintf(stderr, "%p\n", out_fn);
 	graph_t *og; 
 	sdict_t *ctgs = 0;
 	if (use_sat) {

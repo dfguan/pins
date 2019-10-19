@@ -230,7 +230,7 @@ int col_hits(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, sd
 			} else {
 				uint64_t c1ns = (uint64_t)ind2 << 32 | a1s; //don't think there will be 2G contig, if happends might be a bug 
 				uint64_t c2ns = (uint64_t)ind1 << 32 | a0s; //don't think there will be 2G contig, if happends might be a bug 
-				hit_t h = (hit_t) {c1ns, a[0].rev, c2ns, a[1].rev}; 
+				hit_t h = (hit_t) {c1ns, a[1].rev, c2ns, a[0].rev}; 
 				hit_ary_push(hit_ary, &h);	
 			}
 			return 0;
@@ -252,7 +252,7 @@ int col_hits(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, sd
 			} else {
 				uint64_t c1ns = (uint64_t)ind2 << 32 | f1s; //don't think there will be 2G contig, if happends might be a bug 
 				uint64_t c2ns = (uint64_t)ind1 << 32 | f0s; //don't think there will be 2G contig, if happends might be a bug 
-				hit_t h = (hit_t) {c1ns, f[0].rev, c2ns, f[1].rev}; 
+				hit_t h = (hit_t) {c1ns, f[1].rev, c2ns, f[0].rev}; 
 				hit_ary_push(hit_ary, &h);	
 			}
 			return 0;	
@@ -277,7 +277,7 @@ int col_hits(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, sd
 			} else {
 				uint64_t c1ns = (uint64_t)ind2 << 32 | a[1].s; //don't think there will be 2G contig, if happends might be a bug 
 				uint64_t c2ns = (uint64_t)ind1 << 32 | a[0].s; //don't think there will be 2G contig, if happends might be a bug 
-				hit_t h = (hit_t) {c1ns, a[0].rev, c2ns, a[1].rev}; 
+				hit_t h = (hit_t) {c1ns, a[1].rev, c2ns, a[0].rev}; 
 				hit_ary_push(hit_ary, &h);	
 			}
 			return 0;
@@ -294,7 +294,7 @@ int col_hits(aln_inf_t *a, int a_cnt, aln_inf_t *f, int f_cnt, sdict_t *ctgs, sd
 			} else {
 				uint64_t c1ns = (uint64_t)ind2 << 32 | f[1].s; //don't think there will be 2G contig, if happends might be a bug 
 				uint64_t c2ns = (uint64_t)ind1 << 32 | f[0].s; //don't think there will be 2G contig, if happends might be a bug 
-				hit_t h = (hit_t) {c1ns, f[0].rev, c2ns, f[1].rev}; 
+				hit_t h = (hit_t) {c1ns, f[1].rev, c2ns, f[0].rev}; 
 				hit_ary_push(hit_ary, &h);	
 			}
 			return 0;	

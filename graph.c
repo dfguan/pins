@@ -809,11 +809,11 @@ uint32_t *parse_path(graph_t *g, uint32_t pid, uint32_t *n)
 	kvec_t(uint32_t) eles, ctgids;
 	kv_init(eles);
 	kv_init(ctgids);
-	kv_push(uint32_t, eles, pid<<1);
+	kv_push(uint32_t, eles, pid<<1 | 1);
 	/*fprintf(stderr, "Enter %d %d\n", __LINE__, pts->n);*/
 	while (eles.n > 0) {
 		pid = kv_pop(eles);		
-	/*fprintf(stderr, "Enter %d %s %s %d %d\n", __LINE__, pts[pid>>2].name, (pid>>1) & 1 ? "PATH" : "NODE", pts[pid>>2].n, pid);*/
+	fprintf(stderr, "Enter %d %s %s %d %d\n", __LINE__, pts[pid>>2].name, (pid>>1) & 1 ? "PATH" : "NODE", pts[pid>>2].n, pid);
 	/*int j;	*/
 	/*for (j = 0; j < pts[pid>>2].n; ++j) */
 		/*fprintf(stderr, "Enter %d %s %d\n", __LINE__, (pts[pid>>2].ns[j]>>1) & 1 ? "PATH" : "NODE", pts[pid>>2].ns[j]);*/
@@ -823,10 +823,10 @@ uint32_t *parse_path(graph_t *g, uint32_t pid, uint32_t *n)
 			path_t *pt = &pts[pid>>2];
 			int i;
 			if (pid & 1)  //forward 
-				for (i = 0; i < pt->n; ++i) 
+				for ( i = pt->n - 1; i >= 0; --i) 
 					kv_push(uint32_t, eles, pt->ns[i]);	
 			 else  //reverse complementary 
-				for ( i = pt->n - 1; i >= 0; --i) 
+				for (i = 0; i < pt->n; ++i) 
 					kv_push(uint32_t, eles, pt->ns[i]^1);	
 		}else  // is a seq
 			kv_push(uint32_t, ctgids, pid);	
@@ -849,7 +849,9 @@ int get_path(graph_t *g, uint32_t min_l, char *fn)
 		uint32_t *p = parse_path(g, as->pn[i], &m);
 	   	char *ref_nm = ps[as->pn[i]>>1].name;
 		uint32_t ref_len = 0; 	
+		fprintf(stderr, "PATH: %s\n", ref_nm);
 		for ( j = 0; j < m; ++j) {
+		fprintf(stderr, "CTG: %s ORI: %c\n", vs[p[j]>>2].name, p[j] & 1? '+': '-');
 			uint32_t seq_len = vs[p[j] >> 2].len;
 			if (seq_len) {
 				ref_len += seq_len;//200 'N' s	

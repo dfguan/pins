@@ -314,6 +314,7 @@ uint32_t add_path(graph_t *g, char *name,  uint32_t *nodes, uint32_t n, uint32_t
 		p->n = n;
 		kh_key(h, k) =p->name = strdup(pname);	
 		kh_val(h, k) = (ps->n<<1 | 1);
+		/*fprintf(stderr, "%s\t%x\n", p->name, ps->n << 1 | 1);*/
 		++ps->n;	
 	} else 
 		fprintf(stderr, "[W::%s] path name %s has been added\n", __func__, pname);
@@ -809,15 +810,18 @@ uint32_t *parse_path(graph_t *g, uint32_t pid, uint32_t *n)
 	kvec_t(uint32_t) eles, ctgids;
 	kv_init(eles);
 	kv_init(ctgids);
+
 	kv_push(uint32_t, eles, pid<<1 | 1);
 	/*fprintf(stderr, "Enter %d %d\n", __LINE__, pts->n);*/
 	while (eles.n > 0) {
 		pid = kv_pop(eles);		
-	fprintf(stderr, "Enter %d %s %s %d %d\n", __LINE__, pts[pid>>2].name, (pid>>1) & 1 ? "PATH" : "NODE", pts[pid>>2].n, pid);
+
+	/*fprintf(stderr, "Enter %d %s %s %d %x\n", __LINE__, pts[pid>>2].name, (pid>>1) & 1 ? "PATH" : "NODE", pts[pid>>2].n, pid >> 1);*/
 	/*int j;	*/
 	/*for (j = 0; j < pts[pid>>2].n; ++j) */
 		/*fprintf(stderr, "Enter %d %s %d\n", __LINE__, (pts[pid>>2].ns[j]>>1) & 1 ? "PATH" : "NODE", pts[pid>>2].ns[j]);*/
 		
+	/*fprintf(stderr, "Enter\n");*/
 		if ((pid >> 1) & 1) {
 			//is a path
 			path_t *pt = &pts[pid>>2];

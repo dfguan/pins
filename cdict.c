@@ -32,6 +32,24 @@ void cd_init(cdict_t *c)
 	c->h = kh_init(str);
 }
 
+void cd2_init(cdict2_t *c)
+{
+	c->h = kh_init(str);
+}
+
+void cd2_destroy(cdict2_t *c)
+{
+	if (c) {
+		uint32_t i;
+		if (c->h) kh_destroy(str, (shash_t *)c->h);
+		for ( i = 0; i < c->n_cnt; i++)  {
+			if (c->cnts[i].name) 
+				free(c->cnts[i].name);	
+		}
+		if (c->cnts) free(c->cnts);
+	}
+}
+
 void cd_destroy(cdict_t *c)
 {
 	if (c) {
@@ -67,6 +85,21 @@ void cd_filt(cdict_t *c, uint32_t n, float min_rat)
 }
 
 
+void cd2_set_lim(cdict_t *c, uint32_t n, int cann)
+{
+	cdict_t *t;
+
+	uint32_t i, j;
+
+	for (i = 0; i < n; ++i)  {
+		t = c + i;
+		//maximum weight
+		/*t->lim = t->n_cnt ? 1 : 0;*/
+		t->lim = cann < t->n_cnt? cann : t->n_cnt;
+
+		/*if (!t->n_cnt)  continue;*/
+	}
+}
 
 
 void cd_set_lim(cdict_t *c, uint32_t n, uint32_t min_wt, float min_rat, int max_cand, int norm)
@@ -107,6 +140,46 @@ void cd_set_lim(cdict_t *c, uint32_t n, uint32_t min_wt, float min_rat, int max_
 	}
 }
 
+int cmp_cnt2(const void *a, const void *b)
+{
+	cd_cnt2_t *f = (cd_cnt2_t *)a;
+	cd_cnt2_t *h = (cd_cnt2_t *)b;
+	if (f->ncnt > h->ncnt) return -1;
+	else if (f->ncnt == h->ncnt) return 0; 
+	else return 1;
+}
+void cd2_sort(cdict2_t *c)
+{
+    if (c) {
+        qsort(c->cnts, c->n_cnt, sizeof(cd_cnt2_t), cmp_cnt2);
+    }
+
+}
+void cd2_add(cdict2_t *c, uint32_t is_l1, const char *name, uint32_t is_l2, uint32_t cnt)
+{
+	shash_t *h = (shash_t *)c->h;
+	khint_t k;
+	int absent;
+	/*if (h) fprintf(stderr, "cd add");*/
+	k = kh_put(str, h, name, &absent);
+	if (absent) {
+		/*fprintf(stderr, "%u\n", c->n_cnt);*/
+		if (c->n_cnt == c->m_cnt) {
+			c->m_cnt = c->m_cnt ? c->m_cnt << 1 : 16;
+			cd_cnt_t *ncnts = calloc(c->m_cnt, sizeof(cd_cnt2_t));	
+			if (c->cnts) memcpy(ncnts, c->cnts, sizeof(cd_cnt2_t) * c->n_cnt);
+			if (c->cnts) free(c->cnts);
+			c->cnts = ncnts;
+		}
+		kh_key(h, k) = c->cnts[c->n_cnt].name = strdup(name); //
+		c->cnts[c->n_cnt].cnt[is_l1<<1 | is_l2] = cnt;
+		kh_val(h, k) = c->n_cnt++;  
+	} else {
+		uint32_t ind = kh_val(h, k);
+		/*fprintf(stderr, "%u\t %s exist\n", ind, name);*/
+		c->cnts[ind].cnt[is_l1 << 1 | is_l2] = cnt;
+	}
+}
 void cd_add2(cdict_t *c, const char *name, uint32_t is_l, float cnt, uint32_t snp_n)
 {
 	shash_t *h = (shash_t *)c->h;
@@ -131,12 +204,14 @@ void cd_add2(cdict_t *c, const char *name, uint32_t is_l, float cnt, uint32_t sn
 		c->cnts[c->n_cnt+1].is_l = 1;	
 		
 		c->cnts[c->n_cnt | is_l].cnt = cnt;
+		c->cnts[c->n_cnt | is_l].intcnt = cnt;
 		c->cnts[c->n_cnt | is_l].snp_n = snp_n;
 		c->n_cnt += 2;
 	} else {
 		uint32_t ind = kh_val(h, k);
 		/*fprintf(stderr, "%u\t %s exist\n", ind, name);*/
 		c->cnts[ind | is_l].cnt = cnt;
+		c->cnts[ind | is_l].intcnt = cnt;
 		c->cnts[ind | is_l].snp_n = snp_n;
 	}
 		
@@ -238,7 +313,7 @@ void cd_norm(cdict_t *c)
 		uint32_t i;
 		cd_cnt_t *t = c->cnts;
 		for ( i = 0; i < c->n_cnt; ++i) 
-			if (t[i].snp_n) t[i].cnt = t[i].cnt / t[i].snp_n;
+			if (t[i].snp_n)  t[i].cnt = t[i].cnt / t[i].snp_n;
 			else t[i].cnt = 0;	
 		
 	}	

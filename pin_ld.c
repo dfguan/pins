@@ -35,7 +35,7 @@ help:
 		return 1;
 	} else {
 		if (!strcmp(argv[1], "link")) main_ld_lnks(argc , argv);
-	   	else if (!strcmp(argv[1], "build")) main_bldg(argc , argv);	
+	   	else if (!strcmp(argv[1], "build")) main_bldg(argc , argv, 0);	
 		else if (!strcmp(argv[1], "getc")) main_get_seq(argc, argv);
 	   	else if (!strcmp(argv[1], "-h")) goto help;	
 	   	else if (!strcmp(argv[1], "-v")) fprintf(stderr, "version: 0.0.0\n");	

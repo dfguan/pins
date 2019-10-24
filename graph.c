@@ -123,6 +123,7 @@ int out_edges(graph_t *g, int all, FILE *fout)
 	for ( i = 0; i < n_edges; ++i) {
 		uint32_t v = edg[i].v, w = edg[i].w;
 		if (v>>2 > w >> 2) fprintf(fout, "L\t%s\t%c\t%s\t%c\t%s\twt:%.2f\n", v>>1 & 1 ? pt[v>>2].name : vs[v>>2].name, v&1?'+':'-', w>>1 & 1 ? pt[w>>2].name : vs[w>>2].name, w&1?'+':'-', "*", edg[i].wt); // + head of sequence - tail of sequqnce	
+	/*fprintf(fout, "L\t%s\t%c\t%s\t%c\t%s\twt:%.2f\n", v>>1 & 1 ? pt[v>>2].name : vs[v>>2].name, v&1?'+':'-', w>>1 & 1 ? pt[w>>2].name : vs[w>>2].name, w&1?'+':'-', "*", edg[i].wt); // + head of sequence - tail of sequqnce	*/
 	}
 	return 0;
 }
@@ -140,10 +141,11 @@ int out_paths(graph_t *g, FILE *fout)
 		else 
 			fprintf(fout, "P\t%s\t", p[i].name);
 		uint32_t v;	
-		/*fprintf(stderr, "%d\n", p[i].n);*/
+		/*fprintf(fout, "%d\n", p[i].n);*/
 		for ( j = 0; j < p[i].n; ++j)  {
 			v = p[i].ns[j];
 			fprintf(fout, "%s%c%c", v>>1 & 1 ? p[v>>2].name : vs[v>>2].name, v&1?'+':'-', j + 1 == p[i].n ? '\n' : ','); // + head of sequence - tail of sequqnce	
+			/*fprintf(fout, "\t%s\t", v>>1 & 1 ? p[v>>2].name : vs[v>>2].name); // + head of sequence - tail of sequqnce	*/
 		}
 	}
 	return 0;
@@ -425,9 +427,9 @@ int join_ends(graph_t *g)
 	
 	uint32_t i;
 	for ( i = 0; i < n_vtx << 1; i+=2) {
-		edge_t e = (edge_t) {(i<<1), 0, (i<<1)+1, 0,1000};	
+		edge_t e = (edge_t) {i<<1, 0, (i<<1)+1, 0,1000};	
 		add_edge1(g, &e);
-		edge_t re = (edge_t) {(i<<1)+1, 0, i<<1, 0, 1000};
+		edge_t re = (edge_t) {(i<<1) + 1, 0, i<<1, 0, 1000};
 		add_edge1(g, &re);
 	}
 	fprintf(stderr, "[M::%s] %u edges\n", __func__, g->eg.n);
@@ -495,7 +497,7 @@ int srch_path(graph_t *g)
 			if (mark[p]) break;
 			else {
 				mark[p] = 1;
-				/*fprintf(stderr, "%d\n", p);*/
+				/*fprintf(stderr, "%d %s %c\n", p, g->vtx.vertices[p>>1].name, p & 1 ? '+':'-');*/
 				kdq_push(uint32_t, q, p);				
 			}
 		 //traverse forwardly
@@ -550,6 +552,8 @@ int srch_path(graph_t *g)
 			pth->ns = malloc(sizeof(uint32_t) * (kdq_size(q) >> 1));	
 			/*fprintf(stderr, "ENTER %d %d\n", __LINE__, kdq_size(q));*/
 			uint32_t k, m;
+			/*for ( k = 0; k < kdq_size(q); ++k) fprintf(stderr, "%u,",kdq_at(q, k));*/
+			/*for ( k = 0; k < kdq_size(q); ++k) fprintf(stderr, "\n");*/
 			for ( k = 0, m = 0; k < kdq_size(q); k += 2, ++m) pth->ns[m] = kdq_at(q, k);
 			/*for ( k = 0; k < m; ++k) fprintf(stderr, "PID: %d\t%d\n", k, pth->ns[k]);*/
 			pth->n = m;
@@ -608,10 +612,12 @@ int merge_graph(graph_t *g, graph_t *c, int all)
 int process_graph(graph_t *g)
 {
 	idx_edge(g);
-	/*out_edges(g);*/
+	/*out_edges(g,0, stderr);*/
 	clean_edges(g);
 	join_ends(g);
 	update_graph(g);
+	/*fprintf(stderr, "after update ends\n");*/
+	/*out_edges(g,0, stderr);*/
 	srch_path(g);
 	return 0;
 }

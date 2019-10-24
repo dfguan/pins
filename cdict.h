@@ -24,6 +24,7 @@
 typedef struct {
 	char	*name; 
 	float cnt;
+	uint32_t intcnt;
 	//uint32_t cnt:31, is_added:1;	
 	uint32_t snp_n:31, is_l:1;
 } cd_cnt_t;
@@ -35,6 +36,18 @@ typedef struct {
 	void		*h;
 }cdict_t;
 
+typedef struct {
+	char	*name; 
+    uint32_t cnt[4]; // 00 01 10 11
+    float ncnt;//could be enough normalized cnt
+} cd_cnt2_t;
+
+typedef struct {
+	size_t		n_cnt, m_cnt;
+	size_t		lim;
+	cd_cnt2_t	*cnts;
+	void		*h;
+}cdict2_t;
 
 #ifdef __cplusplus
 extern "C" {
@@ -49,6 +62,11 @@ void cd_set_lim(cdict_t *c, uint32_t n, uint32_t min_wt, float min_rat, int max_
 	//void cd_add(cdict_t *c, char *name, int is_l);
 	void cd_sort(cdict_t *c);
 void cd_filt(cdict_t *c, uint32_t n, float min_rat);
+//cdict2 operations	
+	void cd2_init(cdict2_t *c);
+	void cd2_destroy(cdict2_t *c);
+    void cd2_add(cdict2_t *c, uint32_t is_l1, const char *name, uint32_t is_l2, uint32_t cnt);
+	void cd2_sort(cdict2_t *c);
 #ifdef __cplusplus
 }
 #endif

@@ -204,14 +204,14 @@ void cd_add2(cdict_t *c, const char *name, uint32_t is_l, float cnt, uint32_t sn
 		c->cnts[c->n_cnt+1].is_l = 1;	
 		
 		c->cnts[c->n_cnt | is_l].cnt = cnt;
-		c->cnts[c->n_cnt | is_l].intcnt = cnt;
+		/*c->cnts[c->n_cnt | is_l].intcnt = cnt;*/
 		c->cnts[c->n_cnt | is_l].snp_n = snp_n;
 		c->n_cnt += 2;
 	} else {
 		uint32_t ind = kh_val(h, k);
 		/*fprintf(stderr, "%u\t %s exist\n", ind, name);*/
 		c->cnts[ind | is_l].cnt = cnt;
-		c->cnts[ind | is_l].intcnt = cnt;
+		/*c->cnts[ind | is_l].intcnt = cnt;*/
 		c->cnts[ind | is_l].snp_n = snp_n;
 	}
 		

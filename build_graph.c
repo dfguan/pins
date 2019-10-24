@@ -162,7 +162,7 @@ int print_cdict(cdict_t *cds, sdict_t *ctgs)
 		for (j = 0; j < c->n_cnt; ++j) {
 			char *name2 = c->cnts[j].name; 
 			icnt = c->cnts[j].cnt ; 
-			intcnt = c->cnts[j].intcnt;
+			intcnt = 1; //c->cnts[j].intcnt;
 			uint32_t snp2 = c->cnts[j].is_l ? ctgs->seq[sd_get(ctgs, name2)].l_snp_n:ctgs->seq[sd_get(ctgs,name2)].r_snp_n;
 			fprintf(stderr, "%s\t%c\t%s\t%c\t%f\t%u\t%u\t%u\n", name1, i&1?'+':'-', name2, c->cnts[j].is_l?'+':'-', icnt, intcnt, snpn, snp2);
 		}

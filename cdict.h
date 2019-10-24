@@ -24,7 +24,6 @@
 typedef struct {
 	char	*name; 
 	float cnt;
-	uint32_t intcnt;
 	//uint32_t cnt:31, is_added:1;	
 	uint32_t snp_n:31, is_l:1;
 } cd_cnt_t;

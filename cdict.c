@@ -85,9 +85,9 @@ void cd_filt(cdict_t *c, uint32_t n, float min_rat)
 }
 
 
-void cd2_set_lim(cdict_t *c, uint32_t n, int cann)
+void cd2_set_lim(cdict2_t *c, uint32_t n, int cann)
 {
-	cdict_t *t;
+	cdict2_t *t;
 
 	uint32_t i, j;
 

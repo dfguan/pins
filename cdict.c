@@ -166,7 +166,7 @@ void cd2_add(cdict2_t *c, uint32_t is_l1, const char *name, uint32_t is_l2, uint
 		/*fprintf(stderr, "%u\n", c->n_cnt);*/
 		if (c->n_cnt == c->m_cnt) {
 			c->m_cnt = c->m_cnt ? c->m_cnt << 1 : 16;
-			cd_cnt_t *ncnts = calloc(c->m_cnt, sizeof(cd_cnt2_t));	
+			cd_cnt2_t *ncnts = calloc(c->m_cnt, sizeof(cd_cnt2_t));	
 			if (c->cnts) memcpy(ncnts, c->cnts, sizeof(cd_cnt2_t) * c->n_cnt);
 			if (c->cnts) free(c->cnts);
 			c->cnts = ncnts;

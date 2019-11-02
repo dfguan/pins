@@ -70,7 +70,7 @@ int get_links_hic(char *links_fn, cdict2_t *cds, sdict_t *ctgs)
 			sd_put2(ctgs, r.ctgn2, 0, 0, 0, 0, r.rlen);		
 		/*uint32_t ind2 = sd_put2(ctgs, r.ctgn, 0, 0, 0, r.llen, r.rlen);		*/
 		line_n += 1;
-		cd2_add(&cds[ind1], !r.is_l, r.ctgn2, !r.is_l2, r.fwt);	//this has been normalized	
+		cd2_add(&cds[ind1], r.is_l, r.ctgn2, r.is_l2, r.fwt);	//this has been normalized	
 	} 
 	bed_close(bf);
 	return 0;	
@@ -239,16 +239,21 @@ int norm_links(cdict2_t *cds, sdict_t *ctgs)
 int det_ori(uint32_t *ws)
 {
 	uint32_t l, sl;
-	l = sl = ws[0];
-	int i, maxi;
+	l = ws[0];
+	sl = 0;
+	int i, maxi = 0;
 	for (i = 1; i < 4; ++i ) 
 		if (ws[i] >= l) 
 				maxi = i, sl = l, l = ws[i];  
 		else if (ws[i] > sl) sl = ws[i];
-	if (norm_cdf(l, 0.5, sl + l) <= 0.95) 
-			return -1; 
+	if (sl != l)
+		return maxi;
 	else
-		   return maxi;	
+		return -1;
+	/*if (norm_cdf(l, 0.5, sl + l) <= 0.95) */
+			/*return -1; */
+	/*else*/
+		   /*return maxi;	*/
 }
 graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs)
 {

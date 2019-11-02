@@ -37,7 +37,7 @@ typedef struct {
 
 typedef struct {
 	char	*name; 
-    uint32_t cnt[4]; // 00 01 10 11
+    uint32_t cnt[4]; // 00 01 10 11 --, -+, +-, ++
     float ncnt;//could be enough normalized cnt
 } cd_cnt2_t;
 

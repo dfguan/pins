@@ -49,6 +49,7 @@ typedef struct {
 typedef struct {
 	uint32_t *ns;
 	uint32_t n:31, is_circ:1; //be careful with these uint32_t 
+	uint32_t len;
 	char *name;
 }path_t;
 

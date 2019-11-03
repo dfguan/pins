@@ -46,9 +46,15 @@ sdict_t *col_ctgs_from_graph(graph_t *g)
 	asm_t *ca = &g->as.asms[g->as.casm];
 	path_t *pt = g->pt.paths;
 	uint32_t n = ca->n;
-	uint32_t i;
-	for ( i = 0; i < n; ++i) 
-		sd_put2(ctgs, pt[ca->pn[i]>>1].name, 0, 0, 0, 0, 0);
+	uint32_t i, j;
+	for ( i = 0; i < n; ++i) {
+		//get path length
+		/*uint32_t path_len = 0;*/
+		/*for (j = 0; j < pt[ca->pn[i]>>1].n; ++j) */
+			/*path_len += ctgs->seq[sd_get(ctgs, pt[ca->pn[i]>>1].name)].len;	*/
+		/*path_len += (pt[ca->pn[i]>>1].n - 1) * 200;	 //gap size = 200	*/
+		sd_put2(ctgs, pt[ca->pn[i]>>1].name, pt[ca->pn[i]>>1].len, 0, 0, 0, 0);
+	} 
 	return ctgs;
 }
 
@@ -125,7 +131,7 @@ int print_cdict2(cdict2_t *cds, sdict_t *ctgs)
 	uint32_t i;
 	cdict2_t *c ;
 	for ( i = 0; i < n_cds; ++i) {
-		char *name1 = ctgs->seq[i>>1].name;
+		char *name1 = ctgs->seq[i].name;
 		/*uint32_t snpn = i&1 ? ctgs->seq[i>>1].l_snp_n:ctgs->seq[i>>1].r_snp_n;*/
 		uint32_t j;
 		c = cds + i;
@@ -135,13 +141,14 @@ int print_cdict2(cdict2_t *cds, sdict_t *ctgs)
             /*fprintf(stderr, "%s\n", c->cnts[j].name);*/
 			char *name2 = c->cnts[j].name; 
             uint32_t ctg2_idx = sd_get(ctgs, name2);
+			/*fprintf(stderr, "ctg_idx: %u\n", ctg2_idx);*/
 			icnt = c->cnts[j].cnt[0] + c->cnts[j].cnt[1] + c->cnts[j].cnt[2] + c->cnts[j].cnt[3]; 
             c->cnts[j].ncnt = (float) icnt / ctgs->seq[ctg2_idx].len;
             /*c->cnts[j].ncnt = (float) icnt / (ctgs->seq[ctg2_idx].l_snp_n + ctgs->seq[ctg2_idx].r_snp_n);*/
             /*uint32_t z;*/
             /*for ( z = 0; z < 4; ++z) c->cnts[j].fcnt[z] = (float) c->cnts[j].cnt[z]/(z >> 1 ? ctgs->seq[i].l_snp_n : ctgs->seq[i].r_snp_n) / ( z & 0x1 ? ctgs->seq[ctg2_idx].l_snp_n : ctgs->seq[ctg2_idx].r_snp_n);  */
 			/*uint32_t snp2 = c->cnts[j].is_l ? ctgs->seq[sd_get(ctgs, name2)].l_snp_n:ctgs->seq[sd_get(ctgs,name2)].r_snp_n;*/
-			fprintf(stderr, "%s\t%s\t%f\t%u\t%u\t%u\t%u\n", name1, name2, c->cnts[j].ncnt, c->cnts[j].cnt[0], c->cnts[j].cnt[1], c->cnts[j].cnt[2], c->cnts[j].cnt[3]);
+			fprintf(stderr, "%s\t%s\t%f\t%u\t%u\t%u\t%u\t%u\n", name1, name2, c->cnts[j].ncnt, c->cnts[j].cnt[0], c->cnts[j].cnt[1], c->cnts[j].cnt[2], c->cnts[j].cnt[3], ctgs->seq[ctg2_idx].len);
 		}
 	}
 	return 0;
@@ -349,9 +356,10 @@ int buildg_hic(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float
 	/*anothernorm(cds, ctgs);*/
 	/*return 0;*/
 	/*if (norm) for (i = 0; i < n_cds; ++i) cd_norm(cds + i);*/
+	/*print_cdict2(cds, ctgs);	*/
 	norm_links(cds, ctgs);
 	for ( i = 0; i < n_ctg; ++i) cd2_sort(cds+i); 
-	/*print_cdict2(cds, ctgs);	*/
+	print_cdict2(cds, ctgs);	
 	cd2_set_lim(cds, n_ctg, mlc); 
 	/*if (norm) */
 	/*if (norm) cd_filt(cds, n_cds, min_rat); */

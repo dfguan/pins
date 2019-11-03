@@ -34,7 +34,7 @@ KSEQ_INIT(gzFile, gzread, gzseek)
 /*KSTREAM_INIT(gzFile, gzread, gzseek, 0x10000)*/
 
 
-
+#define GAP_SZ 200
 #define edge_key(a) ((a).v)
 KRADIX_SORT_INIT(edge, edge_t, edge_key, 4)
 
@@ -137,9 +137,9 @@ int out_paths(graph_t *g, FILE *fout)
 	for ( i = 0; i < n_p; ++i) {
 		uint32_t j;
 		if (!p[i].name) 
-			fprintf(fout, "P\t%c%06u\t", p[i].is_circ?'c':'u',i); //check before output use the same name?
+			fprintf(fout, "P\t%c%06u\t%u\t", p[i].is_circ?'c':'u',i, p[i].len); //check before output use the same name?
 		else 
-			fprintf(fout, "P\t%s\t", p[i].name);
+			fprintf(fout, "P\t%s\t%u\t", p[i].name, p[i].len);
 		uint32_t v;	
 		/*fprintf(fout, "%d\n", p[i].n);*/
 		for ( j = 0; j < p[i].n; ++j)  {
@@ -283,7 +283,7 @@ int add_dedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, fl
 }
 
 
-uint32_t add_path(graph_t *g, char *name,  uint32_t *nodes, uint32_t n, uint32_t is_circ) 
+uint32_t add_path(graph_t *g, char *name,  uint32_t pl, uint32_t *nodes, uint32_t n, uint32_t is_circ) 
 {
 	
 	paths_t *ps = &g->pt;
@@ -312,6 +312,7 @@ uint32_t add_path(graph_t *g, char *name,  uint32_t *nodes, uint32_t n, uint32_t
 		}	
 		path_t *p = &ps->paths[ps->n];
 		p->ns = malloc(n*sizeof(uint32_t));
+		p->len = pl;
 		memcpy(p->ns, nodes, sizeof(uint32_t) * n);
 		p->n = n;
 		kh_key(h, k) =p->name = strdup(pname);	
@@ -481,6 +482,7 @@ int srch_path(graph_t *g)
 {
 	fprintf(stderr, "[M::%s] traversing graph\n", __func__);	
 	uint32_t n_vtx = g->vtx.n;
+	vertex_t *vt = g->vtx.vertices; 
 	/*fprintf(stderr, "%d\n", n_vtx);		*/
 	uint8_t *mark = calloc(n_vtx << 1, sizeof(uint8_t));
 	
@@ -554,7 +556,9 @@ int srch_path(graph_t *g)
 			uint32_t k, m;
 			/*for ( k = 0; k < kdq_size(q); ++k) fprintf(stderr, "%u,",kdq_at(q, k));*/
 			/*for ( k = 0; k < kdq_size(q); ++k) fprintf(stderr, "\n");*/
-			for ( k = 0, m = 0; k < kdq_size(q); k += 2, ++m) pth->ns[m] = kdq_at(q, k);
+			uint32_t pl = 0;
+			for ( k = 0, m = 0; k < kdq_size(q); k += 2, ++m) pth->ns[m] = kdq_at(q, k), pl += vt[pth->ns[m]>>1].len;
+			pth->len = pl + (m - 1) * GAP_SZ;
 			/*for ( k = 0; k < m; ++k) fprintf(stderr, "PID: %d\t%d\n", k, pth->ns[k]);*/
 			pth->n = m;
 			pth->is_circ = is_circ;
@@ -593,7 +597,7 @@ int merge_graph(graph_t *g, graph_t *c, int all)
 		for (j = 0; j < p[i].n; ++j) p[i].ns[j] = (crspid[p[i].ns[j]>>1] << 1) | (p[i].ns[j] & 1);
 		/*for (j = 0; j < p[i].n; ++j) fprintf(stderr, "new: %d\t%d\n", j, p[i].ns[j]);*/
 		/*fprintf(stderr, "new: %d\t%d\n", j, p[i].n);*/
-		uint32_t pid = add_path(g, 0, p[i].ns, p[i].n, p[i].is_circ);
+		uint32_t pid = add_path(g, 0, p[i].len, p[i].ns, p[i].n, p[i].is_circ);
 		kv_push(uint32_t, pids, pid);
 	}
 	//add asm
@@ -688,12 +692,14 @@ int add_p(graph_t *g, char *s)
 	kvec_t(uint32_t) ns;
 	kv_init(ns);
 	char *nodes_str;
+	uint32_t plen;
 	for (i = 0, p = q = s + 2;; ++p) {
 		if (*p == 0 || *p == '\t') {
 			int c = *p;
 			*p = 0;
 			if (i == 0) name = q;
-			else if (i == 1) nodes_str = q;
+			else if (i == 1) plen = strtoul(q, NULL, 10);
+			else if (i == 2) nodes_str = q;
 			++i, q = p + 1;	
 			if (c == 0) break;	
 		}
@@ -717,7 +723,7 @@ int add_p(graph_t *g, char *s)
 	}
 	/*fprintf(stderr, "enterp %d\n", ns.n);*/
 	
-	if (ns.n) add_path(g, name, ns.a, ns.n, name[0]=='c');
+	if (ns.n) add_path(g, name, plen, ns.a, ns.n, name[0]=='c');
 	kv_destroy(ns);
 	/*fprintf(stderr, "leavep\n");*/
 	return 0;
@@ -859,13 +865,13 @@ int get_path(graph_t *g, uint32_t min_l, char *fn)
 		uint32_t *p = parse_path(g, as->pn[i], &m);
 	   	char *ref_nm = ps[as->pn[i]>>1].name;
 		uint32_t ref_len = 0; 	
-		fprintf(stderr, "PATH: %s\n", ref_nm);
+		/*fprintf(stderr, "PATH: %s\n", ref_nm);*/
 		for ( j = 0; j < m; ++j) {
-		fprintf(stderr, "CTG: %s ORI: %c\n", vs[p[j]>>2].name, p[j] & 1? '+': '-');
+		/*fprintf(stderr, "CTG: %s ORI: %c\n", vs[p[j]>>2].name, p[j] & 1? '+': '-');*/
 			uint32_t seq_len = vs[p[j] >> 2].len;
 			if (seq_len) {
 				ref_len += seq_len;//200 'N' s	
-				if (j != m - 1) ref_len += 200;
+				if (j != m - 1) ref_len += GAP_SZ;
 			} else {
 				ref_len = 0;
 				break;
@@ -878,7 +884,7 @@ int get_path(graph_t *g, uint32_t min_l, char *fn)
 		
 			for (j = 0; j < m; ++j) {
 				cp_seq(s, vs[p[j]>> 2].seq, vs[p[j]>>2].len, p[j] & 1) , s += vs[p[j]>>2].len;
-				if (j != m - 1) memset(s,'N', 200), s += 200;
+				if (j != m - 1) memset(s,'N', GAP_SZ), s += GAP_SZ;
 			}
 			*s = 0;
 		} 	

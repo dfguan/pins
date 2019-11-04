@@ -216,7 +216,7 @@ graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)
 	return g;
 }
 
-int norm_links(cdict2_t *cds, sdict_t *ctgs)
+int norm_links(cdict2_t *cds, sdict_t *ctgs, int norm)
 {
 	uint32_t n_cds = ctgs->n_seq;
 	uint32_t i;
@@ -233,7 +233,7 @@ int norm_links(cdict2_t *cds, sdict_t *ctgs)
 			char *name2 = c->cnts[j].name; 
             uint32_t ctg2_idx = sd_get(ctgs, name2);
 			icnt = c->cnts[j].cnt[0] + c->cnts[j].cnt[1] + c->cnts[j].cnt[2] + c->cnts[j].cnt[3]; 
-            c->cnts[j].ncnt = (float) icnt / ctgs->seq[ctg2_idx].len;
+            c->cnts[j].ncnt = norm ? (float) icnt / ctgs->seq[ctg2_idx].len : (float) icnt;
             /*c->cnts[j].ncnt = (float) icnt / (ctgs->seq[ctg2_idx].l_snp_n + ctgs->seq[ctg2_idx].r_snp_n);*/
             /*uint32_t z;*/
             /*for ( z = 0; z < 4; ++z) c->cnts[j].fcnt[z] = (float) c->cnts[j].cnt[z]/(z >> 1 ? ctgs->seq[i].l_snp_n : ctgs->seq[i].r_snp_n) / ( z & 0x1 ? ctgs->seq[ctg2_idx].l_snp_n : ctgs->seq[ctg2_idx].r_snp_n);  */
@@ -357,9 +357,9 @@ int buildg_hic(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float
 	/*return 0;*/
 	/*if (norm) for (i = 0; i < n_cds; ++i) cd_norm(cds + i);*/
 	/*print_cdict2(cds, ctgs);	*/
-	norm_links(cds, ctgs);
+	norm_links(cds, ctgs, norm);
 	for ( i = 0; i < n_ctg; ++i) cd2_sort(cds+i); 
-	print_cdict2(cds, ctgs);	
+	/*print_cdict2(cds, ctgs);	*/
 	cd2_set_lim(cds, n_ctg, mlc); 
 	/*if (norm) */
 	/*if (norm) cd_filt(cds, n_cds, min_rat); */

@@ -395,7 +395,7 @@ int clean_edges(graph_t *g)
 		float mwt = 0, smwt = 0;
 		uint32_t n_mwt = 0;	
 		for ( a = e; a < e + en; ++a) {
-			if (a->is_del) continue;
+			/*if (a->is_del) continue;*/
 			if (a->wt > mwt) {
 				smwt = mwt;
 				mwt = a->wt;

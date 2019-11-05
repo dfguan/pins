@@ -124,7 +124,7 @@ help:
 		sprintf(mat_fn, "%s/links.%02d.mat", outdir, i);
 		col_hic_lnks(sat_ofn, bam_fn, n_bam, min_mq, 5000, mat_fn);
 		/*fprintf(stderr, "%p\n", sat_nfn);*/
-		buildg_hic(use_sat ? sat_ofn : faidx_fn, mat_fn, 0, use_sat,1, 0, cann, sat_nfn);
+		buildg_hic(use_sat ? sat_ofn : faidx_fn, mat_fn, 0, use_sat,0, 0, cann, sat_nfn);
 		//get seq at the final round
 		
 		if (i == iter) {

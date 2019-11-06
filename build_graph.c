@@ -148,7 +148,7 @@ int print_cdict2(cdict2_t *cds, sdict_t *ctgs)
             /*uint32_t z;*/
             /*for ( z = 0; z < 4; ++z) c->cnts[j].fcnt[z] = (float) c->cnts[j].cnt[z]/(z >> 1 ? ctgs->seq[i].l_snp_n : ctgs->seq[i].r_snp_n) / ( z & 0x1 ? ctgs->seq[ctg2_idx].l_snp_n : ctgs->seq[ctg2_idx].r_snp_n);  */
 			/*uint32_t snp2 = c->cnts[j].is_l ? ctgs->seq[sd_get(ctgs, name2)].l_snp_n:ctgs->seq[sd_get(ctgs,name2)].r_snp_n;*/
-			fprintf(stderr, "%s\t%s\t%f\t%u\t%u\t%u\t%u\t%u\n", name1, name2, c->cnts[j].ncnt, c->cnts[j].cnt[0], c->cnts[j].cnt[1], c->cnts[j].cnt[2], c->cnts[j].cnt[3], ctgs->seq[ctg2_idx].len);
+			fprintf(stderr, "%s\t%s\t%f\t%f\t%f\t%f\t%f\t%u\n", name1, name2, c->cnts[j].ncnt, c->cnts[j].cnt[0], c->cnts[j].cnt[1], c->cnts[j].cnt[2], c->cnts[j].cnt[3], ctgs->seq[ctg2_idx].len);
 		}
 	}
 	return 0;
@@ -359,7 +359,7 @@ int buildg_hic(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float
 	/*print_cdict2(cds, ctgs);	*/
 	norm_links(cds, ctgs, norm);
 	for ( i = 0; i < n_ctg; ++i) cd2_sort(cds+i); 
-	/*print_cdict2(cds, ctgs);	*/
+	print_cdict2(cds, ctgs);	
 	cd2_set_lim(cds, n_ctg, mlc); 
 	/*if (norm) */
 	/*if (norm) cd_filt(cds, n_cds, min_rat); */

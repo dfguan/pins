@@ -280,9 +280,9 @@ void srt_by_nm_loc(bc_t *s, bc_t *e)
 int col_joints(uint32_t ind1l, uint32_t ind2l, sdict_t *ctgs, cdict_t *cs)
 {
 	/*fprintf(stderr, "%u\t%u\t%u\n", ctgs->n_seq << 1, ind1l, ind2l);*/
-	cd_add(&cs[ind1l], ctgs->seq[ind2l>>1].name, ind2l & 1, ind2l & 1 ? ctgs->seq[ind2l>>1].l_snp_n:ctgs->seq[ind2l>>1].r_snp_n);		
+	cd_add(&cs[ind1l], ctgs->seq[ind2l>>1].name, ind2l & 1, ind2l & 1 ? ctgs->seq[ind2l>>1].l_snp_n:ctgs->seq[ind2l>>1].r_snp_n, 1);		
 	/*fprintf(stderr, "leave2\n");*/
-	cd_add(&cs[ind2l], ctgs->seq[ind1l>>1].name, ind1l & 1, ind1l & 1 ? ctgs->seq[ind1l>>1].l_snp_n:ctgs->seq[ind1l>>1].r_snp_n);		
+	cd_add(&cs[ind2l], ctgs->seq[ind1l>>1].name, ind1l & 1, ind1l & 1 ? ctgs->seq[ind1l>>1].l_snp_n:ctgs->seq[ind1l>>1].r_snp_n, 1);		
 	return 0;
 }
 

@@ -196,8 +196,10 @@ int col_contacts(hit_ary_t *hit_ary, sdict_t *sd, cdict_t *cs)
 			if (is_l1 > 1) return 1; //middle won't be added
 			uint32_t is_l2 = check_left_half(use_sd->seq[ind2].le, use_sd->seq[ind2].rs, a1s);
 			if (is_l2 > 1) return 1; //middle won't be added
-			cd_add(&cs[ind1<<1|is_l1], use_sd->seq[ind2].name, is_l2, is_l2?use_sd->seq[ind2].l_snp_n:use_sd->seq[ind2].r_snp_n);		
-			cd_add(&cs[ind2<<1|is_l2], use_sd->seq[ind1].name, is_l1, is_l1?use_sd->seq[ind1].l_snp_n:use_sd->seq[ind1].r_snp_n);		
+			uint32_t min_dist = is_l1 ? a0s : use_sd->seq[ind1].len - a0s; 
+			min_dist += is_l2 ? a1s : use_sd->seq[ind2].len - a1s;	
+			cd_add(&cs[ind1<<1|is_l1], use_sd->seq[ind2].name, is_l2, is_l2?use_sd->seq[ind2].l_snp_n:use_sd->seq[ind2].r_snp_n, 1.0/min_dist);		
+			cd_add(&cs[ind2<<1|is_l2], use_sd->seq[ind1].name, is_l1, is_l1?use_sd->seq[ind1].l_snp_n:use_sd->seq[ind1].r_snp_n, 1.0/min_dist);		
 			
 			i = j;	
 		}

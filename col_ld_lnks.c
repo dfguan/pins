@@ -89,8 +89,8 @@ int add_lnks(ld_t *r, sdict_t *ctgs, sdict_t *scfs, cdict_t *cds)
 		uint32_t is_l2 = check_left_half(scfs->seq[ind2].le, scfs->seq[ind2].rs, a1s);
 		if (is_l2 > 1) return 1; //middle won't be added
 		
-		cd_add(&cds[ind1<<1|is_l1], scfs->seq[ind2].name, is_l2, is_l2?scfs->seq[ind2].l_snp_n:scfs->seq[ind2].r_snp_n);		
-		cd_add(&cds[ind2<<1|is_l2], scfs->seq[ind1].name, is_l1, is_l1?scfs->seq[ind1].l_snp_n:scfs->seq[ind1].r_snp_n);		
+		cd_add(&cds[ind1<<1|is_l1], scfs->seq[ind2].name, is_l2, is_l2?scfs->seq[ind2].l_snp_n:scfs->seq[ind2].r_snp_n, 1);		
+		cd_add(&cds[ind2<<1|is_l2], scfs->seq[ind1].name, is_l1, is_l1?scfs->seq[ind1].l_snp_n:scfs->seq[ind1].r_snp_n, 1);		
 		return 0;
 	} else {
 	
@@ -102,8 +102,8 @@ int add_lnks(ld_t *r, sdict_t *ctgs, sdict_t *scfs, cdict_t *cds)
 		uint32_t is_l2 = check_left_half(ctgs->seq[ind2].le, ctgs->seq[ind2].rs, r->pos2);
 		if (is_l2 > 1) return 1; //middle won't be added
 		
-		cd_add(&cds[ind1<<1|is_l1], r->ctgn2, is_l2, is_l2?ctgs->seq[ind2].l_snp_n:ctgs->seq[ind2].r_snp_n);		
-		cd_add(&cds[ind2<<1|is_l2], r->ctgn1, is_l1, is_l1?ctgs->seq[ind1].l_snp_n:ctgs->seq[ind1].r_snp_n);		
+		cd_add(&cds[ind1<<1|is_l1], r->ctgn2, is_l2, is_l2?ctgs->seq[ind2].l_snp_n:ctgs->seq[ind2].r_snp_n, 1);		
+		cd_add(&cds[ind2<<1|is_l2], r->ctgn1, is_l1, is_l1?ctgs->seq[ind1].l_snp_n:ctgs->seq[ind1].r_snp_n, 1);		
 		return 0;
 	}
 	

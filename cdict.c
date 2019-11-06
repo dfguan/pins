@@ -261,7 +261,7 @@ void cd_add2(cdict_t *c, const char *name, uint32_t is_l, uint32_t cnt)
 	}
 } 
 */
-void cd_add(cdict_t *c, const char *name, uint32_t is_l, uint32_t snp_n)
+void cd_add(cdict_t *c, const char *name, uint32_t is_l, uint32_t snp_n, float w)
 {
 	shash_t *h = (shash_t *)c->h;
 	khint_t k;
@@ -284,12 +284,12 @@ void cd_add(cdict_t *c, const char *name, uint32_t is_l, uint32_t snp_n)
 		c->cnts[c->n_cnt+1].name = c->cnts[c->n_cnt].name; // init two 
 		c->cnts[c->n_cnt+1].is_l = 1;	
 		
-		++c->cnts[c->n_cnt | is_l].cnt;
+		c->cnts[c->n_cnt | is_l].cnt = w;
 		c->cnts[c->n_cnt | is_l].snp_n = snp_n;
 		c->n_cnt += 2;
 	} else {
 		uint32_t ind = kh_val(h, k);
-		++c->cnts[ind | is_l].cnt;
+		c->cnts[ind | is_l].cnt += w;
 		c->cnts[ind | is_l].snp_n = snp_n;
 	}
 		

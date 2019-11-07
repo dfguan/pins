@@ -420,7 +420,7 @@ int init_ctgs(graph_t *g, sdict_t* ctgs)
 	uint32_t n_vs = g->vtx.n;
 	uint32_t i;
 	for ( i = 0; i < n_vs; ++i) 
-		sd_put2(ctgs, vs[i].name, vs[i].len, vs[i].len >> 1, (vs[i].len >> 1) + 1, vs[i].len >> 1, vs[i].len >> 1);
+		sd_put4(ctgs, vs[i].name, vs[i].len, vs[i].len >> 1, (vs[i].len >> 1) + 1, vs[i].len >> 1, vs[i].len >> 1, 0);
 	return 0;
 }
 
@@ -499,7 +499,7 @@ int chl_col_ctgs(char *bam_fn, sdict_t *ctgs, uint32_t ws)
 		uint32_t rs = (len >> 1) + 1;
 		uint32_t lenl, lenr;
 		lenl = lenr = len >> 1;
-		sd_put2(ctgs, name, len, le, rs, lenl, lenr);
+		sd_put4(ctgs, name, len, le, rs, lenl, lenr, 0);
 	}
 	bam_destroy1(b);
 	bam_header_destroy(h);

@@ -8,6 +8,7 @@ PROG = pin_10x  pin_hic  pin_hic_it  pin_ld pin_ld_it #pin_hic2
 .SUFFIXS:.c .o
 
 all:$(PROG)
+	mkdir -p ../bin && cp $(PROG) ../bin
 
 pin_hic_it: bamlite.o bed.o cdict.o graph.o pin_hic_it.o sdict.o col_hic_lnks.o build_graph.o get_seq.o
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
@@ -31,7 +32,7 @@ pin_ld_it: ld_io.o bed.o cdict.o graph.o sdict.o build_graph.o col_ld_lnks.o get
 	$(CC) -c $(CFLAGS) $< -o $@
 
 clean:
-	rm -f *.o $(PROG)
+	rm -rf *.o $(PROG) ../bin
 
 	
 

@@ -76,6 +76,39 @@ int32_t sd_put3(sdict_t *d, const char *name, uint32_t len, uint32_t le, uint32_
 	}
 	return kh_val(h, k);
 }
+int32_t sd_put4(sdict_t *d, const char *name, uint32_t len, uint32_t le, uint32_t rs, uint32_t l_snp_n, uint32_t r_snp_n, uint32_t is_circ)
+{
+	shash_t *h = (shash_t*)d->h;
+	khint_t k;
+	int absent;
+	k = kh_put(str, h, name, &absent);
+	if (absent) {
+		sd_seq_t *s;
+		if (d->n_seq == d->m_seq) {
+			d->m_seq = d->m_seq? d->m_seq<<1 : 16;
+			d->seq = (sd_seq_t*)realloc(d->seq, d->m_seq * sizeof(sd_seq_t));
+		}
+		s = &d->seq[d->n_seq];
+		s->le = le, s->rs = rs;
+		s->l_snp_n = l_snp_n, s->r_snp_n = r_snp_n;
+		s->len = len;
+		kh_key(h, k) = s->name = strdup(name);
+		kh_val(h, k) = d->n_seq++;
+		s->is_circ = is_circ;
+	} // TODO: test if len is the same;
+	else {
+		uint32_t ind = kh_val(h, k);
+		sd_seq_t *s = &d->seq[ind];
+		if (len) s->len = len;
+	   	if (l_snp_n) s->l_snp_n = l_snp_n;
+		if (r_snp_n) s->r_snp_n = r_snp_n;	
+		if (rs) s->rs = rs;
+		if (le) s->le = le;	
+
+		s->is_circ = is_circ;
+	}
+	return kh_val(h, k);
+}
 int32_t sd_put2(sdict_t *d, const char *name, uint32_t len, uint32_t le, uint32_t rs, uint32_t l_snp_n, uint32_t r_snp_n)
 {
 	shash_t *h = (shash_t*)d->h;
@@ -103,6 +136,7 @@ int32_t sd_put2(sdict_t *d, const char *name, uint32_t len, uint32_t le, uint32_
 		if (r_snp_n) s->r_snp_n = r_snp_n;	
 		if (rs) s->rs = rs;
 		if (le) s->le = le;	
+
 	}
 	return kh_val(h, k);
 }

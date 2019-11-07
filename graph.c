@@ -243,6 +243,7 @@ int idx_edge(graph_t *g)
 			}
 		}
 	/*fprintf(stderr, "leave\n");*/
+	return 0;
 }
 
 int add_edge1(graph_t *g, edge_t *e)
@@ -253,6 +254,7 @@ int add_edge1(graph_t *g, edge_t *e)
 		es->edges = realloc(es->edges, sizeof(edge_t) * es->m);
 	}
 	es->edges[es->n++] = *e;
+	return 0;
 }
 
 int add_udedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, float wt)

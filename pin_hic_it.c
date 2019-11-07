@@ -32,6 +32,7 @@ int main(int argc, char *argv[])
 	int c;
 	int  min_mq = 0;
 	int  iter = 3;
+	int norm = 1;
 	char *program;
 	char *sat_fn = 0, *faidx_fn = 0, *seq_fn = 0;
 	int use_sat = 0;
@@ -39,7 +40,7 @@ int main(int argc, char *argv[])
 	int cann = 5;
 	uint32_t min_l  = 0;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
-	while (~(c=getopt(argc, argv, "O:q:c:s:r:i:l:x:h"))) {
+	while (~(c=getopt(argc, argv, "O:q:nc:s:r:i:l:x:h"))) {
 		switch (c) {
 			case 'q':
 				min_mq = atoi(optarg);
@@ -63,6 +64,9 @@ int main(int argc, char *argv[])
 			case 'i':
 				iter = atoi(optarg);
 				break;
+			case 'n':
+				norm = 0;
+				break;
 			case 'l':
 				min_l = atoi(optarg);
 				break;
@@ -74,6 +78,7 @@ help:
 				fprintf(stderr, "         -i    INT      iteration times\n");
 				fprintf(stderr, "         -O    STR      output directory [.]\n");
 				fprintf(stderr, "         -q    INT      minimum alignment quality [10]\n");
+				fprintf(stderr, "         -n    BOOL     do not use normalized weight [TRUE]\n");
 				fprintf(stderr, "         -c    INT      candidate number [5]\n");
 				fprintf(stderr, "         -s    STR      sat file [nul]\n");
 				fprintf(stderr, "         -x    STR      reference fa index file [nul]\n");
@@ -124,7 +129,7 @@ help:
 		sprintf(mat_fn, "%s/links.%02d.mat", outdir, i);
 		col_hic_lnks(sat_ofn, bam_fn, n_bam, min_mq, 5000, mat_fn);
 		/*fprintf(stderr, "%p\n", sat_nfn);*/
-		buildg_hic(use_sat ? sat_ofn : faidx_fn, mat_fn, 0, use_sat,0, 0, cann, sat_nfn);
+		buildg_hic(use_sat ? sat_ofn : faidx_fn, mat_fn, 0, use_sat, norm, 0, cann, sat_nfn);
 		//get seq at the final round
 		
 		if (i == iter) {

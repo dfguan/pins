@@ -243,9 +243,9 @@ int norm_links(cdict2_t *cds, sdict_t *ctgs, int norm)
 	}
 	return 0;
 }
-int det_ori(uint32_t *ws)
+int det_ori(float *ws)
 {
-	uint32_t l, sl;
+	float l, sl;
 	l = ws[0];
 	sl = 0;
 	int i, maxi = 0;

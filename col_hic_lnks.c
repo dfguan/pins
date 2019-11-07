@@ -140,7 +140,7 @@ void out_matrix(cdict_t *cds, sdict_t *ctgs, uint32_t n, char *out_fn)
 		c = cds + i;
 		uint32_t j;
 		for ( j = 0; j < c->n_cnt; ++j) {
-			if (c->cnts[j].cnt) fprintf(fout, "%s\t%c\t%s\t%c\t%.0f\t%u\t%u\n", ctgs->seq[i>>1].name, i&1?'+':'-', c->cnts[j].name, j&1?'+':'-', c->cnts[j].cnt, c->cnts[j].snp_n, ctgs->seq[i>>1].l_snp_n);				
+			if (c->cnts[j].cnt && !ctgs->seq[i>>1].is_circ && !ctgs->seq[j].is_circ) fprintf(fout, "%s\t%c\t%s\t%c\t%.0f\t%u\t%u\n", ctgs->seq[i>>1].name, i&1?'+':'-', c->cnts[j].name, j&1?'+':'-', c->cnts[j].cnt, c->cnts[j].snp_n, ctgs->seq[i>>1].l_snp_n);				
 		}	
 	}
 	if (out_fn) fclose(fout);
@@ -194,17 +194,17 @@ int col_contacts(hit_ary_t *hit_ary, sdict_t *sd, cdict_t *cs)
 			uint32_t a0s = (uint32_t) hs[i].c1ns; 
 			uint32_t a1s = (uint32_t) hs[i].c2ns; 
 			uint32_t is_l1 = check_left_half(use_sd->seq[ind1].le, use_sd->seq[ind1].rs, a0s);
-			if (is_l1 > 1) return 1; //middle won't be added
+			if (is_l1 > 1) continue; //middle won't be added
 			uint32_t is_l2 = check_left_half(use_sd->seq[ind2].le, use_sd->seq[ind2].rs, a1s);
-			if (is_l2 > 1) return 1; //middle won't be added
+			if (is_l2 > 1) continue; //middle won't be added
 			uint32_t min_dist = is_l1 ? a0s : use_sd->seq[ind1].len - a0s; 
 			min_dist += is_l2 ? a1s : use_sd->seq[ind2].len - a1s;	
 			cd_add(&cs[ind1<<1|is_l1], use_sd->seq[ind2].name, is_l2, is_l2?use_sd->seq[ind2].l_snp_n:use_sd->seq[ind2].r_snp_n, 1.0);		
 			cd_add(&cs[ind2<<1|is_l2], use_sd->seq[ind1].name, is_l1, is_l1?use_sd->seq[ind1].l_snp_n:use_sd->seq[ind1].r_snp_n, 1.0);		
-			
 			i = j;	
 		}
 	}
+	return 0;
 }
 
 
@@ -454,7 +454,7 @@ int init_scaffs(graph_t *g, sdict_t *ctgs, sdict_t *scfs)
 				len += len_ctg + 200;
 		}
 		//reset scaffold length le rs l_snp_n, r_snp_n
-		sd_put2(scfs, pt[as->pn[i]>>1].name, len, len >> 1, (len >>1) + 1, len >> 1, len >> 1);
+		sd_put4(scfs, pt[as->pn[i]>>1].name, len, len >> 1, (len >>1) + 1, len >> 1, len >> 1, pt[as->pn[i]>>1].is_circ);
 		free(p);
 	}
 	return 0;

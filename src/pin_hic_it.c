@@ -30,7 +30,7 @@
 int main(int argc, char *argv[])
 {
 	int c;
-	int  min_mq = 0;
+	int  min_mq = 10;
 	int  iter = 3;
 	int norm = 1;
 	char *program;
@@ -38,9 +38,10 @@ int main(int argc, char *argv[])
 	int use_sat = 0;
 	char *outdir = ".";
 	int cann = 5;
+	int min_wt = 100;
 	uint32_t min_l  = 0;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
-	while (~(c=getopt(argc, argv, "O:q:nc:s:r:i:l:x:h"))) {
+	while (~(c=getopt(argc, argv, "O:q:nc:s:r:w:i:l:x:h"))) {
 		switch (c) {
 			case 'q':
 				min_mq = atoi(optarg);
@@ -54,6 +55,9 @@ int main(int argc, char *argv[])
 			case 's': 
 				sat_fn = optarg;
 				use_sat = 1;
+				break;
+			case 'w': 
+				min_wt = atoi(optarg);
 				break;
 			case 'x': 
 				faidx_fn = optarg;
@@ -129,7 +133,7 @@ help:
 		sprintf(mat_fn, "%s/links.%02d.mat", outdir, i);
 		col_hic_lnks(sat_ofn, bam_fn, n_bam, min_mq, 5000, mat_fn);
 		/*fprintf(stderr, "%p\n", sat_nfn);*/
-		buildg_hic(use_sat ? sat_ofn : faidx_fn, mat_fn, 0, use_sat, norm, 0, cann, sat_nfn);
+		buildg_hic(use_sat ? sat_ofn : faidx_fn, mat_fn, min_wt, use_sat, norm, 0, cann, sat_nfn);
 		//get seq at the final round
 		
 		if (i == iter) {

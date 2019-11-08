@@ -262,7 +262,7 @@ int det_ori(float *ws)
 	/*else*/
 		   /*return maxi;	*/
 }
-graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs)
+graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs, float min_wt)
 {
 	graph_t *g = graph_init();
 	
@@ -274,6 +274,7 @@ graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs)
 		
 	for ( i = 0; i < ctgs->n_seq; ++i) {
 		char *name1 = ctgs->seq[i].name;
+		uint32_t len1 = ctgs->seq[i].len;
 		cdict2_t *c = cds + i;	
 
 		for (j = 0; j < c->lim; ++j) {
@@ -285,6 +286,7 @@ graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs)
 			uint32_t k;
 			uint8_t hand_shaking = 0;
 			uint32_t is_l, is_l2;
+			uint32_t len2 = ctgs->seq[ind].len;
 			for ( k = 0; k < cds[ind].lim; ++k) {
 					if (strcmp(name1, cds[ind].cnts[k].name) == 0) {
 						hand_shaking = 1;
@@ -295,7 +297,7 @@ graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs)
 			//determine joint direction, here we use a very easy model
 			if (!hand_shaking) continue;
 			int idx;
-			if (~(idx = det_ori(c->cnts[j].cnt)))
+			if (~(idx = det_ori(c->cnts[j].cnt)) && c->cnts[j].cnt[idx] > min_wt)
 			/*uint32_t hh = c->cnts[j].cnt[0];*/
 			/*uint32_t ht = c->cnts[j].cnt[1];*/
 			/*uint32_t th = c->cnts[j].cnt[2];*/
@@ -312,7 +314,7 @@ graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs)
 					/*is_l2 = tl2 > hd ? 0 : 1; 	*/
 			/*else */
 					/*continue;*/
-			is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, c->cnts[j].cnt[is_l << 1 | is_l2]);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.
+			is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, (float)4.0 * c->cnts[j].cnt[idx]/len1/len2);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.
 		}		
 	}	
 	return g;
@@ -369,7 +371,7 @@ int buildg_hic(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] building graph\n", __func__);
 #endif
-	graph_t *g = build_graph_hic(cds, ctgs);
+	graph_t *g = build_graph_hic(cds, ctgs, min_wt);
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] processing graph\n", __func__);
 #endif

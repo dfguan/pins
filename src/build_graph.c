@@ -314,7 +314,7 @@ graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs, float min_wt)
 					/*is_l2 = tl2 > hd ? 0 : 1; 	*/
 			/*else */
 					/*continue;*/
-			is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, (float)4.0 * c->cnts[j].cnt[idx]/len1/len2);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.
+			is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, c->cnts[j].cnt[idx]);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.
 		}		
 	}	
 	return g;

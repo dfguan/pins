@@ -184,7 +184,7 @@ int core(char *snps_fn, char *edge_fn)
 
 }
 */
-int col_contacts(hit_ary_t *hit_ary, sdict_t *sd, cdict_t *cs)
+int col_contacts(hit_ary_t *hit_ary, sdict_t *sd, cdict_t *cs, int use_min_dist)
 {
 	size_t i, j;
 	sdict_t *use_sd = sd;
@@ -203,8 +203,8 @@ int col_contacts(hit_ary_t *hit_ary, sdict_t *sd, cdict_t *cs)
 			if (is_l2 > 1) continue; //middle won't be added
 			uint32_t min_dist = is_l1 ? a0s : use_sd->seq[ind1].len - a0s; 
 			min_dist += is_l2 ? a1s : use_sd->seq[ind2].len - a1s;	
-			cd_add(&cs[ind1<<1|is_l1], use_sd->seq[ind2].name, is_l2, is_l2?use_sd->seq[ind2].l_snp_n:use_sd->seq[ind2].r_snp_n, 1.0);		
-			cd_add(&cs[ind2<<1|is_l2], use_sd->seq[ind1].name, is_l1, is_l1?use_sd->seq[ind1].l_snp_n:use_sd->seq[ind1].r_snp_n, 1.0);	//use min_dist here	
+			cd_add(&cs[ind1<<1|is_l1], use_sd->seq[ind2].name, is_l2, is_l2?use_sd->seq[ind2].l_snp_n:use_sd->seq[ind2].r_snp_n, use_min_dist ? 1.0 / min_dist : 1.0);		
+			cd_add(&cs[ind2<<1|is_l2], use_sd->seq[ind1].name, is_l1, is_l1?use_sd->seq[ind1].l_snp_n:use_sd->seq[ind1].r_snp_n, use_min_dist ? 1.0 /min_dist : 1.0);	//use min_dist here	
 			i = j;	
 		}
 	}
@@ -524,7 +524,7 @@ int init_seqs(char *fn, sdict_t *ctgs, sdict_t *scfs)
 
 /*int aa_10x_hic(char *bam_fn, int min_as, int min_mq, int min_cov, float min_cov_rat, int max_cov, float max_cov_rat)*/
 /*int aa_hic(char *bam_fn, int min_as, int min_mq, int min_cov, int max_cov, uint32_t max_ins_len)*/
-int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t win_s, char *out_fn)
+int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t win_s, int use_min_dist, char *out_fn)
 {
 
 	/*uint32_t n_cds = ctgs->n_seq<<1;*/
@@ -573,7 +573,7 @@ int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t wi
 	sdict_t *_sd = scfs->n_seq ? scfs : ctgs;
 	cdict_t *cds = calloc(_sd->n_seq << 1, sizeof(cdict_t));
 	for ( i = 0; i < _sd->n_seq << 1; ++i) cd_init(&cds[i]); //be careful with the access way
-	col_contacts(hit_ary, _sd, cds);
+	col_contacts(hit_ary, _sd, cds, use_min_dist);
 	
 	free(hit_ary->ary); free(hit_ary);
 
@@ -591,7 +591,8 @@ int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t wi
 int main_hic_lnks(int argc, char *argv[])
 {
 	int c;
-	int  min_mq = 10;
+	int min_mq = 10;
+	int use_min_dist = 1;
 	/*uint32_t max_ins_len = 10000;*/
 	/*int max_cov = 100, min_cov = 0, min_mq = 0;*/
 	/*int min_as = 0;*/
@@ -601,13 +602,16 @@ int main_hic_lnks(int argc, char *argv[])
 	char *sat_fn = 0, *out_fn = 0;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
 	--argc, ++argv;
-	while (~(c=getopt(argc, argv, "q:w:s:h"))) {
+	while (~(c=getopt(argc, argv, "q:w:ds:h"))) {
 		switch (c) {
 			case 'q':
 				min_mq = atoi(optarg);
 				break;
 			case 'w':
 				win_s = strtol(optarg, NULL, 10);
+				break;
+			case 'd':
+				use_min_dist = 0;
 				break;
 			case 's':
 				sat_fn  = optarg;
@@ -622,6 +626,7 @@ help:
 				fprintf(stderr, "Options:\n");
 				fprintf(stderr, "         -q    INT      minimum alignment quality [0]\n");
 				fprintf(stderr, "         -s    STR      sat file\n");
+				fprintf(stderr, "         -d    BOOL     do not use minimum dist to normalize weight [False]\n");
 				fprintf(stderr, "         -o    STR      output file\n");
 				fprintf(stderr, "         -h             help\n");
 				return 1;	
@@ -633,7 +638,7 @@ help:
 	char **bam_fn = &argv[optind];
 	int n_bam = argc - optind;
 	fprintf(stderr, "Program starts\n");	
-	col_hic_lnks(sat_fn, bam_fn, n_bam, min_mq, win_s, out_fn);
+	col_hic_lnks(sat_fn, bam_fn, n_bam, min_mq, win_s, use_min_dist, out_fn);
 	fprintf(stderr, "Program ends\n");	
 	return 0;	
 }

@@ -37,17 +37,21 @@ int main(int argc, char *argv[])
 	char *sat_fn = 0, *faidx_fn = 0, *seq_fn = 0;
 	int use_sat = 0;
 	char *outdir = ".";
+	int use_min_dist = 1;
 	int cann = 5;
 	int min_wt = 100;
 	uint32_t min_l  = 0;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
-	while (~(c=getopt(argc, argv, "O:q:nc:s:r:w:i:l:x:h"))) {
+	while (~(c=getopt(argc, argv, "O:q:nc:ds:r:w:i:l:x:h"))) {
 		switch (c) {
 			case 'q':
 				min_mq = atoi(optarg);
 				break;
 			case 'O':
 				outdir = optarg;
+				break;
+			case 'd':
+				use_min_dist = 0;
 				break;
 			case 'c': 
 				cann = atoi(optarg);
@@ -83,6 +87,7 @@ help:
 				fprintf(stderr, "         -O    STR      output directory [.]\n");
 				fprintf(stderr, "         -q    INT      minimum alignment quality [10]\n");
 				fprintf(stderr, "         -n    BOOL     do not use normalized weight [TRUE]\n");
+				fprintf(stderr, "         -d    BOOL     do not use minimum distance to normalize weight [FALSE]\n");
 				fprintf(stderr, "         -c    INT      candidate number [5]\n");
 				fprintf(stderr, "         -s    STR      sat file [nul]\n");
 				fprintf(stderr, "         -x    STR      reference fa index file [nul]\n");
@@ -127,11 +132,12 @@ help:
 	//scaffs.01.fa
 	
 	int i;
+	if (use_min_dist) min_wt = -1, norm = 0;
 	for ( i = 1; i <= iter; ++i) {
 		//input sat_fn output mat_fn
 		sprintf(sat_nfn, "%s/scaffs.%02d.sat", outdir, i);
 		sprintf(mat_fn, "%s/links.%02d.mat", outdir, i);
-		col_hic_lnks(sat_ofn, bam_fn, n_bam, min_mq, 5000, mat_fn);
+		col_hic_lnks(sat_ofn, bam_fn, n_bam, min_mq, 5000, use_min_dist, mat_fn);
 		/*fprintf(stderr, "%p\n", sat_nfn);*/
 		buildg_hic(use_sat ? sat_ofn : faidx_fn, mat_fn, min_wt, use_sat, norm, 0, cann, sat_nfn);
 		//get seq at the final round

@@ -224,6 +224,7 @@ int norm_links(cdict2_t *cds, sdict_t *ctgs, int norm)
 	for ( i = 0; i < n_cds; ++i) {
 		/*char *name1 = ctgs->seq[i>>1].name;*/
 		/*uint32_t snpn = i&1 ? ctgs->seq[i>>1].l_snp_n:ctgs->seq[i>>1].r_snp_n;*/
+		uint32_t len1 = ctgs->seq[i].len;
 		uint32_t j;
 		c = cds + i;
 		uint32_t icnt;
@@ -232,8 +233,10 @@ int norm_links(cdict2_t *cds, sdict_t *ctgs, int norm)
             /*fprintf(stderr, "%s\n", c->cnts[j].name);*/
 			char *name2 = c->cnts[j].name; 
             uint32_t ctg2_idx = sd_get(ctgs, name2);
+			uint32_t len2 = ctgs->seq[ctg2_idx].len; 
 			icnt = c->cnts[j].cnt[0] + c->cnts[j].cnt[1] + c->cnts[j].cnt[2] + c->cnts[j].cnt[3]; 
-            c->cnts[j].ncnt = norm ? (float) icnt / ctgs->seq[ctg2_idx].len : (float) icnt;
+            /*c->cnts[j].ncnt = norm ? (float) icnt / ctgs->seq[ctg2_idx].len : (float) icnt;*/
+            c->cnts[j].ncnt = norm ? (float) icnt / (len1/2 + len2/2) : (float) icnt;
             /*c->cnts[j].ncnt = (float) icnt / (ctgs->seq[ctg2_idx].l_snp_n + ctgs->seq[ctg2_idx].r_snp_n);*/
             /*uint32_t z;*/
             /*for ( z = 0; z < 4; ++z) c->cnts[j].fcnt[z] = (float) c->cnts[j].cnt[z]/(z >> 1 ? ctgs->seq[i].l_snp_n : ctgs->seq[i].r_snp_n) / ( z & 0x1 ? ctgs->seq[ctg2_idx].l_snp_n : ctgs->seq[ctg2_idx].r_snp_n);  */
@@ -314,7 +317,7 @@ graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs, float min_wt)
 					/*is_l2 = tl2 > hd ? 0 : 1; 	*/
 			/*else */
 					/*continue;*/
-			is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, c->cnts[j].cnt[idx]);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.
+			is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, c->cnts[j].cnt[idx] / (len1/2 + len2/2));	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.
 		}		
 	}	
 	return g;

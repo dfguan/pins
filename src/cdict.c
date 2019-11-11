@@ -155,7 +155,7 @@ void cd2_sort(cdict2_t *c)
     }
 
 }
-void cd2_add(cdict2_t *c, uint32_t is_l1, const char *name, uint32_t is_l2, uint32_t cnt)
+void cd2_add(cdict2_t *c, uint32_t is_l1, const char *name, uint32_t is_l2, float cnt)
 {
 	shash_t *h = (shash_t *)c->h;
 	khint_t k;

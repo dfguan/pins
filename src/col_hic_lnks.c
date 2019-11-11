@@ -204,7 +204,7 @@ int col_contacts(hit_ary_t *hit_ary, sdict_t *sd, cdict_t *cs)
 			uint32_t min_dist = is_l1 ? a0s : use_sd->seq[ind1].len - a0s; 
 			min_dist += is_l2 ? a1s : use_sd->seq[ind2].len - a1s;	
 			cd_add(&cs[ind1<<1|is_l1], use_sd->seq[ind2].name, is_l2, is_l2?use_sd->seq[ind2].l_snp_n:use_sd->seq[ind2].r_snp_n, 1.0);		
-			cd_add(&cs[ind2<<1|is_l2], use_sd->seq[ind1].name, is_l1, is_l1?use_sd->seq[ind1].l_snp_n:use_sd->seq[ind1].r_snp_n, 1.0);		
+			cd_add(&cs[ind2<<1|is_l2], use_sd->seq[ind1].name, is_l1, is_l1?use_sd->seq[ind1].l_snp_n:use_sd->seq[ind1].r_snp_n, 1.0);	//use min_dist here	
 			i = j;	
 		}
 	}

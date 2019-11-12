@@ -148,6 +148,9 @@ help:
 		}
 		strcpy(sat_ofn, sat_nfn);
 		use_sat = 1;
+		use_min_dist = 0;
+		min_wt = 100;
+		norm = 1;
 	}
 	free(sat_ofn);
 	free(sat_nfn);

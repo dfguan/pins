@@ -127,6 +127,37 @@ int out_edges(graph_t *g, int all, FILE *fout)
 	}
 	return 0;
 }
+int insert_sort_(uint32_t *ary, int n)
+{
+	int i;
+	for ( i = 1; i < n; ++i) {
+		int j;
+		uint32_t tmp;
+		for (j = i; j >0 && ary[j-1] < ary[j]; --j) tmp = ary[j], ary[j] = ary[j-1], ary[j-1] = tmp; 
+	}
+	return 0;
+}
+int cal_n50(graph_t *g)
+{
+	path_t *p = g->pt.paths;
+	uint32_t n_p = g->pt.n;
+	uint32_t i;
+	kvec_t(uint32_t) pls;
+	kv_init(pls);
+	long sum = 0;
+	for ( i = 0; i < n_p; ++i) {
+		kv_push(uint32_t, pls, p[i].len);
+		sum += p[i].len;
+	}
+	insert_sort_(pls.a, pls.n);
+	long tmp_sum = 0;
+	for (i = 0; i < pls.n; ++i) { tmp_sum += pls.a[i]; if (tmp_sum >= sum / 2) break;}
+	fprintf(stderr, "Genome Size: %lu bp\n", sum);
+	fprintf(stderr, "No. scaffolds: %lu bp\n", pls.n);
+	fprintf(stderr, "N50: %u bp\n", pls.a[i]);
+	kv_destroy(pls);
+	return 0;
+}
 
 int out_paths(graph_t *g, FILE *fout)
 {
@@ -625,6 +656,7 @@ int process_graph(graph_t *g)
 	/*fprintf(stderr, "after update ends\n");*/
 	/*out_edges(g,0, stderr);*/
 	srch_path(g);
+	cal_n50(g);
 	return 0;
 }
 

@@ -28,9 +28,9 @@ int main(int argc, char *argv[])
 help:
 		fprintf(stderr, "\n  pin_10x [-v] [-h] <command> [<args>]\n");
 		fprintf(stderr, "  commands:\n");
-		fprintf(stderr, "           link        generate links for contigs\n");
-		fprintf(stderr, "           build       generate graph with links\n");
-		fprintf(stderr, "           getc        get contigs from graph\n");
+		fprintf(stderr, "           link        generate link matrix for pairs of contigs\n");
+		fprintf(stderr, "           build       generate a scaffolding graph with links\n");
+		fprintf(stderr, "           getc        get scaffolds from a scaffolding graph\n");
 		return 1;
 	} else {
 		if (!strcmp(argv[1], "link")) main_10x_lnks(argc , argv);

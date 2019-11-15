@@ -422,7 +422,7 @@ int main_brks(int argc, char *argv[])
 {
 	int c;
 	char *sat_fn = 0, *links_fn = 0, *out_fn = 0;
-	int limn = 4;
+	int limn = 2;
 	char *program = argv[0];
 	--argc, ++argv;
 	while (~(c=getopt(argc, argv, "n:o:h"))) {

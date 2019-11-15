@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 	int c;
 	int  min_mq = 10;
 	int  iter = 3;
-	int norm = 1, brk = 1, limn = 4;
+	int norm = 1, brk = 1, limn = 2;
 	char *program;
 	char *sat_fn = 0, *faidx_fn = 0, *seq_fn = 0;
 	int use_sat = 0;
@@ -91,7 +91,7 @@ help:
 				fprintf(stderr, "\nUsage: %s [options] <BAM_FILE>\n", program);
 				fprintf(stderr, "Options:\n");
 				fprintf(stderr, "         -i    INT      iteration times\n");
-				fprintf(stderr, "         -a    INT      allowed top N candidates [4]\n");
+				fprintf(stderr, "         -a    INT      allowed top N candidates [2]\n");
 				fprintf(stderr, "         -O    STR      output directory [.]\n");
 				fprintf(stderr, "         -q    INT      minimum alignment quality [10]\n");
 				fprintf(stderr, "         -n    BOOL     do not use normalized weight [TRUE]\n");

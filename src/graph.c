@@ -137,7 +137,7 @@ int insert_sort_(uint32_t *ary, int n)
 	}
 	return 0;
 }
-int cal_n50(graph_t *g, uint32_t asm_id)
+int cal_asmm(graph_t *g, uint32_t asm_id)
 {
 	asm_t *am = &g->as.asms[asm_id];	
 	path_t *p = g->pt.paths;
@@ -151,11 +151,13 @@ int cal_n50(graph_t *g, uint32_t asm_id)
 		sum += p[i].len;
 	}
 	insert_sort_(pls.a, pls.n);
+
 	long tmp_sum = 0;
 	for (i = 0; i < pls.n; ++i) { tmp_sum += pls.a[i]; if (tmp_sum >= sum / 2) break;}
 	fprintf(stderr, "\n[M::%s] assembly metrics\n",__func__);
 	fprintf(stderr, "[M::%s] Genome Size: %lu bp\n",__func__, sum);
 	fprintf(stderr, "[M::%s] No. scaffolds: %lu\n", __func__, pls.n);
+	fprintf(stderr, "[M::%s] Maximum: %u bp\n", __func__, pls.a[0]);
 	fprintf(stderr, "[M::%s] N50: %u bp\n", __func__, pls.a[i]);
 	kv_destroy(pls);
 	return 0;
@@ -407,7 +409,7 @@ int break_path(graph_t *g, uint32_t scf_id, uint32_t *bs, uint32_t bn)
 	kvec_t(uint32_t) pids;
 	kv_init(pids);
 	for (i = 0; i < bn; ++i) {
-		uint32_t e, s = bs[i];
+		uint32_t e, s = bs[i] + 1;
 		if (i == bn - 1) {
 			e = pt->n;		
 		} else 
@@ -1065,7 +1067,7 @@ graph_t *load_sat(char *fn)
 
 int dump_sat(graph_t *g, char *fn)
 {
-	cal_n50(g, g->as.casm);
+	cal_asmm(g, g->as.casm);
 	FILE *fout = fn ? fopen(fn, "w") : stdout;
 	fprintf(fout, "H\tVN:Z:1.0\n");	
 	out_vetices(g, fout);

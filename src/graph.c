@@ -981,7 +981,7 @@ int get_path(graph_t *g, uint32_t min_l, char *fn)
 		uint32_t *p = parse_path(g, as->pn[i], &m);
 	   	char *ref_nm = ps[as->pn[i]>>1].name;
 		uint32_t ref_len = 0; 	
-		fprintf(stderr, "PATH: %s\n", ref_nm);
+		/*fprintf(stderr, "PATH: %s\n", ref_nm);*/
 		for ( j = 0; j < m; ++j) {
 		/*fprintf(stderr, "CTG: %s ORI: %c\n", vs[p[j]>>2].name, p[j] & 1? '+': '-');*/
 			uint32_t seq_len = vs[p[j] >> 2].len;
@@ -1004,7 +1004,7 @@ int get_path(graph_t *g, uint32_t min_l, char *fn)
 			}
 			*s = 0;
 		} 	
-		fprintf(stderr, "PATH: too\n");
+		/*fprintf(stderr, "PATH: too\n");*/
 		fprintf(fout, ">%s_%u\n",ref_nm, ref_len);
 		if (ref_seq) {
 			fprintf(fout, "%s\n",ref_seq);

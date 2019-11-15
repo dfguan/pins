@@ -24,6 +24,7 @@
 #include "col_hic_lnks.h"
 #include "build_graph.h"
 #include "get_seq.h"
+#include "make_brk.h"
 
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
@@ -32,7 +33,7 @@ int main(int argc, char *argv[])
 	int c;
 	int  min_mq = 10;
 	int  iter = 3;
-	int norm = 1;
+	int norm = 1, brk = 1, limn = 4;
 	char *program;
 	char *sat_fn = 0, *faidx_fn = 0, *seq_fn = 0;
 	int use_sat = 0;
@@ -42,10 +43,16 @@ int main(int argc, char *argv[])
 	int min_wt = 100;
 	uint32_t min_l  = 0;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
-	while (~(c=getopt(argc, argv, "O:q:nc:ds:r:w:i:l:x:h"))) {
+	while (~(c=getopt(argc, argv, "O:q:nc:ds:br:a:w:i:l:x:h"))) {
 		switch (c) {
 			case 'q':
 				min_mq = atoi(optarg);
+				break;
+			case 'b':
+				brk = 0;
+				break;
+			case 'a':
+				limn = atoi(optarg);
 				break;
 			case 'O':
 				outdir = optarg;
@@ -84,10 +91,12 @@ help:
 				fprintf(stderr, "\nUsage: %s [options] <BAM_FILE>\n", program);
 				fprintf(stderr, "Options:\n");
 				fprintf(stderr, "         -i    INT      iteration times\n");
+				fprintf(stderr, "         -a    INT      allowed top N candidates [4]\n");
 				fprintf(stderr, "         -O    STR      output directory [.]\n");
 				fprintf(stderr, "         -q    INT      minimum alignment quality [10]\n");
 				fprintf(stderr, "         -n    BOOL     do not use normalized weight [TRUE]\n");
 				fprintf(stderr, "         -d    BOOL     do not use minimum distance to normalize weight [FALSE]\n");
+				fprintf(stderr, "         -b    BOOL     do not break at the final step [FALSE]\n");
 				fprintf(stderr, "         -c    INT      candidate number [5]\n");
 				fprintf(stderr, "         -s    STR      sat file [nul]\n");
 				fprintf(stderr, "         -x    STR      reference fa index file [nul]\n");
@@ -142,11 +151,14 @@ help:
 		buildg_hic(use_sat ? sat_ofn : faidx_fn, mat_fn, min_wt, use_sat, norm, 0, cann, sat_nfn);
 		//get seq at the final round
 		
-		if (i == iter) {
-			sprintf(scf_fn, "%s/scaffolds_final.fa", outdir);
-			get_seq(sat_nfn, seq_fn, min_l, scf_fn);
-		}
 		strcpy(sat_ofn, sat_nfn);
+		if (i == iter) {
+			sprintf(mat_fn, "%s/links.%02d.mat", outdir, 1);
+			sprintf(scf_fn, "%s/scaffolds_final.fa", outdir);
+			if (brk) sprintf(sat_nfn, "%s/scaffs.bk.sat", outdir), mk_brks(sat_ofn, mat_fn, limn, sat_nfn);
+			get_seq(sat_nfn, seq_fn, min_l, scf_fn);
+			
+		}
 		use_sat = 1;
 		/*use_min_dist = 0;*/
 		/*min_wt = 100;*/

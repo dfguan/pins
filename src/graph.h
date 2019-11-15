@@ -102,7 +102,10 @@ extern "C" {
 	graph_t  *load_gfa(char *fn);
 	graph_t  *load_sat(char *fn);
 	int get_path(graph_t *g, uint32_t min_l, char *fn);
+	int simp_graph(graph_t *g);
+	int update_asm(graph_t *g);
 	int read_seq(graph_t *g, char *fn);
+	int break_path(graph_t *g, uint32_t scf_id, uint32_t *bs, uint32_t bn);
 	uint32_t *parse_path(graph_t *g, uint32_t pid, uint32_t *n);
 #ifdef __cplusplus
 }

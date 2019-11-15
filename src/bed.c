@@ -111,6 +111,7 @@ int bed_parse_lnks(int l, char *s, lnk_rec_t *pr) // s must be NULL terminated
 		else if (t == 4) pr->fwt = strtof(q, &r);
 		else if (t == 5) pr->llen = strtol(q, &r, 10);
 		else if (t == 6) pr->rlen = strtol(q, &r, 10);
+		else if (t == 7) pr->wt = strtol(q, &r, 10);
 		++t, q = i < l? &s[i+1] : 0;
 	}
 	if (t < 4) return -1;

@@ -23,8 +23,18 @@
 
 int get_seq(char *sat_fn, char *seq_fn, uint32_t min_l, char *out_fn)
 {
+	
+#ifdef VERBOSE
+		fprintf(stderr, "[M::%s] load scaffolding graph to memory \n", __func__);
+#endif
 	graph_t *g = load_sat(sat_fn);
+#ifdef VERBOSE
+		fprintf(stderr, "[M::%s] get contigs to memory \n", __func__);
+#endif
 	if (seq_fn) read_seq(g, seq_fn);
+#ifdef VERBOSE
+		fprintf(stderr, "[M::%s] get scaffolds \n", __func__);
+#endif
 	get_path(g, min_l, out_fn);
 	graph_destroy(g);	
 	return 0;

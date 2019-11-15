@@ -137,24 +137,26 @@ int insert_sort_(uint32_t *ary, int n)
 	}
 	return 0;
 }
-int cal_n50(graph_t *g)
+int cal_n50(graph_t *g, uint32_t asm_id)
 {
+	asm_t *am = &g->as.asms[asm_id];	
 	path_t *p = g->pt.paths;
-	uint32_t n_p = g->pt.n;
+	/*uint32_t n_p = g->pt.n;*/
 	uint32_t i;
 	kvec_t(uint32_t) pls;
 	kv_init(pls);
 	long sum = 0;
-	for ( i = 0; i < n_p; ++i) {
-		kv_push(uint32_t, pls, p[i].len);
+	for ( i = 0; i < am->n; ++i) {
+		kv_push(uint32_t, pls, p[am->pn[i]>>1].len);
 		sum += p[i].len;
 	}
 	insert_sort_(pls.a, pls.n);
 	long tmp_sum = 0;
 	for (i = 0; i < pls.n; ++i) { tmp_sum += pls.a[i]; if (tmp_sum >= sum / 2) break;}
-	fprintf(stderr, "Genome Size: %lu bp\n", sum);
-	fprintf(stderr, "No. scaffolds: %lu bp\n", pls.n);
-	fprintf(stderr, "N50: %u bp\n", pls.a[i]);
+	fprintf(stderr, "\n[M::%s] assembly metrics\n",__func__);
+	fprintf(stderr, "[M::%s] Genome Size: %lu bp\n",__func__, sum);
+	fprintf(stderr, "[M::%s] No. scaffolds: %lu\n", __func__, pls.n);
+	fprintf(stderr, "[M::%s] N50: %u bp\n", __func__, pls.a[i]);
 	kv_destroy(pls);
 	return 0;
 }
@@ -316,6 +318,7 @@ int add_dedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, fl
 }
 
 
+
 uint32_t add_path(graph_t *g, char *name,  uint32_t pl, uint32_t *nodes, uint32_t n, uint32_t is_circ) 
 {
 	
@@ -357,6 +360,85 @@ uint32_t add_path(graph_t *g, char *name,  uint32_t pl, uint32_t *nodes, uint32_
 	if (pname) free(pname);
 	return kh_val(h, k);
 }
+int simp_graph(graph_t *g) 
+{
+	asm_t *as = &g->as.asms[g->as.casm];
+	vertex_t *vt = g->vtx.vertices;
+	path_t *pt = g->pt.paths;
+	uint32_t n = as->n;
+	uint32_t i;	
+	/*for (i = 0; i < g->vtx.n; ++i) sd_put(ctgs, vt[i].name);	*/
+	for ( i = 0; i < n; ++i) {
+		uint32_t m;
+		uint32_t *p = parse_path(g, as->pn[i], &m);
+		/*fprintf(stderr, "PATH %s %u\n", pt[as->pn[i]>>1].name,m ); */
+		//push scaffold name to scfs 
+		if (pt[as->pn[i]>>1].ns) free(pt[as->pn[i]>>1].ns);
+		pt[as->pn[i]>>1].ns = malloc(sizeof(uint32_t) * m);
+		memcpy(pt[as->pn[i]>>1].ns, p, sizeof(uint32_t) * m);
+		pt[as->pn[i]>>1].n = m; 
+		free(p);
+	}
+	return 0;
+}
+
+int append_paths_to_casm(graph_t *g, uint32_t casm, uint32_t *pid, uint32_t n)
+{
+	asm_t *ca = &g->as.asms[casm];
+	uint32_t pn = ca->n; 
+	if (pn + n >= ca->m) {
+		ca->m = pn + (n << 1);
+		ca->pn = realloc(ca->pn, sizeof(uint32_t) * ca->m);
+		memcpy(ca->pn + pn, pid, sizeof(uint32_t) * n);
+		ca->n += n;	
+	} else {
+		memcpy(ca->pn + pn, pid, sizeof(uint32_t) * n);
+		ca->n += n;	
+	}
+	return 0;
+}
+int break_path(graph_t *g, uint32_t scf_id, uint32_t *bs, uint32_t bn)
+{
+	if (!bn) return 0;
+	int adpn = 0;
+	path_t *pt = &g->pt.paths[scf_id];
+	vertex_t *vt = g->vtx.vertices;
+	uint32_t i, j, pl;
+	kvec_t(uint32_t) pids;
+	kv_init(pids);
+	for (i = 0; i < bn; ++i) {
+		uint32_t e, s = bs[i];
+		if (i == bn - 1) {
+			e = pt->n;		
+		} else 
+			e = bs[i + 1] + 1;	
+		//create a new path 
+		pl = 0;
+		/*fprintf(stderr, "%d %u %u\n", __LINE__, s, e);*/
+		for (j = s; j < e; ++j) {
+		/*fprintf(stderr, "%u %u\n", __LINE__, pt->ns[j]>>2);*/
+			pl += vt[pt->ns[j]>>2].len;	
+			if (j != e - 1)
+				pl += GAP_SZ;	
+		} 
+		uint32_t pid = add_path(g, 0, pl, pt->ns + s, e - s, 0);	
+		kv_push(uint32_t, pids, pid);
+		++adpn;
+	}
+
+	//set path vertex number equals to  
+	pl = 0;
+	for (i = 0; i <= bs[0]; ++i) {
+		pl += vt[pt->ns[i]>>2].len;	
+		if (pl != bs[0]) pl += GAP_SZ;
+	}	
+	pt->len = pl;
+	pt->n = bs[0] + 1;
+	append_paths_to_casm(g, g->as.casm, pids.a, pids.n);
+	kv_destroy(pids);
+	return adpn;
+}
+
 
 int add_asm(graph_t *g, char *name,  uint32_t *nodes, uint32_t n) 
 {
@@ -601,6 +683,7 @@ int srch_path(graph_t *g)
 	return 0;
 }
 
+
 int merge_graph(graph_t *g, graph_t *c, int all)
 {
 	vertex_t *vs = c->vtx.vertices;
@@ -656,7 +739,6 @@ int process_graph(graph_t *g)
 	/*fprintf(stderr, "after update ends\n");*/
 	/*out_edges(g,0, stderr);*/
 	srch_path(g);
-	cal_n50(g);
 	return 0;
 }
 
@@ -899,7 +981,7 @@ int get_path(graph_t *g, uint32_t min_l, char *fn)
 		uint32_t *p = parse_path(g, as->pn[i], &m);
 	   	char *ref_nm = ps[as->pn[i]>>1].name;
 		uint32_t ref_len = 0; 	
-		/*fprintf(stderr, "PATH: %s\n", ref_nm);*/
+		fprintf(stderr, "PATH: %s\n", ref_nm);
 		for ( j = 0; j < m; ++j) {
 		/*fprintf(stderr, "CTG: %s ORI: %c\n", vs[p[j]>>2].name, p[j] & 1? '+': '-');*/
 			uint32_t seq_len = vs[p[j] >> 2].len;
@@ -922,6 +1004,7 @@ int get_path(graph_t *g, uint32_t min_l, char *fn)
 			}
 			*s = 0;
 		} 	
+		fprintf(stderr, "PATH: too\n");
 		fprintf(fout, ">%s_%u\n",ref_nm, ref_len);
 		if (ref_seq) {
 			fprintf(fout, "%s\n",ref_seq);
@@ -982,6 +1065,7 @@ graph_t *load_sat(char *fn)
 
 int dump_sat(graph_t *g, char *fn)
 {
+	cal_n50(g, g->as.casm);
 	FILE *fout = fn ? fopen(fn, "w") : stdout;
 	fprintf(fout, "H\tVN:Z:1.0\n");	
 	out_vetices(g, fout);

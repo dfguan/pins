@@ -86,7 +86,6 @@ int mb_col_contacts(hit2_ary_t *hit_ary, sdict_t *sd, ctg_pos_t *d)
 	size_t n = hit_ary->n;
 	for (i = 0, j = 1; j <= n; ++j) {
 		if (j == n || hs[i].cid != hs[j].cid || hs[i].c1s != hs[j].c1s || hs[i].c1rev != hs[j].c1rev || hs[i].c2s != hs[j].c2s || hs[i].c2rev != hs[j].c2rev) {
-			ctg_pos_push(d, hs[i].cid);
 			pos_push(&d->ctg_pos[hs[i].cid], hs[i].c1s << 1);	
 			pos_push(&d->ctg_pos[hs[i].cid], hs[i].c2s << 1 | 1);	
 			i = j;	
@@ -448,7 +447,8 @@ int mb_init_scaffs(graph_t *g, sdict_t *ctgs, sdict_t *scfs)
 		uint32_t *p = pt[as->pn[i] >> 1].ns;
 		uint32_t j, len = 0, len_ctg;
 		//push scaffold name to scfs 
-		int32_t scf_id = as->pn[i] >> 1;
+		/*int32_t scf_id = as->pn[i] >> 1;*/
+		int32_t scf_id =sd_put2(scfs, pt[as->pn[i]>>1].name, 0, 0, 0, 0, 0);
 		uint32_t sid;
 		for ( j = 0; j < m; ++j ) { // pid, length,   
 			len_ctg = vt[p[j]>>2].len;	
@@ -469,6 +469,7 @@ int mb_init_scaffs(graph_t *g, sdict_t *ctgs, sdict_t *scfs)
 				len += len_ctg + 200;
 		}
 		//reset scaffold length le rs l_snp_n, r_snp_n
+		sd_put4(scfs, pt[as->pn[i]>>1].name, len, len >> 1, (len >>1) + 1, len >> 1, len >> 1, pt[as->pn[i]>>1].is_circ);
 		/*free(p);*/
 	}
 	return 0;
@@ -662,6 +663,9 @@ int mk_brks2(char *sat_fn, char *bam_fn[], int n_bams, int min_mq, char *out_fn)
 			return 1;	
 		}	
 	}
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] sort array\n", __func__);
+#endif
 	//sort hit_ary
 	if (!hit2_ary->ary) {
 		fprintf(stderr, "[W::%s] no qualified hits found in the alignments\n", __func__);
@@ -671,17 +675,17 @@ int mk_brks2(char *sat_fn, char *bam_fn[], int n_bams, int min_mq, char *out_fn)
 	//col joints
 	sdict_t *_sd = scfs->n_seq ? scfs : ctgs;
 
-#ifdef DEBUG
+#ifdef VERBOSE
 	fprintf(stderr, "[M::%s] collecting positions\n", __func__);
 #endif
-	ctg_pos_t *d = ctg_pos_init();
+	ctg_pos_t *d = ctg_pos_init_wctgn(_sd->n_seq);
 	if (!d) {
 		fprintf(stderr, "[E::%s] fail to initiate space for position arrays\n", __func__);
 		return -1;
 	}
 	mb_col_contacts(hit2_ary, _sd, d);
 	free(hit2_ary->ary); free(hit2_ary);
-#ifdef DEBUG
+#ifdef VERBOSE
 	fprintf(stderr, "[M::%s] calculating coverage for each base on genome\n", __func__);
 #endif
 	cov_ary_t *ca = cal_cov(d, _sd);

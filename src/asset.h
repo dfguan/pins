@@ -64,6 +64,7 @@ typedef struct {
 #ifdef __cplusplus
 extern "C" {
 #endif
+ctg_pos_t *ctg_pos_init_wctgn(uint32_t ctgn);
 
 void cov_ary_push(cov_ary_t *c, uint32_t s, uint32_t e, int cov);
 void cov_ary_destroy(cov_ary_t *ca, int n);

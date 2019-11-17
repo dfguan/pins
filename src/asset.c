@@ -79,6 +79,14 @@ void cord_destroy(cord_t *c, int n)
 	}
 }
 
+ctg_pos_t *ctg_pos_init_wctgn(uint32_t ctgn)
+{
+	ctg_pos_t *a = (ctg_pos_t*)calloc(1, sizeof(ctg_pos_t));
+	a->ctg_pos = calloc(ctgn, sizeof(pos_t));
+	a->n = a->m = ctgn;
+	return a;
+}
+
 ctg_pos_t *ctg_pos_init()
 {
 	return (ctg_pos_t*)calloc(1, sizeof(ctg_pos_t));
@@ -400,7 +408,7 @@ cov_ary_t *cal_cov(ctg_pos_t *d, sdict_t* ctgs)
 		radix_sort_pos(ps->p, ps->p + ps->n);
 		/*fprintf(stderr, "leave sort\n");*/
 		/*fprintf(stdout, "%u\n", ps->n);*/
-		int s = 1, e;
+		int s = 1, e = 1;
 		/*fprintf(stderr, "enter cal\n");*/
 		for (j = 0; j < ps->n; ++j) {
 			if (ps->p[j] & 1) {

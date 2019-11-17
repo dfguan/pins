@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <getopt.h>	
 
 #include "make_brk.h"
@@ -27,6 +28,170 @@
 #include "bed.h"
 #include "kvec.h"
 #include "utls.h"
+#include "asset.h"
+#include "bamlite.h"
+
+typedef struct {
+	/*int mq:15, rev:1, as:16;*/
+	uint32_t s, ns;
+   	uint32_t tid:31, rev:1;
+	int qual;
+}aln_inf_t;
+
+typedef struct {
+	uint32_t cid;
+	uint32_t c1s:31, c1rev:1;
+	uint32_t c2s:31, c2rev:1;
+}hit2_t;
+
+typedef struct {
+	uint32_t n, m;
+	hit2_t *ary;
+}hit2_ary_t;
+
+void hit2_ary_push(hit2_ary_t *l, hit2_t *z)
+{
+	uint32_t max = -1;
+	if (l->n >= l->m) {
+		if (l->m > (max >> 1)) {
+			fprintf(stderr, "Too many values here\n");
+			exit(1);
+		} else 
+			l->m = l->m ? l->m << 1 : 16;
+		l->ary = realloc(l->ary, sizeof(hit2_t) * l->m);//beware of overflow
+	}
+	l->ary[l->n++] = *z;
+}
+
+int cmp_hits2(const void *a, const void *b)
+{
+	hit2_t *m = (hit2_t *)a;
+	hit2_t *n = (hit2_t *)b; //too many branches
+	if (m->c1s > n->c1s) return 1;	
+	else if (m->c1s < n->c1s) return -1;	
+	else if (m->c1rev > n->c1rev) return 1;
+	else if (m->c1rev < n->c1rev) return -1;
+	else if (m->c2s > n->c2s) return 1;	
+	else if (m->c2s < n->c2s) return -1;	
+	else if (m->c2rev > n->c2rev) return 1;	
+	else if (m->c2rev < n->c2rev) return -1;	
+	else return 0;
+}
+
+int mb_col_contacts(hit2_ary_t *hit_ary, sdict_t *sd, ctg_pos_t *d)
+{
+	size_t i, j;
+	/*sdict_t *use_sd = sd;*/
+	hit2_t *hs = hit_ary->ary;
+	size_t n = hit_ary->n;
+	for (i = 0, j = 1; j <= n; ++j) {
+		if (j == n || hs[i].cid != hs[j].cid || hs[i].c1s != hs[j].c1s || hs[i].c1rev != hs[j].c1rev || hs[i].c2s != hs[j].c2s || hs[i].c2rev != hs[j].c2rev) {
+			ctg_pos_push(d, hs[i].cid);
+			pos_push(&d->ctg_pos[hs[i].cid], hs[i].c1s << 1);	
+			pos_push(&d->ctg_pos[hs[i].cid], hs[i].c2s << 1 | 1);	
+			i = j;	
+		}
+	}
+	return 0;
+}
+
+
+int mb_col_hits2(aln_inf_t *f, int f_cnt, sdict_t *ctgs, sdict_t *scfs, hit2_ary_t *hit2_ary, int min_mq)
+{
+	if (f[0].qual < min_mq || f[1].qual < min_mq) return 1;
+	if (scfs->n_seq) {
+		/*if (a_cnt == 2) {*/
+			/*fprintf(stderr, "%u\t%u\n", a[0].tid, a[1].tid);*/
+			/*sd_seq_t *sq1 = &ctgs->seq[a[0].tid];*/
+			/*sd_seq_t *sq2 = &ctgs->seq[a[1].tid];*/
+
+			/*uint32_t ind1 = sq1->le; //maybe not well paired up*/
+			/*uint32_t ind2 = sq2->le;*/
+			/*if (ind1 == ind2) return 1;*/
+			/*fprintf(stderr, "%s\t%s\t%u\t%u\n", sq1->name, sq2->name, ind1, ind2);*/
+			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
+			/*uint32_t a0s = sq1->l_snp_n == a[0].rev ? sq1->rs + a[0].s : sq1->rs + sq1->len - a[0].s; */
+			/*uint32_t a1s = sq2->l_snp_n == a[1].rev ? sq2->rs + a[1].s : sq2->rs + sq2->len - a[1].s; */
+			
+			/*if (ind1 < ind2) {*/
+				/*uint64_t c1ns = (uint64_t)ind1 << 32 | a0s; //don't think there will be 2G contig, if happends might be a bug */
+				/*uint64_t c2ns = (uint64_t)ind2 << 32 | a1s; //don't think there will be 2G contig, if happends might be a bug */
+				/*hit_t h = (hit_t) {c1ns, a[0].rev, c2ns, a[1].rev}; */
+				/*hit_ary_push(hit_ary, &h);	*/
+			/*} else {*/
+				/*uint64_t c1ns = (uint64_t)ind2 << 32 | a1s; //don't think there will be 2G contig, if happends might be a bug */
+				/*uint64_t c2ns = (uint64_t)ind1 << 32 | a0s; //don't think there will be 2G contig, if happends might be a bug */
+				/*hit_t h = (hit_t) {c1ns, a[1].rev, c2ns, a[0].rev}; */
+				/*hit_ary_push(hit_ary, &h);	*/
+			/*}*/
+			/*return 0;*/
+		/*} else if (f_cnt == 2){*/
+			sd_seq_t *sq1 = &ctgs->seq[f[0].tid];
+			sd_seq_t *sq2 = &ctgs->seq[f[1].tid];
+			uint32_t ind1 = sq1->le; //maybe not well paired up
+			uint32_t ind2 = sq2->le;
+			if (ind1 != ind2) return 1;
+			uint32_t f0s = sq1->rs + f[0].s; 
+			uint32_t f1s = sq2->rs + f[1].s; 
+			/*fprintf(stderr, "%u\t%u\n", ind1, ind2);*/
+			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
+			/*uint32_t f0s = sq1->l_snp_n == f[0].rev ? sq1->rs + f[0].s : sq1->rs + sq1->len - f[0].s; */
+			/*uint32_t f1s = sq1->l_snp_n == f[1].rev ? sq2->rs + f[1].s : sq2->rs + sq2->len - f[1].s; */
+			/*fprintf(stderr, "%s\t%u\t%d\t%d\t%d\t%s\t%u\t%d\t%d\t%d\n", scfs->seq[ind1].name, f0s, f[0].qual, sq1->l_snp_n, f[0].rev, scfs->seq[ind2].name, f1s, f[1].qual, sq2->l_snp_n, f[1].rev);*/
+			if (f0s < f1s) {
+				hit2_t h = (hit2_t) {ind1, f0s, !!(f[0].rev ^ sq1->l_snp_n), f1s, !!(f[1].rev ^ sq2->l_snp_n)}; 
+				hit2_ary_push(hit2_ary, &h);	
+			} else {
+				hit2_t h = (hit2_t) {ind2, f1s, !!(f[1].rev ^ sq2->l_snp_n), f0s, !!(f[0].rev ^ sq1->l_snp_n)}; 
+				hit2_ary_push(hit2_ary, &h);	
+			}
+			return 0;	
+		/*}*/
+	} else {
+		/*if (a_cnt == 2) {*/
+			/*uint32_t ind1 = a[0].tid; //maybe not well paired up*/
+			/*uint32_t ind2 = a[1].tid;*/
+			/*if (ind1 == ind2) return 1;*/
+			/*fprintf(stderr, "%u\t%u\n", ind1, ind2);*/
+			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
+			/*uint32_t is_l1 = check_left_half(ctgs->seq[ind1].le, ctgs->seq[ind1].rs, a[0].s);*/
+			/*if (is_l1 > 1) return 1; //middle won't be added*/
+			/*uint32_t is_l2 = check_left_half(ctgs->seq[ind2].le, ctgs->seq[ind2].rs, a[1].s);*/
+			/*if (is_l2 > 1) return 1; //middle won't be added*/
+			
+			/*if (ind1 < ind2) {*/
+				/*uint64_t c1ns = (uint64_t)ind1 << 32 | a[0].s; //don't think there will be 2G contig, if happends might be a bug */
+				/*uint64_t c2ns = (uint64_t)ind2 << 32 | a[1].s; //don't think there will be 2G contig, if happends might be a bug */
+				/*hit_t h = (hit_t) {c1ns, a[0].rev, c2ns, a[1].rev}; */
+				/*hit_ary_push(hit_ary, &h);	*/
+			/*} else {*/
+				/*uint64_t c1ns = (uint64_t)ind2 << 32 | a[1].s; //don't think there will be 2G contig, if happends might be a bug */
+				/*uint64_t c2ns = (uint64_t)ind1 << 32 | a[0].s; //don't think there will be 2G contig, if happends might be a bug */
+				/*hit_t h = (hit_t) {c1ns, a[1].rev, c2ns, a[0].rev}; */
+				/*hit_ary_push(hit_ary, &h);	*/
+			/*}*/
+			/*return 0;*/
+		/*} else if (f_cnt == 2){*/
+			uint32_t ind1 = f[0].tid;
+			uint32_t ind2 = f[1].tid;
+			if (ind1 != ind2) return 1;
+			uint32_t f0s = f[0].s;
+			uint32_t f1s = f[1].s;
+			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
+			if (f0s < f1s) {
+				hit2_t h = (hit2_t) {ind1, f0s, f[0].rev, f1s, f[1].rev}; 
+				hit2_ary_push(hit2_ary, &h);	
+			} else {
+				/*uint64_t c1ns = (uint64_t)ind2 << 32 | f[1].s; //don't think there will be 2G contig, if happends might be a bug */
+				/*uint64_t c2ns = (uint64_t)ind1 << 32 | f[0].s; //don't think there will be 2G contig, if happends might be a bug */
+				hit2_t h = (hit2_t) {ind2, f1s, f[1].rev, f0s, f[0].rev}; 
+				hit2_ary_push(hit2_ary, &h);	
+			}
+			return 0;	
+		/*}*/
+	}
+	return 1;
+}
 
 int mb_get_links_hic(char *links_fn, cdict2_t *cds, sdict_t *ctgs)
 {	
@@ -358,6 +523,187 @@ int cut_paths(graph_t *g, uint32_t *brks, uint32_t n_brks, sdict_t *ctgs)
 	kv_destroy(pos);
     return 0;
 }
+
+int mb_proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, hit2_ary_t *ha)
+{
+	
+	bamFile fp;
+	bam_header_t *h;
+	bam1_t *b;
+	fp = bam_open(bam_fn, "r"); //should check if bam is sorted
+	if (fp == 0) {
+		fprintf(stderr, "[E::%s] fail to open %s\n", __func__, bam_fn);
+		return -1;
+	}
+	
+	h = bam_header_read(fp);
+	b = bam_init1();
+	/*int i;*/
+	/*for ( i = 0; i < h->n_targets; ++i) {*/
+		/*char *name = h->target_name[i];*/
+		/*uint32_t len = h->target_len[i];*/
+		/*if (ws > len) ws = len;*/
+		/*uint32_t le = (len - ws) >> 1;*/
+		/*uint32_t rs = (len + ws) >> 1;*/
+		/*uint32_t lenl, lenr;*/
+		/*lenl = lenr = (len - ws) >> 1;*/
+		/*sd_put2(ctgs, name, len, le, rs, lenl, lenr);*/
+	/*}*/
+	/*uint32_t cur_ws;*/
+	/*for ( i = 0; i < h->n_targets; ++i) {*/
+		/*char *name = h->target_name[i];*/
+		/*uint32_t len = h->target_len[i];*/
+		/*cur_ws = ws;*/
+		/*if (len < (cur_ws << 1)) cur_ws = len >> 1;*/
+		/*uint32_t le = cur_ws;*/
+		/*uint32_t rs = len - cur_ws + 1;*/
+		/*uint32_t lenl, lenr;*/
+		/*lenl = lenr = cur_ws;*/
+		/*sd_put2(ctgs, name, len, le, rs, lenl, lenr);*/
+	/*}*/
+	/*if (!ns->ct) { //not initiate yet*/
+		/*init_gaps(gap_fn, ns, ctgs, max_ins_len);*/
+	/*}*/
+
+	char *cur_qn = 0;
+	long bam_cnt = 0;
+	int is_set = 0;
+	/*aln_inf_t aln[2];*/
+	/*int aln_cnt;*/
+	
+	kvec_t(aln_inf_t) all;
+	kv_init(all);
+	kvec_t(aln_inf_t) five;
+	kv_init(five);
+
+	uint8_t rev;
+	uint64_t rdp_counter  = 0;
+	uint32_t rd1_cnt = 0, rd2_cnt = 0;
+	uint32_t rd1_5cnt = 0, rd2_5cnt = 0;
+	uint64_t used_rdp_counter = 0;
+	/*fprintf(stderr, "Proc Bam %d\n", __LINE__);*/
+	while (1) {
+		//segment were mapped 
+		if (bam_read1(fp, b) >= 0 ) {
+			if (!cur_qn || strcmp(cur_qn, bam1_qname(b)) != 0) {
+				if (rd1_cnt < 3 && rd2_cnt < 3 && rd1_5cnt == 1 && rd2_5cnt == 1 && !mb_col_hits2(five.a, five.n, ctgs, scfs, ha, min_mq)) ++used_rdp_counter;
+				/*aln_cnt = 0;	*/
+				/*rev = 0;*/
+				/*is_set = 0;*/
+				/*kv_reset(all);*/
+				kv_reset(five);
+				rd1_cnt = rd2_cnt = rd1_5cnt = rd2_5cnt = 0;
+				if (cur_qn) ++rdp_counter, free(cur_qn); 
+				cur_qn = strdup(bam1_qname(b));
+			}
+			b->core.flag & 0x40 ? ++rd1_cnt : ++rd2_cnt;	
+			if (b->core.flag & 0x4) continue; //not aligned
+			aln_inf_t tmp;
+			rev = tmp.rev = !!(b->core.flag & 0x10);
+			/*tmp.nrev = !!(b->core.flag & 0x20);*/
+			//only collects five prime
+			tmp.tid = b->core.tid;
+			/*tmp.ntid = b->core.mtid;*/
+			tmp.s = b->core.pos + 1;
+			tmp.qual = b->core.qual;
+			/*tmp.ns = b->core.mpos + 1;*/
+			/*kv_push(aln_inf_t, all, tmp);*/
+				
+			uint32_t *cigar = bam1_cigar(b);
+			if ((!rev && bam_cigar_op(cigar[0]) == BAM_CMATCH) || (rev && bam_cigar_op(cigar[b->core.n_cigar-1]) == BAM_CMATCH)) {
+				b->core.flag & 0x40 ? ++rd1_5cnt: ++rd2_5cnt; kv_push(aln_inf_t, five, tmp);
+			}
+			
+			/*aln_cnt = (aln_cnt + 1 ) & 1;*/
+			/*if ((++bam_cnt % 1000000) == 0) fprintf(stderr, "[M::%s] processing %ld bams\n", __func__, bam_cnt); */
+		} else {
+			if (rd1_cnt < 3 && rd2_cnt < 3 && rd1_5cnt == 1 && rd2_5cnt == 1 && !mb_col_hits2(five.a, five.n, ctgs, scfs, ha, min_mq)) ++used_rdp_counter;
+			if (cur_qn) ++rdp_counter, free(cur_qn); 
+			break;	
+		}
+	}
+	fprintf(stderr, "[M::%s] finish processing %lld read pairs %lld (%.2f) passed\n", __func__, rdp_counter, used_rdp_counter, (double)used_rdp_counter/rdp_counter); 
+	bam_destroy1(b);
+	bam_header_destroy(h);
+	bam_close(fp);
+	kv_destroy(all);
+	kv_destroy(five);
+	return 0;
+}
+int mk_brks2(char *sat_fn, char *bam_fn[], int n_bams, int min_mq, char *out_fn)
+{
+	
+	sdict_t *ctgs = sd_init();	
+	sdict_t *scfs = sd_init();
+	int win_s = 0;
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] initiate contigs\n", __func__);
+#endif
+	graph_t *og = load_sat(sat_fn);
+	simp_graph(og);
+	mb_init_scaffs(og, ctgs, scfs);	
+	if (!ctgs) {
+		fprintf(stderr, "[E::%s] fail to collect contigs\n", __func__);	
+		return 1;
+	} 
+	if (!scfs->n_seq) {
+		fprintf(stderr, "[E::%s] fail to collect scaffolds\n", __func__);	
+		return 1;
+	} 
+
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] processing bam file\n", __func__);
+#endif
+	
+	hit2_ary_t *hit2_ary = calloc(1, sizeof(hit2_ary_t));
+	int i;	
+	for ( i = 0; i < n_bams; ++i) {
+		if (mb_proc_bam(bam_fn[i], min_mq, ctgs, scfs, hit2_ary)) {
+			return 1;	
+		}	
+	}
+	//sort hit_ary
+	if (!hit2_ary->ary) {
+		fprintf(stderr, "[W::%s] no qualified hits found in the alignments\n", __func__);
+		return 1;
+	} 
+	qsort(hit2_ary->ary, hit2_ary->n, sizeof(hit2_t), cmp_hits2);	
+	//col joints
+	sdict_t *_sd = scfs->n_seq ? scfs : ctgs;
+
+#ifdef DEBUG
+	fprintf(stderr, "[M::%s] collecting positions\n", __func__);
+#endif
+	ctg_pos_t *d = ctg_pos_init();
+	if (!d) {
+		fprintf(stderr, "[E::%s] fail to initiate space for position arrays\n", __func__);
+		return -1;
+	}
+	mb_col_contacts(hit2_ary, _sd, d);
+	free(hit2_ary->ary); free(hit2_ary);
+#ifdef DEBUG
+	fprintf(stderr, "[M::%s] calculating coverage for each base on genome\n", __func__);
+#endif
+	cov_ary_t *ca = cal_cov(d, _sd);
+	ctg_pos_destroy(d);
+	if (!ca) {
+		fprintf(stderr, "[W::%s] low quality alignments\n", __func__);
+		return 0;	
+	}
+
+	char *type = "PB";
+	char *desc = "pacbio data";
+	
+#ifdef DEBUG
+	fprintf(stderr, "[M::%s] print average coverage for each 1024 base of the contigs\n", __func__);
+#endif
+	print_coverage_wig(ca, _sd, type, 1024, ".");
+	cov_ary_destroy(ca, _sd->n_seq); //a little bit messy
+	sd_destroy(ctgs);
+	sd_destroy(scfs);
+	return 0;
+}
+
 int mk_brks(char *sat_fn, char *links_fn, int limn, char *out_fn)
 {
 #ifdef VERBOSE
@@ -447,10 +793,13 @@ help:
 	if (optind + 2 > argc) {
 		fprintf(stderr,"[E::%s] require a SAT and link matrix file!\n", __func__); goto help;
 	}
-	links_fn = argv[optind++];
-	sat_fn = argv[optind];
+	sat_fn = argv[optind++];
+	char **bam_fn = argv + optind;
+	int n_bams = argc - optind;	
+	int min_mq = 10;
+	fprintf(stderr, "%d\t%s\t%s\n", n_bams, bam_fn[0], bam_fn[1]);
 	fprintf(stderr, "Program starts\n");	
-	mk_brks(sat_fn, links_fn, limn, out_fn);
+	mk_brks2(sat_fn, bam_fn, n_bams, min_mq, out_fn);
 	fprintf(stderr, "Program ends\n");	
 	return 0;	
 }

@@ -254,6 +254,7 @@ int col_hits(aln_inf_t *f, int f_cnt, sdict_t *ctgs, sdict_t *scfs, hit_ary_t *h
 			/*uint32_t f1s = sq1->l_snp_n == f[1].rev ? sq2->rs + f[1].s : sq2->rs + sq2->len - f[1].s; */
 			uint32_t f0s = sq1->rs + f[0].s; 
 			uint32_t f1s = sq2->rs + f[1].s; 
+			/*fprintf(stderr, "%s\t%u\t%d\t%d\t%d\t%s\t%u\t%d\t%d\t%d\n", scfs->seq[ind1].name, f0s, f[0].qual, sq1->l_snp_n, f[0].rev, scfs->seq[ind2].name, f1s, f[1].qual, sq2->l_snp_n, f[1].rev);*/
 			if (ind1 < ind2) {
 				uint64_t c1ns = (uint64_t)ind1 << 32 | f0s; //don't think there will be 2G contig, if happends might be a bug 
 				uint64_t c2ns = (uint64_t)ind2 << 32 | f1s; //don't think there will be 2G contig, if happends might be a bug 

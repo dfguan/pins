@@ -10,10 +10,10 @@ PROG = pin_10x  pin_hic  pin_hic_it  pin_ld pin_ld_it #pin_hic2
 all:$(PROG)
 	mkdir -p ../bin && cp $(PROG) ../bin
 
-pin_hic_it: bamlite.o bed.o cdict.o graph.o pin_hic_it.o sdict.o col_hic_lnks.o build_graph.o get_seq.o make_brk.o
+pin_hic_it: bamlite.o bed.o cdict.o graph.o pin_hic_it.o sdict.o col_hic_lnks.o build_graph.o get_seq.o make_brk.o asset.o
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
-pin_hic: bamlite.o bed.o cdict.o graph.o pin_hic.o sdict.o col_hic_lnks.o build_graph.o get_seq.o make_brk.o
+pin_hic: bamlite.o bed.o cdict.o graph.o pin_hic.o sdict.o col_hic_lnks.o build_graph.o get_seq.o make_brk.o asset.o 
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 #pin_hic2: bamlite.o bed.o cdict.o graph.o pin_hic.o sdict.o col_hic_lnks.o build_graph2.o get_seq.o

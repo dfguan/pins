@@ -86,6 +86,8 @@ int mb_col_contacts(hit2_ary_t *hit_ary, sdict_t *sd, ctg_pos_t *d)
 	size_t n = hit_ary->n;
 	for (i = 0, j = 1; j <= n; ++j) {
 		if (j == n || hs[i].cid != hs[j].cid || hs[i].c1s != hs[j].c1s || hs[i].c1rev != hs[j].c1rev || hs[i].c2s != hs[j].c2s || hs[i].c2rev != hs[j].c2rev) {
+			/*if (hs[i].c2s > sd->seq[hs[i].cid].len) fprintf(stderr, "much larger\n");*/
+			/*fprintf(stderr, "%s\t%u\t%u\n", sd->seq[hs[i].cid].name, hs[i].c1s, hs[i].c2s);*/
 			pos_push(&d->ctg_pos[hs[i].cid], hs[i].c1s << 1);	
 			pos_push(&d->ctg_pos[hs[i].cid], hs[i].c2s << 1 | 1);	
 			i = j;	
@@ -130,18 +132,21 @@ int mb_col_hits2(aln_inf_t *f, int f_cnt, sdict_t *ctgs, sdict_t *scfs, hit2_ary
 			uint32_t ind1 = sq1->le; //maybe not well paired up
 			uint32_t ind2 = sq2->le;
 			if (ind1 != ind2) return 1;
-			uint32_t f0s = sq1->rs + f[0].s; 
-			uint32_t f1s = sq2->rs + f[1].s; 
+			uint32_t f0s = sq1->r_snp_n + f[0].s; 
+			uint32_t f1s = sq2->r_snp_n + f[1].s; 
+			/*fprintf(stderr, "%s\t%u\t%s\t%u\n", sq1->name, f[0].s, sq2->name, f[1].s);*/
+			/*fprintf(stderr, "%s\t%u\t%u\t%u\t%u\t%u\t%u\n", scfs->seq[ind1].name, sq1->r_snp_n, scfs->seq[ind1].len, f0s, f1s, f[0].s, f[1].s);*/
+			/*if (scfs->seq[ind1].len < f0s || scfs->seq[ind1].len < f1s) fprintf(stderr, "larger\n");*/
 			/*fprintf(stderr, "%u\t%u\n", ind1, ind2);*/
 			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
 			/*uint32_t f0s = sq1->l_snp_n == f[0].rev ? sq1->rs + f[0].s : sq1->rs + sq1->len - f[0].s; */
 			/*uint32_t f1s = sq1->l_snp_n == f[1].rev ? sq2->rs + f[1].s : sq2->rs + sq2->len - f[1].s; */
 			/*fprintf(stderr, "%s\t%u\t%d\t%d\t%d\t%s\t%u\t%d\t%d\t%d\n", scfs->seq[ind1].name, f0s, f[0].qual, sq1->l_snp_n, f[0].rev, scfs->seq[ind2].name, f1s, f[1].qual, sq2->l_snp_n, f[1].rev);*/
 			if (f0s < f1s) {
-				hit2_t h = (hit2_t) {ind1, f0s, !!(f[0].rev ^ sq1->l_snp_n), f1s, !!(f[1].rev ^ sq2->l_snp_n)}; 
+				hit2_t h = (hit2_t) {ind1, f0s, !!(f[0].rev ^ (sq1->l_snp_n & 0x1)), f1s, !!(f[1].rev ^ (sq2->l_snp_n & 0x1))}; 
 				hit2_ary_push(hit2_ary, &h);	
 			} else {
-				hit2_t h = (hit2_t) {ind2, f1s, !!(f[1].rev ^ sq2->l_snp_n), f0s, !!(f[0].rev ^ sq1->l_snp_n)}; 
+				hit2_t h = (hit2_t) {ind2, f1s, !!(f[1].rev ^ (sq2->l_snp_n & 0x1)), f0s, !!(f[0].rev ^ (sq1->l_snp_n&0x1))}; 
 				hit2_ary_push(hit2_ary, &h);	
 			}
 			return 0;	
@@ -458,8 +463,8 @@ int mb_init_scaffs(graph_t *g, sdict_t *ctgs, sdict_t *scfs)
 			/*fprintf(stdout, "%s\t%s\t%u\n", pt[as->pn[i]>>1].name, vt[p[j]>>2].name, len);*/
 			ctgs->seq[sid].len = len_ctg;
 			ctgs->seq[sid].le = scf_id;
-			ctgs->seq[sid].l_snp_n = p[j] & 1;
-			ctgs->seq[sid].r_snp_n = j;
+			ctgs->seq[sid].l_snp_n = (j << 1) | (p[j] & 0x1);
+			ctgs->seq[sid].r_snp_n = len;
 			ctgs->seq[sid].rs = 0;	
 			if (!j) 
 				ctgs->seq[sid].rs = 2;
@@ -539,6 +544,7 @@ int mb_proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, hit2_ary
 	
 	h = bam_header_read(fp);
 	b = bam_init1();
+	char **names = h->target_name;
 	/*int i;*/
 	/*for ( i = 0; i < h->n_targets; ++i) {*/
 		/*char *name = h->target_name[i];*/
@@ -603,7 +609,7 @@ int mb_proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, hit2_ary
 			rev = tmp.rev = !!(b->core.flag & 0x10);
 			/*tmp.nrev = !!(b->core.flag & 0x20);*/
 			//only collects five prime
-			tmp.tid = b->core.tid;
+			tmp.tid = sd_get(ctgs, names[b->core.tid]);
 			/*tmp.ntid = b->core.mtid;*/
 			tmp.s = b->core.pos + 1;
 			tmp.qual = b->core.qual;
@@ -689,6 +695,9 @@ int mk_brks2(char *sat_fn, char *bam_fn[], int n_bams, int min_mq, char *out_fn)
 	fprintf(stderr, "[M::%s] calculating coverage for each base on genome\n", __func__);
 #endif
 	cov_ary_t *ca = cal_cov(d, _sd);
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] release ctg pos\n", __func__);
+#endif
 	ctg_pos_destroy(d);
 	if (!ca) {
 		fprintf(stderr, "[W::%s] low quality alignments\n", __func__);
@@ -698,10 +707,13 @@ int mk_brks2(char *sat_fn, char *bam_fn[], int n_bams, int min_mq, char *out_fn)
 	char *type = "PB";
 	char *desc = "pacbio data";
 	
-#ifdef DEBUG
+#ifdef VERBOSE
 	fprintf(stderr, "[M::%s] print average coverage for each 1024 base of the contigs\n", __func__);
 #endif
 	print_coverage_wig(ca, _sd, type, 1024, ".");
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] release coverage array\n", __func__);
+#endif
 	cov_ary_destroy(ca, _sd->n_seq); //a little bit messy
 	sd_destroy(ctgs);
 	sd_destroy(scfs);

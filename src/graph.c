@@ -1007,7 +1007,7 @@ int get_path(graph_t *g, uint32_t min_l, char *fn)
 			*s = 0;
 		} 	
 		/*fprintf(stderr, "PATH: too\n");*/
-		fprintf(fout, ">%s_%u\n",ref_nm, ref_len);
+		fprintf(fout, ">%s %u\n",ref_nm, ref_len);
 		if (ref_seq) {
 			fprintf(fout, "%s\n",ref_seq);
 			free(ref_seq);		

@@ -317,7 +317,7 @@ void print_coverage_wig(cov_ary_t *ca, sdict_t* ctgs, char *tp, uint32_t ws, cha
 		if (ca[i].n) {
 			n = 0;
 			uint32_t tot_cov_cnt = (ctgs->seq[i].len + ws - 1)/ws;	
-			/*fprintf(stderr, "%s\t%d\t%d\n", ctgs->seq[i].name, ca[i].intv[ca[i].n-1].e, m);*/
+			/*fprintf(stderr, "%s\t%d\n", ctgs->seq[i].name, ctgs->seq[i].len);*/
 			if (tot_cov_cnt > m) {
 				if (total_coverage) free(total_coverage);
 				total_coverage = calloc(tot_cov_cnt, sizeof(uint64_t));

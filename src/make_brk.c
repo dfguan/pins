@@ -97,7 +97,7 @@ int mb_col_contacts(hit2_ary_t *hit_ary, sdict_t *sd, ctg_pos_t *d)
 }
 
 
-int mb_col_hits2(aln_inf_t *f, int f_cnt, sdict_t *ctgs, sdict_t *scfs, hit2_ary_t *hit2_ary, int min_mq)
+int mb_col_hits2(aln_inf_t *f, int f_cnt, sdict_t *ctgs, sdict_t *scfs, hit2_ary_t *hit2_ary, int min_mq, char *qn)
 {
 	if (f[0].qual < min_mq || f[1].qual < min_mq) return 1;
 	if (scfs->n_seq) {
@@ -131,9 +131,11 @@ int mb_col_hits2(aln_inf_t *f, int f_cnt, sdict_t *ctgs, sdict_t *scfs, hit2_ary
 			sd_seq_t *sq2 = &ctgs->seq[f[1].tid];
 			uint32_t ind1 = sq1->le; //maybe not well paired up
 			uint32_t ind2 = sq2->le;
-			if (ind1 != ind2) return 1;
 			uint32_t f0s = sq1->r_snp_n + f[0].s; 
 			uint32_t f1s = sq2->r_snp_n + f[1].s; 
+			fprintf(stdout, "%s\t%u\t%u\t%s/1\t%d\t%d\n", scfs->seq[ind1].name, f0s, f0s + 100, qn, f[0].qual, !!(f[0].rev ^ (sq1->l_snp_n & 0x1)));
+			fprintf(stdout, "%s\t%u\t%u\t%s/2\t%d\t%d\n", scfs->seq[ind2].name, f1s, f1s + 100, qn, f[1].qual, !!(f[1].rev ^ (sq2->l_snp_n & 0x1)));
+			if (ind1 != ind2) return 1;
 			/*fprintf(stderr, "%s\t%u\t%s\t%u\n", sq1->name, f[0].s, sq2->name, f[1].s);*/
 			/*fprintf(stderr, "%s\t%u\t%u\t%u\t%u\t%u\t%u\n", scfs->seq[ind1].name, sq1->r_snp_n, scfs->seq[ind1].len, f0s, f1s, f[0].s, f[1].s);*/
 			/*if (scfs->seq[ind1].len < f0s || scfs->seq[ind1].len < f1s) fprintf(stderr, "larger\n");*/
@@ -593,7 +595,7 @@ int mb_proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, hit2_ary
 		//segment were mapped 
 		if (bam_read1(fp, b) >= 0 ) {
 			if (!cur_qn || strcmp(cur_qn, bam1_qname(b)) != 0) {
-				if (rd1_cnt < 3 && rd2_cnt < 3 && rd1_5cnt == 1 && rd2_5cnt == 1 && !mb_col_hits2(five.a, five.n, ctgs, scfs, ha, min_mq)) ++used_rdp_counter;
+				if (rd1_cnt < 3 && rd2_cnt < 3 && rd1_5cnt == 1 && rd2_5cnt == 1 && !mb_col_hits2(five.a, five.n, ctgs, scfs, ha, min_mq, cur_qn)) ++used_rdp_counter;
 				/*aln_cnt = 0;	*/
 				/*rev = 0;*/
 				/*is_set = 0;*/
@@ -624,7 +626,7 @@ int mb_proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, hit2_ary
 			/*aln_cnt = (aln_cnt + 1 ) & 1;*/
 			/*if ((++bam_cnt % 1000000) == 0) fprintf(stderr, "[M::%s] processing %ld bams\n", __func__, bam_cnt); */
 		} else {
-			if (rd1_cnt < 3 && rd2_cnt < 3 && rd1_5cnt == 1 && rd2_5cnt == 1 && !mb_col_hits2(five.a, five.n, ctgs, scfs, ha, min_mq)) ++used_rdp_counter;
+			if (rd1_cnt < 3 && rd2_cnt < 3 && rd1_5cnt == 1 && rd2_5cnt == 1 && !mb_col_hits2(five.a, five.n, ctgs, scfs, ha, min_mq, cur_qn)) ++used_rdp_counter;
 			if (cur_qn) ++rdp_counter, free(cur_qn); 
 			break;	
 		}
@@ -813,7 +815,7 @@ help:
 	char **bam_fn = argv + optind;
 	int n_bams = argc - optind;	
 	int min_mq = 10;
-	fprintf(stderr, "%d\t%s\t%s\n", n_bams, bam_fn[0], bam_fn[1]);
+	/*fprintf(stderr, "%d\t%s\t%s\n", n_bams, bam_fn[0], bam_fn[1]);*/
 	fprintf(stderr, "Program starts\n");	
 	mk_brks2(sat_fn, bam_fn, n_bams, min_mq, out_fn);
 	fprintf(stderr, "Program ends\n");	

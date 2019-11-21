@@ -408,6 +408,8 @@ int break_path(graph_t *g, uint32_t scf_id, uint32_t *bs, uint32_t bn)
 	uint32_t i, j, pl;
 	kvec_t(uint32_t) pids;
 	kv_init(pids);
+	for ( i = 0; i < bn; ++i) 
+		fprintf(stderr, "[M::%s] break: %s\t%s\t%s\n", __func__, pt->name, vt[pt->ns[bs[i]] >> 2].name, vt[pt->ns[bs[i]+1]>>2].name);
 	for (i = 0; i < bn; ++i) {
 		uint32_t e, s = bs[i] + 1;
 		if (i == bn - 1) {
@@ -416,7 +418,6 @@ int break_path(graph_t *g, uint32_t scf_id, uint32_t *bs, uint32_t bn)
 			e = bs[i + 1] + 1;	
 		//create a new path 
 		pl = 0;
-		/*fprintf(stderr, "%d %u %u\n", __LINE__, s, e);*/
 		for (j = s; j < e; ++j) {
 		/*fprintf(stderr, "%u %u\n", __LINE__, pt->ns[j]>>2);*/
 			pl += vt[pt->ns[j]>>2].len;	

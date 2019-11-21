@@ -455,7 +455,7 @@ int mb_init_scaffs(graph_t *g, sdict_t *ctgs, sdict_t *scfs)
 		uint32_t j, len = 0, len_ctg;
 		//push scaffold name to scfs 
 		/*int32_t scf_id = as->pn[i] >> 1;*/
-		int32_t scf_id =sd_put2(scfs, pt[as->pn[i]>>1].name, 0, 0, 0, 0, 0);
+		/*int32_t scf_id =sd_put2(scfs, pt[as->pn[i]>>1].name, 0, 0, 0, 0, 0);*/
 		uint32_t sid;
 		for ( j = 0; j < m; ++j ) { // pid, length,   
 			len_ctg = vt[p[j]>>2].len;	
@@ -464,7 +464,7 @@ int mb_init_scaffs(graph_t *g, sdict_t *ctgs, sdict_t *scfs)
 			/*fprintf(stderr, "sid: %u\t%s\t%s\n", sid, pt[as->pn[i]>>1].name, vt[p[j]>>2].name, p[j]);*/
 			/*fprintf(stdout, "%s\t%s\t%u\n", pt[as->pn[i]>>1].name, vt[p[j]>>2].name, len);*/
 			ctgs->seq[sid].len = len_ctg;
-			ctgs->seq[sid].le = scf_id;
+			ctgs->seq[sid].le = as->pn[i]>>1;
 			ctgs->seq[sid].l_snp_n = (j << 1) | (p[j] & 0x1);
 			ctgs->seq[sid].r_snp_n = len;
 			ctgs->seq[sid].rs = 0;	
@@ -476,7 +476,7 @@ int mb_init_scaffs(graph_t *g, sdict_t *ctgs, sdict_t *scfs)
 				len += len_ctg + 200;
 		}
 		//reset scaffold length le rs l_snp_n, r_snp_n
-		sd_put4(scfs, pt[as->pn[i]>>1].name, len, len >> 1, (len >>1) + 1, len >> 1, len >> 1, pt[as->pn[i]>>1].is_circ);
+		/*sd_put4(scfs, pt[as->pn[i]>>1].name, len, len >> 1, (len >>1) + 1, len >> 1, len >> 1, pt[as->pn[i]>>1].is_circ);*/
 		/*free(p);*/
 	}
 	return 0;
@@ -490,7 +490,7 @@ int cmp_brks(const void *a, const void *b)
     else return 1;
 }
 
-int cut_paths(graph_t *g, uint32_t *brks, uint32_t n_brks, sdict_t *ctgs) 
+int cut_paths(graph_t *g, uint32_t *brks, uint32_t n_brks, sdict_t *ctgs, sdict_t *scfs) 
 {
     qsort(brks, n_brks, sizeof(uint32_t), cmp_brks);  
     
@@ -515,13 +515,12 @@ int cut_paths(graph_t *g, uint32_t *brks, uint32_t n_brks, sdict_t *ctgs)
 	for ( i = 1, j = 0; i <= n_brks; ++i) {
 		if (i == n_brks || brks[i] != brks[j]) {
 			uint32_t ctg_idx = brks[j] >> 1;
-			fprintf(stderr, "[M::%s] break: %s\t%s\n", __func__, ctgs->seq[ctg_idx].name, ctgs->seq[(ctg_idx)+1].name);
 			if (ctgs->seq[ctg_idx].le != scf_id) {
 				if (~scf_id) brkn += pos.n, adpn += break_path(g, scf_id, pos.a, pos.n);
 				kv_reset(pos);
 				scf_id = ctgs->seq[ctg_idx].le;	
 			}	
-			kv_push(uint32_t, pos, ctgs->seq[ctg_idx].r_snp_n);
+			kv_push(uint32_t, pos, ctgs->seq[ctg_idx].l_snp_n >> 1);
 			j = i;	
 		} 			
 		/*uint32_t ctg_idx = brks[i];*/
@@ -769,7 +768,7 @@ int mk_brks(char *sat_fn, char *links_fn, int limn, char *out_fn)
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] cut paths\n", __func__);
 #endif
-	cut_paths(og, brks, n_brks, ctgs);
+	cut_paths(og, brks, n_brks, ctgs, scfs);
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] dump sat graph\n", __func__);
 #endif
@@ -802,7 +801,7 @@ int main_brks(int argc, char *argv[])
 help:	
 				fprintf(stderr, "\nUsage: %s %s [<options>] <LINKS_MATRIX> <SAT>\n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
-				fprintf(stderr, "         -n    INT      allow successor or predecessor be top N candidates [4]\n");
+				fprintf(stderr, "         -n    INT      allow successor or predecessor be top N candidates [2]\n");
 				fprintf(stderr, "         -o    FILE     output file [stdout]\n");
 				fprintf(stderr, "         -h             help\n");
 				return 1;	
@@ -811,13 +810,16 @@ help:
 	if (optind + 2 > argc) {
 		fprintf(stderr,"[E::%s] require a SAT and link matrix file!\n", __func__); goto help;
 	}
-	sat_fn = argv[optind++];
-	char **bam_fn = argv + optind;
-	int n_bams = argc - optind;	
-	int min_mq = 10;
+	links_fn = argv[optind++];
+	sat_fn = argv[optind];
+	/*char **bam_fn = argv + optind;*/
+	/*int n_bams = argc - optind;	*/
+	/*int min_mq = 10;*/
 	/*fprintf(stderr, "%d\t%s\t%s\n", n_bams, bam_fn[0], bam_fn[1]);*/
 	fprintf(stderr, "Program starts\n");	
-	mk_brks2(sat_fn, bam_fn, n_bams, min_mq, out_fn);
+	/*mk_brks2(sat_fn, bam_fn, n_bams, min_mq, out_fn);*/
+/*int mk_brks(char *sat_fn, char *links_fn, int limn, char *out_fn)*/
+	mk_brks(sat_fn, links_fn, limn, out_fn);
 	fprintf(stderr, "Program ends\n");	
 	return 0;	
 }

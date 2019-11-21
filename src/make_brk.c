@@ -131,8 +131,10 @@ int mb_col_hits2(aln_inf_t *f, int f_cnt, sdict_t *ctgs, sdict_t *scfs, hit2_ary
 			sd_seq_t *sq2 = &ctgs->seq[f[1].tid];
 			uint32_t ind1 = sq1->le; //maybe not well paired up
 			uint32_t ind2 = sq2->le;
-			uint32_t f0s = sq1->r_snp_n + f[0].s; 
-			uint32_t f1s = sq2->r_snp_n + f[1].s; 
+			/*uint32_t f0s = sq1->r_snp_n + f[0].s; */
+			/*uint32_t f1s = sq2->r_snp_n + f[1].s; */
+			uint32_t f0s = sq1->r_snp_n + (sq1->l_snp_n & 0x1 ? f[0].s : sq1->len - f[0].s);
+			uint32_t f1s = sq2->r_snp_n + (sq2->l_snp_n & 0x1? f[1].s : sq2->len - f[1].s);
 			fprintf(stdout, "%s\t%u\t%u\t%s/1\t%d\t%c\n", scfs->seq[ind1].name, f0s, f0s + 100, qn, f[0].qual, (f[0].rev ^ (sq1->l_snp_n & 0x1)) ? '-':'+');
 			fprintf(stdout, "%s\t%u\t%u\t%s/2\t%d\t%c\n", scfs->seq[ind2].name, f1s, f1s + 100, qn, f[1].qual, (f[1].rev ^ (sq2->l_snp_n & 0x1)) ? '-':'+');
 			if (ind1 != ind2) return 1;

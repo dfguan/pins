@@ -34,7 +34,6 @@ KSEQ_INIT(gzFile, gzread, gzseek)
 /*KSTREAM_INIT(gzFile, gzread, gzseek, 0x10000)*/
 
 
-#define GAP_SZ 200
 #define edge_key(a) ((a).v)
 KRADIX_SORT_INIT(edge, edge_t, edge_key, 4)
 

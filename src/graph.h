@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#define GAP_SZ 200
 typedef struct {
 	char *name;
 	char *seq;

@@ -21,7 +21,7 @@
 #include "col_hic_lnks.h"
 #include "build_graph.h"
 #include "get_seq.h"
-#include "make_brk.h"
+#include "break_pins.h"
 
 int main(int argc, char *argv[])
 {

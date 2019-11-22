@@ -35,6 +35,10 @@ typedef struct {
 }pos_t;
 
 typedef struct {
+	float rsd, maxim, avg;
+} cov_stat_t;
+
+typedef struct {
 	pos_t	*ctg_pos;
 	int		n,m; //contig number
 }ctg_pos_t;
@@ -86,6 +90,7 @@ void sel_sup_reg(cov_ary_t *ca, int min_cov, int max_cov, sdict_t* ctgs, char *t
 cov_ary_t *cal_cov(ctg_pos_t *d, sdict_t* ctgs);
 void print_coverage_stat(cov_ary_t *ca, int max_cov, sdict_t* ctgs, char *tp,char *out_dir);
 void print_base_coverage(cov_ary_t *ca, sdict_t* ctgs, char *tp, char *out_dir);
+int cal_cov_stat4reg(cov_ary_t *ca, uint32_t st, uint32_t ed, cov_stat_t *cs);
 #ifdef __cplusplus
 }
 #endif

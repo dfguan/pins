@@ -24,7 +24,7 @@
 #include "col_hic_lnks.h"
 #include "build_graph.h"
 #include "get_seq.h"
-#include "make_brk.h"
+#include "break_pins.h"
 
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
@@ -42,11 +42,15 @@ int main(int argc, char *argv[])
 	int cann = 5;
 	int min_wt = 100;
 	uint32_t min_l  = 0;
+	float min_rat = 0.1;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
-	while (~(c=getopt(argc, argv, "O:q:nc:ds:br:a:w:i:l:x:h"))) {
+	while (~(c=getopt(argc, argv, "O:q:nc:m:ds:br:a:w:i:l:x:h"))) {
 		switch (c) {
 			case 'q':
 				min_mq = atoi(optarg);
+				break;
+			case 'm':
+				min_rat = atof(optarg);
 				break;
 			case 'b':
 				brk = 0;
@@ -88,12 +92,13 @@ int main(int argc, char *argv[])
 			default:
 				if (c != 'h') fprintf(stderr, "[E::%s] undefined option %c\n", __func__, c);
 help:	
-				fprintf(stderr, "\nUsage: %s [options] <BAM_FILE>\n", program);
+				fprintf(stderr, "\nUsage: %s [options] <BAM_FILEs> ...\n", program);
 				fprintf(stderr, "Options:\n");
 				fprintf(stderr, "         -i    INT      iteration times\n");
 				fprintf(stderr, "         -a    INT      allowed top N candidates [2]\n");
 				fprintf(stderr, "         -O    STR      output directory [.]\n");
 				fprintf(stderr, "         -q    INT      minimum alignment quality [10]\n");
+				fprintf(stderr, "         -m    FLOAT    minimum coverage ratio between maximu coverage and the gap coverage [.1]\n");
 				fprintf(stderr, "         -n    BOOL     do not use normalized weight [TRUE]\n");
 				fprintf(stderr, "         -d    BOOL     do not use minimum distance to normalize weight [FALSE]\n");
 				fprintf(stderr, "         -b    BOOL     do not break at the final step [FALSE]\n");
@@ -155,7 +160,7 @@ help:
 		if (i == iter) {
 			sprintf(mat_fn, "%s/links.%02d.mat", outdir, 1);
 			sprintf(scf_fn, "%s/scaffolds_final.fa", outdir);
-			if (brk) sprintf(sat_nfn, "%s/scaffs.bk.sat", outdir), mk_brks(sat_ofn, mat_fn, limn, sat_nfn);
+			if (brk) sprintf(sat_nfn, "%s/scaffs.bk.sat", outdir), mk_brks(sat_ofn, bam_fn, n_bam, min_mq, min_rat, sat_nfn);
 			get_seq(sat_nfn, seq_fn, min_l, scf_fn);
 			
 		}

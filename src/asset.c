@@ -19,8 +19,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include "asset.h"
+#include <math.h>
 
+#include "asset.h"
 #include "ksort.h"
 #define pos_key(a) (a)
 KRADIX_SORT_INIT(pos, uint32_t, pos_key, 4)
@@ -393,6 +394,50 @@ void sel_sup_reg(cov_ary_t *ca, int min_cov, int max_cov, sdict_t* ctgs, char *t
 			if (is_set) fprintf(stdout, "%s\t%u\t%u\n", ctgs->seq[i].name, ps, pe);
 		}
 	}
+}
+
+uint32_t bin_srch_p(cov_ary_t *ca, uint32_t ca_n, uint32_t p)
+{
+	if (ca_n == 0) return -1;
+	uint32_t l = 0, h = ca_n -1;
+	while (l < h) {
+		uint32_t m = (l + h) >> 1;
+		/*fprintf(stderr, "%u %u %u %p %u %u\n", l, h, m, &ca->intv[m], ca->intv[m].s, ca->intv[m].e);*/
+		if (ca->intv[m].s > p)
+			h = m - 1;
+		else if (ca->intv[m].e < p) 
+			l = m + 1;
+		else 
+			l = h = m;	
+	}		
+	return l;
+}
+int cal_cov_stat4reg(cov_ary_t *ca, uint32_t st, uint32_t ed, cov_stat_t *cs)
+{
+	double sum_squared = 0, sum = 0, maxim = -1; 
+	uint32_t s1s = st;
+	uint32_t s1e = ed;	
+	uint32_t bs = bin_srch_p(ca, ca->n, s1s);	
+	uint32_t be = bin_srch_p(ca, ca->n, s1e);	
+	
+	uint32_t s = s1s;
+	double _cov;
+	for ( ; bs < be; ++bs ) {
+		uint32_t e = ca->intv[bs].e;
+		_cov = ca->intv[bs].coverage;
+		sum_squared += (e - s + 1) * pow(_cov, 2);
+		sum += (e - s +1) * _cov;
+		if (_cov > maxim) maxim = _cov;
+		s = ca->intv[bs + 1].s;			
+	}
+	_cov = ca->intv[be].coverage;
+	sum_squared += (s1e - s + 1) * pow(_cov, 2);
+	sum += ( s1e - s  + 1) * _cov;
+	if (_cov > maxim) maxim = _cov;
+	cs->avg = (float)(sum / (s1e - s1s + 1));
+	cs->rsd = sqrt(sum_squared/(s1e-s1s) - pow(sum, 2) / (s1e - s1s + 1) / (s1e - s1s));
+	cs->maxim = maxim;
+	return 0;
 }
 
 cov_ary_t *cal_cov(ctg_pos_t *d, sdict_t* ctgs)

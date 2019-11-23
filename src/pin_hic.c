@@ -31,13 +31,13 @@ help:
 		fprintf(stderr, "  commands:\n");
 		fprintf(stderr, "           link        generate link matrix for pairs of contigs\n");
 		fprintf(stderr, "           build       generate a scaffolding graph with links\n");
-		fprintf(stderr, "           getc        get scaffolds from a scaffolding graph\n");
+		fprintf(stderr, "           gets        get scaffolds from a scaffolding graph\n");
 		fprintf(stderr, "           break       break at potential mis-assemblies\n");
 		return 1;
 	} else {
 		if (!strcmp(argv[1], "link")) main_hic_lnks(argc , argv);
 	   	else if (!strcmp(argv[1], "build")) main_bldg(argc , argv, 1);	
-		else if (!strcmp(argv[1], "getc")) main_get_seq(argc, argv);
+		else if (!strcmp(argv[1], "gets")) main_get_seq(argc, argv);
 		else if (!strcmp(argv[1], "break")) main_brks(argc, argv);
 	   	else if (!strcmp(argv[1], "-h")) goto help;	
 	   	else if (!strcmp(argv[1], "-v")) fprintf(stderr, "version: 0.0.0\n");	

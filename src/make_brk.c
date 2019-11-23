@@ -246,6 +246,61 @@ int mb_norm_links(cdict2_t *cds, sdict_t *ctgs)
 	}
 	return 0;
 }
+
+
+int deflimn(cdict2_t *cds, sdict_t *ctgs)
+{
+    uint32_t n_cds = ctgs->n_seq;
+	uint32_t i;
+	cdict2_t *c;
+    kvec_t(uint32_t) v;
+    kv_init(v);
+	uint32_t dstr[8] = {0};
+	int limn = 7;
+	for ( i = 0; i < n_cds; ++i) {
+        char *name = ctgs->seq[i].name;
+        uint32_t scf_idx = ctgs->seq[i].le;
+        uint32_t ctg_idx = i; 
+		uint32_t j;
+		c = cds + i;
+        uint32_t fgt, flt, s_ok, p_ok;
+        fgt = flt = s_ok = p_ok = 0;
+        int ctgn = 0;
+		for (j = 0; j < c->n_cnt; ++j) {
+		   uint32_t ctg_idx2 =  sd_get(ctgs, c->cnts[j].name);	
+            uint32_t scf_idx2 = ctgs->seq[ctg_idx2].le;
+			/*if (ctgn <= 50) fprintf(stderr, "%u\t%s\t%u\t%s\t%f\t%f\t%f\t%f\n", ctg_idx, name, ctg_idx2, ctgs->seq[ctg_idx2].name, c->cnts[j].cnt[0], c->cnts[j].cnt[1], c->cnts[j].cnt[2], c->cnts[j].cnt[3]);*/
+            if (scf_idx2 == scf_idx) {
+				++ctgn;
+				if (ctg_idx2 > ctg_idx) {
+					++fgt;
+					if (ctg_idx2 == ctg_idx + 1 && fgt < limn) s_ok = 1, ++dstr[fgt];
+				} else {
+					++flt;	
+					if (ctg_idx2 + 1 == ctg_idx && flt < limn) p_ok = 1, ++dstr[flt];
+				}
+				/*if (ctg_idx2 > ctg_idx + 1) */
+					/*fgt = 1;*/
+				/*else if (ctg_idx2 + 1 == ctg_idx) */
+					/*flt = 1;	*/
+			}
+			if ((p_ok && s_ok) || (fgt + 1 > limn  && flt + 1 > limn)) 
+				break;
+        }
+		/*fprintf(stderr, "%s\t%d\n", name, ctgs->seq[ctg_idx].rs >> 1 & 1);*/
+		/*if (!s_ok) fprintf(stderr, "miss successor add a break\n");	*/
+		/*if (!p_ok) fprintf(stderr, "miss predecessor add a break\n");*/
+		//1 tail 2 head 3 head + tail 0 middle
+        if (!s_ok && (ctgs->seq[ctg_idx].rs & 1) == 0)  
+			++dstr[limn];	
+        if (!p_ok && (ctgs->seq[ctg_idx].rs >> 1 & 1) == 0)  
+			++dstr[limn];	
+        /*if (ctgs->seq[ctg_idx].rs & 1) */
+            /*kv_push(uint32_t, v, ctg_idx << 1 | 1);  */
+	}
+	fprintf(stderr, "%u\t%u\t%u\t%u\t%u\t%u\t%u\t%u\n", dstr[1], dstr[2], dstr[2], dstr[3], dstr[4], dstr[5], dstr[6], dstr[7]);
+}
+
 uint32_t *find_breaks2(cdict2_t *cds, sdict_t *ctgs, uint32_t *n_brks, int lim)
 {
     uint32_t n_cds = ctgs->n_seq;
@@ -764,6 +819,7 @@ int mk_brks(char *sat_fn, char *links_fn, int limn, char *out_fn)
 #endif
 	for ( i = 0; i < n_ctg; ++i) cd2_sort(cds+i); 
 
+	deflimn(cds, ctgs);
 	uint32_t n_brks;
 	uint32_t *brks = find_breaks2(cds, ctgs, &n_brks, limn);
 		

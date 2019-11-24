@@ -21,6 +21,7 @@
 #include "col_10x_lnks.h"
 #include "build_graph.h"
 #include "get_seq.h"
+#include "break_pins.h"
 
 int main(int argc, char *argv[])
 {
@@ -31,11 +32,13 @@ help:
 		fprintf(stderr, "           link        generate link matrix for pairs of contigs\n");
 		fprintf(stderr, "           build       generate a scaffolding graph with links\n");
 		fprintf(stderr, "           gets        get scaffolds from a scaffolding graph\n");
+		fprintf(stderr, "           break       find potential missasseblies and break the joins\n");
 		return 1;
 	} else {
 		if (!strcmp(argv[1], "link")) main_10x_lnks(argc , argv);
 	   	else if (!strcmp(argv[1], "build")) main_bldg(argc , argv, 0);	
 		else if (!strcmp(argv[1], "gets")) main_get_seq(argc, argv);
+		else if (!strcmp(argv[1], "break")) main_brks_10x(argc, argv);
 	   	else if (!strcmp(argv[1], "-h")) goto help;	
 	   	else if (!strcmp(argv[1], "-v")) fprintf(stderr, "version: 0.0.0\n");	
 		else {

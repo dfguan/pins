@@ -1,7 +1,7 @@
 /*
  * =====================================================================================
  *
- *       Filename:  make_brk.c
+ *       Filename:  break_pins.c
  *
  *    Description:	generate breaks for a scaffold
  *
@@ -29,7 +29,10 @@
 #include "utls.h"
 #include "asset.h"
 #include "bamlite.h"
+#include "ksort.h"
 
+#define BC_LEN 16
+#define MIN_MAQ 20
 typedef struct {
 	/*int mq:15, rev:1, as:16;*/
 	uint32_t s, ns;
@@ -37,6 +40,21 @@ typedef struct {
 	int qual;
 }aln_inf_t;
 
+typedef struct {
+	uint32_t s, e; //no more than 
+	uint64_t bctn;
+}bc_t;
+
+typedef struct {
+	uint32_t n, m;
+	bc_t *ary;
+}bc_ary_t;
+
+#define bc_key(a) ((a).bctn)
+KRADIX_SORT_INIT(mbbct, bc_t, bc_key, 8)
+
+#define cord_key(a) ((a).s)
+KRADIX_SORT_INIT(cord, cors, cord_key, 4);
 typedef struct {
 	float maxim, avg;
 } cov_stat;
@@ -52,6 +70,19 @@ typedef struct {
 	hit2_t *ary;
 }hit2_ary_t;
 
+void mb_bc_ary_push(bc_ary_t *l, bc_t *z)
+{
+	uint32_t max = -1;
+	if (l->n >= l->m) {
+		if (l->m > (max >> 1)) {
+			fprintf(stderr, "Too many values here\n");
+			exit(1);
+		} else 
+			l->m = l->m ? l->m << 1 : 16;
+		l->ary = realloc(l->ary, sizeof(bc_t) * l->m);//beware of overflow
+	}
+	l->ary[l->n++] = *z;
+}
 void hit2_ary_push(hit2_ary_t *l, hit2_t *z)
 {
 	uint32_t max = -1;
@@ -640,9 +671,102 @@ int cut_paths(graph_t *g, uint32_t *brks, uint32_t n_brks, sdict_t *ctgs, sdict_
     return 0;
 }
 
-int mb_proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, hit2_ary_t *ha)
+void mb_col_bcnt(aln_inf_t  *fal, uint32_t n, uint32_t bc, int min_mq, sdict_t *ctgs, sdict_t *scfs, uint32_t max_is, bc_ary_t *l)
 {
+	/*if (fal->mq >= min_mq) {*/ //should we allow user to set minimum mapping quality for each alignment? maybe not, those alignments with zero mapping quality are useful to bridge the gaps between two separate alignments
+	int i;
+	for ( i = 0; i < n; ++i ) {
+		if (scfs->n_seq) {
+			sd_seq_t *sq1 = &ctgs->seq[fal[i].tid];
+			uint32_t ind1 = sq1->le; //maybe not well paired up
+			uint32_t f0s = sq1->r_snp_n + (sq1->l_snp_n & 0x1 ? fal[i].s : sq1->len - fal[i].s);
+			bc_t t = (bc_t) {f0s, fal[i].qual, (uint64_t)bc << 32 | ind1};
+			mb_bc_ary_push(l, &t);	
+		} else {
+			bc_t t = (bc_t) {fal[i].s, fal[i].qual, (uint64_t)bc << 32 | fal[i].tid};
+			mb_bc_ary_push(l, &t);	
+		}
+	}	
+		/*uint32_t e = fal->e;*/
+		/*s = s << 1;*/
+		/*e = e << 1 | 1; */
+		/*if (e - s < max_ins_len) {*/
+			/*if (opt) {*/
+				/*uint32_t tmp = s;*/
+				/*s = e;*/
+				/*e = tmp;*/
+			/*}*/
+		/*if (e - s < max_is) {*/
+			/*bc_t t = (bc_t) {s, fal->mq, (uint64_t)bc << 32 | fal->tid};*/
+			
+			/*bc_ary_push(l, &t);	*/
+		/*}*/
+		/*}*/
+		/*pos_push(&d->ctg_pos[fal[0].tid], s);*/
+		/*pos_push(&d->ctg_pos[fal[0].tid], e); // we init */
+		/*ctg_pos_push(&d[fal[0].tid], s);k*/
+		/*ctg_pos_push(&d[fal[0].tid], e);*/
+	/*}*/
+}
+int mb_proc_10x_bam(char *bam_fn, int min_mq, uint32_t max_is, sdict_t *ctgs,  sdict_t *scfs, sdict_t *bc_n, int opt, bc_ary_t *bc_l)
+{
+	bamFile fp;
+	bam_header_t *h;
+	bam1_t *b;
+	fp = bam_open(bam_fn, "r"); //should check if bam is sorted
+	if (fp == 0) {
+		fprintf(stderr, "[E::%s] fail to open %s\n", __func__, bam_fn);
+		return -1;
+	}
 	
+	h = bam_header_read(fp);
+	b = bam_init1();
+	
+	char **names = h->target_name;
+
+	char *cur_qn = NULL, *cur_bc = NULL;
+	/*int32_t cur_l = 0;*/
+	long bam_cnt = 0;
+	long rd_cnt = 0;
+	aln_inf_t aln;
+	kvec_t(aln_inf_t) alns;
+	kv_init(alns);
+	while (1) {
+		//segment were mapped 
+		if (bam_read1(fp, b) >= 0 ) {
+			if (!cur_qn || strcmp(cur_qn, bam1_qname(b)) != 0) {
+				/*fprintf(stderr, "%d\t%d\t%d\n", aln_cnt, rev, aln.mq);*/
+				if (alns.n) mb_col_bcnt(alns.a, alns.n, sd_put(bc_n, cur_bc), min_mq, ctgs, scfs, max_is, bc_l);
+				kv_reset(alns);
+				if (cur_qn) free(cur_qn); 
+				cur_qn = strdup(bam1_qname(b));
+				cur_bc = cur_qn + b->core.l_qname - BC_LEN;
+				++rd_cnt;
+			}
+			if ((b->core.flag & 0x4) || (b->core.flag & 0x80)) continue; //not aligned
+			aln.s = b->core.pos + 1;
+		   	aln.qual = b->core.qual;
+			aln.tid = sd_get(ctgs, names[b->core.tid]);
+			kv_push(aln_inf_t, alns, aln);	
+			
+			if ((++bam_cnt % 1000000) == 0) fprintf(stderr, "[M::%s] processing %ld bams\n", __func__, bam_cnt); 
+		} else {
+			/*fprintf(stderr, "%d\t%d\t%d\n", aln_cnt, rev, aln.mq);*/
+			if (alns.n) mb_col_bcnt(alns.a, alns.n, sd_put(bc_n, cur_bc), min_mq, ctgs, scfs, max_is, bc_l);
+			break;	
+		}
+	}
+	fprintf(stderr, "[M::%s] finish processing %ld bams\n", __func__, bam_cnt); 
+	fprintf(stderr, "[M::%s] read pair counter: %ld\n", __func__, rd_cnt);
+	kv_destroy(alns);
+	bam_destroy1(b);
+	bam_header_destroy(h);
+	bam_close(fp);
+	return 0;
+}
+
+int mb_proc_hic_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, hit2_ary_t *ha)
+{
 	bamFile fp;
 	bam_header_t *h;
 	bam1_t *b;
@@ -747,6 +871,206 @@ int mb_proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, hit2_ary
 	kv_destroy(five);
 	return 0;
 }
+
+void mb_insert_sort(bc_t *b, bc_t *e)
+{
+	bc_t *i, *j, swap_tmp;
+		for (i = b + 1; i < e; ++i)										
+			for (j = i; j > b && ((j-1)->s > j->s || ((j-1)->s == j->s && (j-1)->e > j->e)); --j) {			
+				swap_tmp = *j; *j = *(j-1); *(j-1) = swap_tmp;			
+			}															
+}
+void mb_srt_by_nm_loc(bc_t *s, bc_t *e)
+{
+	bc_t *i = s;
+	while (i < e) {
+		bc_t *j;
+		for (j = i + 1; j < e && j->bctn == i->bctn; ++j);
+		mb_insert_sort(i, j);
+		i = j;
+	}	
+}
+cord_t *mb_col_cords(bc_ary_t *bc_l, uint32_t min_maq, uint32_t min_bc, uint32_t max_bc, uint32_t min_inner_bcn, uint32_t max_span, uint32_t min_mol_len, int n_targets, sdict_t *ctgs, char *gap_fn, uint32_t *n50)
+{
+	int k;
+	/*init_gaps(gap_fn, ns, ctgs, 0);	*/
+	cord_t *cc = calloc(n_targets, sizeof(cord_t));
+	radix_sort_mbbct(bc_l->ary, bc_l->ary + bc_l->n);	
+	uint32_t n = bc_l->n;
+	bc_t *p = bc_l->ary;
+	/*kvec_t(uint32_t) lenset;	*/
+	/*kv_init(lenset);*/
+	uint32_t i = 0;
+	uint32_t maqs;
+	while (i < n) {
+		uint32_t z;
+		for ( z = i; z < n && (p[z].bctn >> 32) == (p[i].bctn >> 32); ++z);
+		uint32_t n_bc = z - i;
+		if (n_bc > min_bc && n_bc < max_bc) {
+			mb_srt_by_nm_loc(p+i, p+z); //sort by ctg name and locus
+			uint32_t s = p[i].s,e = p[i].e;
+			uint32_t j = i + 1;
+			
+			/*fprintf(stderr, "%u\t%u\n",j,z);*/
+			while (j <= z) {
+				if (j == z || p[j].bctn != p[i].bctn || (p[j].s - p[j-1].s > max_span)) {
+					/*if (s > e) fprintf(stderr, "woofy%u\t%u\n", s, e);*/
+					/*fprintf(stderr, "%s\t%u\t%u\t%u\n",ctgs->seq[p[i].bctn&0xFFFFFFFF].name, s, e, j - i);*/
+					if (j - i > min_inner_bcn && e - s > min_mol_len && maqs / (j-i) > min_maq) {
+						cors tmp = (cors) {s, e}; 
+						/*kv_push(uint32_t, lenset, e-s+1);*/
+						cord_push(&cc[p[i].bctn & 0xFFFFFFFF], &tmp);
+						/*fprintf(stderr, "%s\t%u\t%u\n",ctgs->seq[p[i].bctn&0xFFFFFFFF].name, s, e);*/
+					} 					
+					/*pos_push(&d->ctg_pos[p[i].bctn & 0xFFFFFFFF], s << 1);*/
+					/*pos_push(&d->ctg_pos[p[i].bctn & 0xFFFFFFFF], e << 1 | 1);*/
+					if (j == z) break; //otherwise infinate loop
+					i = j;
+					s = p[i].s;
+					e = p[i].s;
+					maqs = p[i].e;
+					j = i + 1;
+				} else {
+					e = p[j].s;
+					maqs += p[j].e;
+					++j;
+				}
+			}
+		}	
+		i = z;	
+	}
+
+	/*for (k=0; k < bc_l->n; ++k) {*/
+		/*if (bc_l->ary[k].s > bc_l->ary[k].e)*/
+			/*fprintf(stderr, "hhh%llx\t%llx\t%u\t%u\n", bc_l->ary[k].bctn >> 32, bc_l->ary[k].bctn & 0xFFFFFFFF, bc_l->ary[k].s, bc_l->ary[k].e);*/
+	/*}*/
+	/**n50 = cal_n50(lenset.a, lenset.n);*/
+	/*kv_destroy(lenset);*/
+	return cc;
+}
+ctg_pos_t *col_pos(cord_t *cc, int n, sdict_t *ctgs)
+{
+	ctg_pos_t *d = ctg_pos_init();
+	int k;
+	for ( k = 0;k < n; ++k) {
+		ctg_pos_push(d, k);
+		cors *e = cc[k].coords;
+		size_t n_e = cc[k].n;
+		radix_sort_cord(e, e + n_e);
+		size_t i = 0, j;
+		uint32_t st,ed;
+		
+		while (i < n_e) {
+			st = e[i].s, ed= e[i].e;
+					/*fprintf(stderr, "h%s\t%u\t%u\n",ctgs->seq[k].name, st, ed);*/
+			for ( j = i + 1; j <= n_e; ++j) {
+					/*fprintf(stderr, "t%s\t%u\t%u\n",ctgs->seq[k].name, st, ed);*/
+				if (j == n_e || e[j].s != e[i].s) {
+					/*fprintf(stderr, "d%s\t%u\t%u\n",ctgs->seq[k].name, st, ed);*/
+					pos_push(&d->ctg_pos[k], st << 1);
+					pos_push(&d->ctg_pos[k], ed << 1 | 1);
+					i = j;
+					break;
+				} else {
+					ed = max(ed, e[j].e);
+				}
+			} 
+		}	
+	} 
+	return d;	
+}
+int mk_brks_10x(char *sat_fn, char *bam_fn[], int n_bam, char *gap_fn, int min_mq, int min_cov, float min_cov_rat, uint32_t max_span, int max_cov, uint32_t max_is, int min_bc, int max_bc, float min_rat, uint32_t min_inner_bcn, uint32_t min_mol_len, int opt, char *out_dir, char *out_fn)
+{
+	sdict_t *ctgs = sd_init();
+	sdict_t *scfs = sd_init();
+	
+	sdict_t* bc_n = sd_init();
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] initiate contigs\n", __func__);
+#endif
+	graph_t *og = load_sat(sat_fn);
+	/*if (!g) {*/
+		/*fprintf(stderr, "[E::%s] fail to load the scaffolding graph!\n", __func__);*/
+		/*return 1;*/
+	/*}*/
+	simp_graph(og);
+	mb_init_scaffs(og, ctgs, scfs);	
+	if (!ctgs) {
+		fprintf(stderr, "[E::%s] fail to collect contigs\n", __func__);	
+		return 1;
+	} 
+	if (!scfs->n_seq) {
+		fprintf(stderr, "[E::%s] fail to collect scaffolds\n", __func__);	
+		return 1;
+	} 
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] processing bam file\n", __func__);
+#endif
+	int i;
+	bc_ary_t *bc_l = calloc(1, sizeof(bc_ary_t));
+	for ( i = 0; i < n_bam; ++i) {
+		if (mb_proc_10x_bam(bam_fn[i], min_mq, max_is, ctgs, scfs, bc_n, opt, bc_l)) {
+			return -1;	
+		}	
+	}	
+
+	sd_destroy(bc_n);	
+	if (!(bc_l&&bc_l->n)) {
+		fprintf(stderr, "[W::%s] none useful information, quit\n", __func__);
+		return -1;
+	}
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] collecting coordinates\n", __func__);
+#endif
+	uint32_t n50;
+	sdict_t *_sd = scfs->n_seq ? scfs : ctgs;
+	cord_t *cc = mb_col_cords(bc_l, min_mq, min_bc, max_bc, min_inner_bcn, max_span, min_mol_len, _sd->n_seq, _sd, gap_fn, &n50);	
+	free(bc_l->ary); free(bc_l);	
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] collecting positions\n", __func__);
+#endif
+	ctg_pos_t *d = col_pos(cc, _sd->n_seq, _sd);	
+	cord_destroy(cc, _sd->n_seq);	
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] calculating coverage\n", __func__);
+#endif
+	/*float avgcov4wg;*/
+	cov_ary_t *ca = cal_cov(d, _sd);
+		
+	ctg_pos_destroy(d);
+	if (!ca) {
+		fprintf(stderr, "[W::%s] low quality alignments\n", __func__);
+		return 0;	
+	}
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] detecting break points\n", __func__);
+#endif
+	detect_bks(ca, og, ctgs, scfs, min_rat);
+
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] dump sat graph\n", __func__);
+#endif
+	dump_sat(og, out_fn);	
+	
+	char *type = "10x";
+	char *desc = "10x data";
+	
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] print average coverage for each 1024 base of the contigs\n", __func__);
+#endif
+	print_coverage_wig(ca, _sd, type, 1024, ".");
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] release coverage array\n", __func__);
+#endif
+	cov_ary_destroy(ca, _sd->n_seq); //a little bit messy
+	graph_destroy(og);
+	sd_destroy(ctgs);
+	sd_destroy(scfs);
+	return 0;
+
+
+}
+
 int mk_brks(char *sat_fn, char *bam_fn[], int n_bams, int min_mq, float min_rat, char *out_fn)
 {
 	
@@ -775,7 +1099,7 @@ int mk_brks(char *sat_fn, char *bam_fn[], int n_bams, int min_mq, float min_rat,
 	hit2_ary_t *hit2_ary = calloc(1, sizeof(hit2_ary_t));
 	int i;	
 	for ( i = 0; i < n_bams; ++i) {
-		if (mb_proc_bam(bam_fn[i], min_mq, ctgs, scfs, hit2_ary)) {
+		if (mb_proc_hic_bam(bam_fn[i], min_mq, ctgs, scfs, hit2_ary)) {
 			return 1;	
 		}	
 	}
@@ -900,6 +1224,98 @@ int mk_brks2(char *sat_fn, char *links_fn, int limn, char *out_fn)
 	if (brks) free(brks);
 	return 0;
 }
+
+int main_brks_10x(int argc, char *argv[])
+{
+	int c;
+	int max_cov = 1000000, min_cov = 10, min_mq = 20;
+	int min_as = 0;
+	uint32_t max_span = 20000, min_inner_bcn = 5, min_mol_len = 1000;
+	uint32_t min_bc = 20, max_bc = 1000000, max_is=1000;
+	float min_cov_rat = .15, min_rat = .2;
+	char *r;
+	char *out_dir = ".", *out_fn = 0;
+		
+	int option = 0; //the way to calculate molecule length //internal parameters not allowed to adjust by users
+	char *program;
+   	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
+	--argc, ++argv;
+	while (~(c=getopt(argc, argv, "b:B:c:C:r:q:S:a:L:l:m:O:o:h"))) {
+		switch (c) {
+			case 'b': 
+				min_bc = strtol(optarg, &r, 10);
+				break;
+			case 'B':
+				max_bc = strtol(optarg, &r, 10);
+				break;
+			case 'c':
+				min_cov = atoi(optarg); 
+				break;
+			case 'r':
+				min_cov_rat = atof(optarg); 
+				break;
+			case 'C':
+				max_cov = atoi(optarg); 
+				break;
+			case 'q':
+				min_mq = atoi(optarg);
+				break;
+			case 'L':
+				max_is = strtol(optarg, &r, 10);
+				break;
+			case 'm':
+				min_rat = atof(optarg);
+				break;
+			case 'S':
+				max_span = strtol(optarg, &r, 10);
+				break;
+			case 'a':
+				min_inner_bcn = strtol(optarg, &r, 10);
+				break;
+			case 'l':
+				min_mol_len = strtol(optarg, &r, 10);
+				break;
+			case 'O':
+				out_dir = optarg;
+				break;
+			case 'o':
+				out_fn = optarg;
+				break;
+			default:
+				if (c != 'h') fprintf(stderr, "[E::%s] undefined option %c\n", __func__, c);
+help:	
+				fprintf(stderr, "\nUsage: %s %s [options] <GAP_BED> <BAM_FILEs> ...\n", program, argv[0]);
+				fprintf(stderr, "Options:\n");
+				fprintf(stderr, "         -b    INT      minimum barcode number for each molecule [5]\n");	
+				fprintf(stderr, "         -B    INT      maximum barcode number for each molecule [inf]\n");
+				fprintf(stderr, "         -O    STR      output directory [.]\n");
+				fprintf(stderr, "         -o    STR      output SAT file [stdout]\n");
+				fprintf(stderr, "         -c    INT      minimum coverage [10]\n");
+				fprintf(stderr, "         -r    FLOAT    minimum coverage ratio [.5]\n");
+				fprintf(stderr, "         -C    INT      maximum coverage [inf]\n");
+				fprintf(stderr, "         -q    INT      minimum average mapping quality for each molecule [%d]\n", MIN_MAQ);
+				/*fprintf(stderr, "         -S    INT      minimum aislignment score [0]\n");*/
+				fprintf(stderr, "         -l    INT      minimum molecule length [1000]\n");
+				fprintf(stderr, "         -S    INT      maximum spanning length [20000]\n");
+				fprintf(stderr, "         -L    INT      maximum insertion length [1000]\n");
+				fprintf(stderr, "         -m    FLOAT    minimum ratio between maixmum coverage and the gap coverage [.2]\n");
+				fprintf(stderr, "         -a    INT      minimum barcode for contig [5]\n");
+				fprintf(stderr, "         -h             help\n");
+				return 1;	
+		}		
+	}
+	if (optind + 2 > argc) {
+		fprintf(stderr,"[E::%s] require at least one bed and bam file!\n", __func__); goto help;
+	}
+	char *sat_fn = argv[optind++];
+	char **bam_fn = argv+optind;
+	int n_bam = argc - optind;
+	fprintf(stderr, "Program starts\n");	
+	mk_brks_10x(sat_fn, bam_fn, n_bam, 0, min_mq, min_cov, min_cov_rat,  max_span, max_cov, max_is, min_bc, max_bc, min_rat, min_inner_bcn,  min_mol_len, option, out_dir, out_fn);
+	fprintf(stderr, "Program ends\n");	
+	return 0;	
+}
+
 
 int main_brks(int argc, char *argv[])
 {

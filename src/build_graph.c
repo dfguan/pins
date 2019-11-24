@@ -494,7 +494,7 @@ int buildg(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min
 int main_bldg(int argc, char *argv[], int ishic)
 {
 	int c;
-	uint32_t min_wt = 5; char *program = argv[0];
+	uint32_t min_wt = 10; char *program = argv[0];
 	char *sat_fn = 0, *ctg_fn = 0, *out_fn = 0;
 	int use_sat = 0, mlc = 1;
 	int norm = 0;

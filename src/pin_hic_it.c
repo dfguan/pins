@@ -98,6 +98,7 @@ help:
 				fprintf(stderr, "         -a    INT      allowed top N candidates [2]\n");
 				fprintf(stderr, "         -O    STR      output directory [.]\n");
 				fprintf(stderr, "         -q    INT      minimum alignment quality [10]\n");
+				fprintf(stderr, "         -w    INT      minimum contact number [100]\n");
 				fprintf(stderr, "         -m    FLOAT    minimum coverage ratio between maximu coverage and the gap coverage [.1]\n");
 				fprintf(stderr, "         -n    BOOL     do not use normalized weight [TRUE]\n");
 				fprintf(stderr, "         -d    BOOL     do not use minimum distance to normalize weight [FALSE]\n");

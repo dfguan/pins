@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
 	int cann = 5;
 	int min_wt = 100;
 	uint32_t min_l  = 0;
-	float min_rat = 0.1;
+	float min_rat = 0.2;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
 	while (~(c=getopt(argc, argv, "O:q:nc:m:ds:br:a:w:i:l:x:h"))) {
 		switch (c) {

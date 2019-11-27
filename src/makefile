@@ -21,7 +21,7 @@ pin_hic: bamlite.o bed.o cdict.o graph.o pin_hic.o sdict.o col_hic_lnks.o build_
 #pin_hic2: bamlite.o bed.o cdict.o graph.o pin_hic.o sdict.o col_hic_lnks.o build_graph2.o get_seq.o
 	#$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
-pin_10x: bamlite.o bed.o cdict.o graph.o pin_10x.o sdict.o build_graph.o col_10x_lnks.o  get_seq.o break_pins.o asset.o
+pin_10x: bamlite.o bed.o cdict.o graph.o pin_10x.o sdict.o build_graph.o col_10x_lnks.o  get_seq.o break_pins.o asset.o btree.o
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 pin_ld: ld_io.o bed.o cdict.o graph.o pin_ld.o sdict.o build_graph.o col_ld_lnks.o get_seq.o

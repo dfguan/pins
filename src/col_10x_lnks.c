@@ -27,6 +27,8 @@
 #include "ksort.h"
 #include "cdict.h"
 #include "utls.h"
+#include "btree.h"
+
 
 #define BC_LEN 16
 
@@ -43,17 +45,50 @@ typedef struct {
 	uint64_t bctn;
 }bc_t;
 
+typedef struct {
+	btree_t *bts;
+	size_t n_bt, m_bt;
+}forest_t;
+
 
 #define bc_key(a) ((a).bctn)
 KRADIX_SORT_INIT(bct, bc_t, bc_key, 8)
 
 /*#define cord_key(a) ((a).s)*/
 /*KRADIX_SORT_INIT(cord, cors, cord_key, 4);*/
-	
+
 typedef struct {
 	uint64_t n, m;
 	bc_t *ary;
 }bc_ary_t;
+//add by order 1, 2, 3, 4 ...
+void free_forest(forest_t *frst)
+{
+	if (!frst) return ;
+	size_t i;
+	for ( i = 0; i < frst->n_bt; ++i) {
+		if (frst->bts[i].n_ele) free(frst->bts[i].data);	
+	}	
+	if (frst->n_bt) free(frst->bts);
+	free(frst);
+}
+
+void add_a_bt(forest_t *ft, uint32_t idx)
+{
+	if (idx >= ft->n_bt) {
+		if (idx >= ft->m_bt) {
+			ft->m_bt = idx ? idx << 1 : 16;	
+			btree_t *bts = calloc(ft->m_bt, sizeof(btree_t));
+			if (ft->n_bt) {
+				memcpy(bts, ft->bts, ft->n_bt * sizeof(btree_t));
+				free(ft->bts);
+			}
+			ft->bts = bts;
+		} 
+		ft->n_bt = idx + 1;
+	}
+}
+
 
 void bc_ary_push(bc_ary_t *l, bc_t *z)
 {
@@ -69,7 +104,13 @@ void bc_ary_push(bc_ary_t *l, bc_t *z)
 	l->ary[l->n++] = *z;
 }
 
-int col_bcnt(aln_inf_t  *fal, uint32_t bc, int min_mq, uint32_t max_is, bc_ary_t *l, sdict_t *ctgs)
+uint32_t check_left_half(uint32_t le, uint32_t rs, uint32_t p) // 1 for left half 0 for right half 2 for middle
+{
+	if (p > le && p < rs) return 2;
+	else if (p <= le) return 1;
+	else return 0;	
+}
+int col_bcnt(aln_inf_t  *fal, uint32_t bc, int min_mq, uint32_t max_is, forest_t *frst, sdict_t *ctgs)
 {
 	/*if (fal->iden < 98)*/
 		/*return 1;*/
@@ -86,9 +127,15 @@ int col_bcnt(aln_inf_t  *fal, uint32_t bc, int min_mq, uint32_t max_is, bc_ary_t
 			/*}*/
 		if (e - s < max_is) {
 			/*fprintf(stderr, "D\t%u\t%s\t%u\t%u\n", bc, ctgs->seq[fal->tid].name, s, e);*/
-			bc_t t = (bc_t) {s, e, (uint64_t)bc << 32 | fal->tid};
-			
-			bc_ary_push(l, &t);	
+			add_a_bt(frst, bc);
+			int found;
+			/*fprintf(stderr, "%d %p %d\n", bc, frst->bts[bc].data, found);*/
+			uint32_t ele = srch_bt(&frst->bts[bc], fal->tid, &found); 
+			fprintf(stderr, "%d %p %d\n", bc, frst->bts[bc].data, found);
+			int which = check_left_half(ctgs->seq[fal->tid].le, ctgs->seq[fal->tid].rs, fal->s);
+			if (!found) 
+				ele = insert_bt(&frst->bts[bc], ele, fal->tid);
+			update_bt(&frst->bts[bc], ele, which);
 			return 0;
 		}
 		/*}*/
@@ -113,12 +160,6 @@ void out_matrix(cdict_t *cds, sdict_t *ctgs, uint32_t n)
 	}
 }
 
-uint32_t check_left_half(uint32_t le, uint32_t rs, uint32_t p) // 1 for left half 0 for right half 2 for middle
-{
-	if (p > le && p < rs) return 2;
-	else if (p <= le) return 1;
-	else return 0;	
-}
 
 int get_identity(uint32_t *cigar, int n_cigar, int len, int ed)
 {
@@ -157,7 +198,8 @@ uint32_t get_target_end(uint32_t *cigar, int n_cigar, uint32_t s)
 /*}*/
 
 
-int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ctgs, sdict_t *bc_n, int opt, bc_ary_t *bc_l)
+
+int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ctgs, sdict_t *bc_n, int opt, forest_t *frst)
 {
 	bamFile fp;
 	bam_header_t *h;
@@ -212,7 +254,7 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ct
 		if (bam_read1(fp, b) >= 0 ) {
 			if (!cur_qn || strcmp(cur_qn, bam1_qname(b)) != 0) {
 				/*fprintf(stderr, "%d\t%d\t%d\n", aln_cnt, rev, aln.mq);*/
-				if (aln_cnt == 2 && (rev == 1 || rev == 2) && !col_bcnt(&aln, sd_put(bc_n, cur_bc), min_mq, max_is, bc_l, ctgs)) ++used_rdp_cnt;
+				if (aln_cnt == 2 && (rev == 1 || rev == 2) && !col_bcnt(&aln, sd_put(bc_n, cur_bc), min_mq, max_is, frst, ctgs)) ++used_rdp_cnt;
 				aln_cnt = 0;	
 				rev = 0;
 				is_set = 0;
@@ -246,7 +288,7 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ct
 				aln.e = b->core.pos + 1;
 		} else {
 			/*fprintf(stderr, "%d\t%d\t%d\n", aln_cnt, rev, aln.mq);*/
-			if (aln_cnt == 2 && (rev == 1 || rev == 2) && !col_bcnt(&aln, sd_put(bc_n, cur_bc), min_mq, max_is, bc_l, ctgs)) ++used_rdp_cnt;
+			if (aln_cnt == 2 && (rev == 1 || rev == 2) && !col_bcnt(&aln, sd_put(bc_n, cur_bc), min_mq, max_is, frst, ctgs)) ++used_rdp_cnt;
 			break;	
 		}
 	}
@@ -297,79 +339,42 @@ int col_joints(uint32_t ind1l, uint32_t ind2l, sdict_t *ctgs, cdict_t *cs)
 
 /*ctg_pos_t *col_pos(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_inner_bcn, uint32_t min_mol_len, int n_targets)*/
 	/*cord_t *cc = col_cords(bc_l, min_bc, max_bc, min_inner_bcn, max_span, min_mol_len, ctgs->n_seq, ctgs);	*/
-cdict_t *col_cds(bc_ary_t *bc_l, uint32_t min_bc, uint32_t max_bc, uint32_t min_inner_bcn, int n_targets, sdict_t *ctgs)
+cdict_t *col_cds(forest_t *frst, uint32_t min_bc, uint32_t max_bc, uint32_t min_inner_bcn, int n_targets, sdict_t *ctgs)
 {
-	/*cord_t *cc = calloc(n_targets, sizeof(cord_t));*/
-	
-	radix_sort_bct(bc_l->ary, bc_l->ary + bc_l->n);	
-	uint64_t n = bc_l->n;
-	bc_t *p = bc_l->ary;
-	
-	kvec_t(uint32_t) ctgl;	
-	kv_init(ctgl);
-	uint64_t i;
+	//traverse all the btrees and collect contact informations. 
+	size_t i, j, z;
 	cdict_t *cs = calloc(ctgs->n_seq << 1, sizeof(cdict_t));	
 	for ( i = 0; i < ctgs->n_seq << 1; ++i) cd_init(&cs[i]);
-	i = 0;
-	while (i < n) {
-		uint64_t z;
-		for ( z = i; z < n && (p[z].bctn >> 32) == (p[i].bctn >> 32); ++z);
-		uint32_t n_bc = z - i;
-		fprintf(stderr, "NEW BARCODE %lu\n", n_bc);
-		if (n_bc > min_bc && n_bc < max_bc) {
-			srt_by_nm_loc(p+i, p+z); //sort by ctg name and locus
-			kv_reset(ctgl);
-			uint32_t lt_cnt, re_cnt, mid_cnt;	
-			lt_cnt = re_cnt = mid_cnt = 0;
-			uint32_t is_l = check_left_half(ctgs->seq[p[i].bctn & 0xFFFF].le, ctgs->seq[p[i].bctn & 0xFFFF].rs, p[i].s); 
-			if (is_l == 1) ++lt_cnt;
-			else if (is_l == 0) ++re_cnt;
-			else ++mid_cnt;
-			uint32_t j = i + 1;
-			/*fprintf(stderr, "%u\t%u\n",j,z);*/
-			while (j <= z) {
-				if (j == z || p[j].bctn != p[i].bctn) {
-					uint32_t is_hd = lt_cnt > re_cnt ? 1 : 0;//is_head
 
-					fprintf(stderr, "%s\t%u\t%u\t%u\t%u\n",ctgs->seq[p[i].bctn&0xFFFF].name, lt_cnt,re_cnt, mid_cnt, j - i);
-					if (j - i > min_inner_bcn && lt_cnt != re_cnt && 1 - norm_cdf(is_hd ? lt_cnt : re_cnt, 0.5, lt_cnt + re_cnt) < 0.05)  {
-					
-						kv_push(uint32_t, ctgl, (p[i].bctn & 0xFFFF) << 1 | is_hd);
-					}
-					 					
-					if (j == z) break; //without this will lead to infinate loop
-					i = j;
-					lt_cnt = re_cnt = mid_cnt = 0;
-					fprintf(stderr, "%s\t%u\n",ctgs->seq[p[i].bctn&0xFFFF].name, p[i].s);
-					is_l = check_left_half(ctgs->seq[p[i].bctn & 0xFFFF].le, ctgs->seq[p[i].bctn & 0xFFFF].rs, p[i].s); 
-					if (is_l == 1) ++lt_cnt;
-					else if (is_l == 0) ++re_cnt;
-					else ++mid_cnt;
-					j = i + 1;
-				} else {
-					fprintf(stderr, "%s\t%u\n",ctgs->seq[p[j].bctn&0xFFFF].name, p[j].s);
-					is_l = check_left_half(ctgs->seq[p[j].bctn & 0xFFFF].le, ctgs->seq[p[j].bctn & 0xFFFF].rs, p[j].s);
-					if (is_l == 1) ++lt_cnt;
-					else if (is_l == 0) ++re_cnt;
-					else ++mid_cnt;
-					++j;
-				}
+	kvec_t(uint32_t) ctgl;	
+	kv_init(ctgl);
+	for ( i = 0; i < frst->n_bt; ++i ) {
+		kv_reset(ctgl);
+		btree_t *bt = &frst->bts[i];
+		uint32_t n_bc = bt->n_bc;
+		if (n_bc > min_bc && n_bc < max_bc) {
+			ele_t *e, *e_end = &bt->data[bt->n_ele];
+			for ( e = bt->data; e < e_end; ++e) {
+				uint32_t lt_cnt = e->nhd; 
+				uint32_t re_cnt = e->ntl;
+				uint32_t is_hd = lt_cnt > re_cnt ? 1 : 0;//is_head
+				fprintf(stderr, "%u\t%lu\t%u\t%s\t%u\t%u\t%u\t%u\t%u\n", i, e-bt->data, e->tid, ctgs->seq[e->tid].name, lt_cnt, re_cnt, e->nall, e->left, e->right);
+				if (e->nall > min_inner_bcn && lt_cnt != re_cnt && 1 - norm_cdf(is_hd ? lt_cnt : re_cnt, 0.5, lt_cnt + re_cnt) < 0.05) kv_push(uint32_t, ctgl, (e->tid << 1 )| is_hd);
 			}
-			uint32_t ctgl_s = kv_size(ctgl);
-		/*fprintf(stderr, "enter\n");*/
-			/*if (ctgl_s > 1) */
-				/*for ( j = 0; j < ctgl_s; ++j) fprintf(stderr, "%s%c,",ctgs->seq[ctgl.a[j]>>1].name, ctgl.a[j]&1 ? '+':'-');*/
-			/*fprintf(stderr, "\n");	*/
-			if (ctgl_s > 1) fprintf(stderr, "PASS\n");
-		   	else fprintf(stderr, "NONE\n");
-			for (j = 0; j < ctgl_s; ++j) {
-					uint32_t w;
-					for ( w = j + 1; w < ctgl_s; ++w) col_joints(ctgl.a[j], ctgl.a[w], ctgs, cs); 
-			}
-		/*fprintf(stderr, "leave\n");*/
-		}	
-		i = z;	
+		}
+		uint32_t ctgl_s = kv_size(ctgl);
+	/*fprintf(stderr, "enter\n");*/
+		/*if (ctgl_s > 1) */
+			/*for ( j = 0; j < ctgl_s; ++j) fprintf(stderr, "%s%c,",ctgs->seq[ctgl.a[j]>>1].name, ctgl.a[j]&1 ? '+':'-');*/
+		/*fprintf(stderr, "\n");	*/
+		if (ctgl_s > 1) fprintf(stderr, "PASS\n");
+		else fprintf(stderr, "NONE\n");
+		for (j = 0; j < ctgl_s; ++j) {
+				uint32_t w;
+				for ( w = j + 1; w < ctgl_s; ++w) col_joints(ctgl.a[j], ctgl.a[w], ctgs, cs); 
+		}
 	}
+
 	kv_destroy(ctgl);	
 	return cs;
 }
@@ -384,23 +389,28 @@ int col_10x_lnks(char *bam_fn[], int n_bam, int min_mq,  uint32_t win_s, uint32_
 	fprintf(stderr, "[M::%s] processing bam file\n", __func__);
 #endif
 	int i;
-	bc_ary_t *bc_l = calloc(1, sizeof(bc_ary_t));
+	/*bc_ary_t *bc_l = calloc(1, sizeof(bc_ary_t));*/
+	forest_t *frst = (forest_t *)calloc(1, sizeof(forest_t))	;
 	for ( i = 0; i < n_bam; ++i) {
-		if (proc_bam(bam_fn[i], min_mq, max_is, win_s, ctgs, bc_n, opt, bc_l)) {
+		if (proc_bam(bam_fn[i], min_mq, max_is, win_s, ctgs, bc_n, opt, frst)) {
 			return -1;	
 		}	
 	}	
-
 	sd_destroy(bc_n);	
-	if (!(bc_l&&bc_l->n)) {
+	if (!frst->n_bt) {
 		fprintf(stderr, "[W::%s] none useful information, quit\n", __func__);
 		return -1;
 	}
+	/*if (!(bc_l&&bc_l->n)) {*/
+		/*fprintf(stderr, "[W::%s] none useful information, quit\n", __func__);*/
+		/*return -1;*/
+	/*}*/
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] collecting coordinates\n", __func__);
 #endif
-	cdict_t *cds = col_cds(bc_l, min_bc, max_bc, min_inner_bcn, ctgs->n_seq, ctgs);	
-	free(bc_l->ary); free(bc_l);	
+	cdict_t *cds = col_cds(frst, min_bc, max_bc, min_inner_bcn, ctgs->n_seq, ctgs);	
+	/*free(bc_l->ary); free(bc_l);	*/
+	free_forest(frst);
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] normalizing joints\n", __func__);
 #endif

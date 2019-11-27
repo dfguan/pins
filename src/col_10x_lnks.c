@@ -110,10 +110,10 @@ uint32_t check_left_half(uint32_t le, uint32_t rs, uint32_t p) // 1 for left hal
 	else if (p <= le) return 1;
 	else return 0;	
 }
-int col_bcnt(aln_inf_t  *fal, uint32_t bc, int min_mq, uint32_t max_is, forest_t *frst, sdict_t *ctgs)
+int col_bcnt(aln_inf_t  *fal, uint32_t bc, int min_mq, int min_id, uint32_t max_is, forest_t *frst, sdict_t *ctgs)
 {
-	/*if (fal->iden < 98)*/
-		/*return 1;*/
+	if (fal->iden < min_id)
+		return 1;
 	if (fal->mq > min_mq) {
 		uint32_t s = fal->s;
 		uint32_t e = fal->e;
@@ -131,7 +131,7 @@ int col_bcnt(aln_inf_t  *fal, uint32_t bc, int min_mq, uint32_t max_is, forest_t
 			int found;
 			/*fprintf(stderr, "%d %p %d\n", bc, frst->bts[bc].data, found);*/
 			uint32_t ele = srch_bt(&frst->bts[bc], fal->tid, &found); 
-			fprintf(stderr, "%d %p %d\n", bc, frst->bts[bc].data, found);
+			/*fprintf(stderr, "%d %p %d\n", bc, frst->bts[bc].data, found);*/
 			int which = check_left_half(ctgs->seq[fal->tid].le, ctgs->seq[fal->tid].rs, fal->s);
 			if (!found) 
 				ele = insert_bt(&frst->bts[bc], ele, fal->tid);
@@ -199,7 +199,7 @@ uint32_t get_target_end(uint32_t *cigar, int n_cigar, uint32_t s)
 
 
 
-int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ctgs, sdict_t *bc_n, int opt, forest_t *frst)
+int proc_bam(char *bam_fn, int min_mq, int min_id, uint32_t max_is, uint32_t ws, sdict_t *ctgs, sdict_t *bc_n, int opt, forest_t *frst)
 {
 	bamFile fp;
 	bam_header_t *h;
@@ -254,7 +254,7 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ct
 		if (bam_read1(fp, b) >= 0 ) {
 			if (!cur_qn || strcmp(cur_qn, bam1_qname(b)) != 0) {
 				/*fprintf(stderr, "%d\t%d\t%d\n", aln_cnt, rev, aln.mq);*/
-				if (aln_cnt == 2 && (rev == 1 || rev == 2) && !col_bcnt(&aln, sd_put(bc_n, cur_bc), min_mq, max_is, frst, ctgs)) ++used_rdp_cnt;
+				if (aln_cnt == 2 && (rev == 1 || rev == 2) && !col_bcnt(&aln, sd_put(bc_n, cur_bc), min_mq, min_id, max_is, frst, ctgs)) ++used_rdp_cnt;
 				aln_cnt = 0;	
 				rev = 0;
 				is_set = 0;
@@ -275,7 +275,7 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ct
 				s = bam_aux_get(b, "NM");
 				if (s) aln.iden = bam_aux2i(s); else aln.iden = 0;	
 				/*fprintf(stderr, "%s %d %d\n", cur_qn,aln.as, aln.iden);*/
-				/*aln.iden = get_identity(bam1_cigar(b), b->core.n_cigar, b->core.l_qseq, aln.iden);*/
+				aln.iden = get_identity(bam1_cigar(b), b->core.n_cigar, b->core.l_qseq, aln.iden);
 				/*fprintf(stderr, "%s %d\n", cur_qn, aln.iden);*/
 				aln.s = opt ? get_target_end(bam1_cigar(b), b->core.n_cigar, b->core.pos) :  b->core.pos + 1;
 				aln.mq = b->core.qual;
@@ -288,7 +288,7 @@ int proc_bam(char *bam_fn, int min_mq, uint32_t max_is, uint32_t ws, sdict_t *ct
 				aln.e = b->core.pos + 1;
 		} else {
 			/*fprintf(stderr, "%d\t%d\t%d\n", aln_cnt, rev, aln.mq);*/
-			if (aln_cnt == 2 && (rev == 1 || rev == 2) && !col_bcnt(&aln, sd_put(bc_n, cur_bc), min_mq, max_is, frst, ctgs)) ++used_rdp_cnt;
+			if (aln_cnt == 2 && (rev == 1 || rev == 2) && !col_bcnt(&aln, sd_put(bc_n, cur_bc), min_mq, min_id, max_is, frst, ctgs)) ++used_rdp_cnt;
 			break;	
 		}
 	}
@@ -358,7 +358,7 @@ cdict_t *col_cds(forest_t *frst, uint32_t min_bc, uint32_t max_bc, uint32_t min_
 				uint32_t lt_cnt = e->nhd; 
 				uint32_t re_cnt = e->ntl;
 				uint32_t is_hd = lt_cnt > re_cnt ? 1 : 0;//is_head
-				fprintf(stderr, "%u\t%lu\t%u\t%s\t%u\t%u\t%u\t%u\t%u\n", i, e-bt->data, e->tid, ctgs->seq[e->tid].name, lt_cnt, re_cnt, e->nall, e->left, e->right);
+				/*fprintf(stderr, "%u\t%lu\t%u\t%s\t%u\t%u\t%u\t%u\t%u\n", i, e-bt->data, e->tid, ctgs->seq[e->tid].name, lt_cnt, re_cnt, e->nall, e->left, e->right);*/
 				if (e->nall > min_inner_bcn && lt_cnt != re_cnt && 1 - norm_cdf(is_hd ? lt_cnt : re_cnt, 0.5, lt_cnt + re_cnt) < 0.05) kv_push(uint32_t, ctgl, (e->tid << 1 )| is_hd);
 			}
 		}
@@ -367,8 +367,8 @@ cdict_t *col_cds(forest_t *frst, uint32_t min_bc, uint32_t max_bc, uint32_t min_
 		/*if (ctgl_s > 1) */
 			/*for ( j = 0; j < ctgl_s; ++j) fprintf(stderr, "%s%c,",ctgs->seq[ctgl.a[j]>>1].name, ctgl.a[j]&1 ? '+':'-');*/
 		/*fprintf(stderr, "\n");	*/
-		if (ctgl_s > 1) fprintf(stderr, "PASS\n");
-		else fprintf(stderr, "NONE\n");
+		/*if (ctgl_s > 1) fprintf(stderr, "PASS\n");*/
+		/*else fprintf(stderr, "NONE\n");*/
 		for (j = 0; j < ctgl_s; ++j) {
 				uint32_t w;
 				for ( w = j + 1; w < ctgl_s; ++w) col_joints(ctgl.a[j], ctgl.a[w], ctgs, cs); 
@@ -380,7 +380,7 @@ cdict_t *col_cds(forest_t *frst, uint32_t min_bc, uint32_t max_bc, uint32_t min_
 }
 
 /*int aa_10x(char *srt_bam_fn, int min_as, int min_mq, int min_cov, float min_cov_rat, int max_cov, float max_cov_rat)*/
-int col_10x_lnks(char *bam_fn[], int n_bam, int min_mq,  uint32_t win_s, uint32_t max_is, int min_bc, int max_bc, uint32_t min_inner_bcn, int opt)
+int col_10x_lnks(char *bam_fn[], int n_bam, int min_mq, int min_id, uint32_t win_s, uint32_t max_is, int min_bc, int max_bc, uint32_t min_inner_bcn, int opt)
 {
 	sdict_t *ctgs = sd_init();
 
@@ -392,7 +392,7 @@ int col_10x_lnks(char *bam_fn[], int n_bam, int min_mq,  uint32_t win_s, uint32_
 	/*bc_ary_t *bc_l = calloc(1, sizeof(bc_ary_t));*/
 	forest_t *frst = (forest_t *)calloc(1, sizeof(forest_t))	;
 	for ( i = 0; i < n_bam; ++i) {
-		if (proc_bam(bam_fn[i], min_mq, max_is, win_s, ctgs, bc_n, opt, frst)) {
+		if (proc_bam(bam_fn[i], min_mq, min_id, max_is, win_s, ctgs, bc_n, opt, frst)) {
 			return -1;	
 		}	
 	}	
@@ -433,7 +433,7 @@ int col_10x_lnks(char *bam_fn[], int n_bam, int min_mq,  uint32_t win_s, uint32_
 int main_10x_lnks(int argc, char *argv[])
 {
 	int c;
-	int  min_mq = 20;
+	int  min_mq = 20, min_id = 98;
 	uint32_t win_s = 50000, min_inner_bcn = 8; 
 	uint32_t min_bc = 20, max_bc = 30000, max_is=1000;
 	char *r;
@@ -444,13 +444,16 @@ int main_10x_lnks(int argc, char *argv[])
 	
 	--argc, ++argv;
 	//optind points at argv[1]
-	while (~(c=getopt(argc, argv, "b:B:q:L:w:a:h"))) {
+	while (~(c=getopt(argc, argv, "b:B:q:L:w:a:s:h"))) {
 		switch (c) {
 			case 'b': 
 				min_bc = strtol(optarg, &r, 10);
 				break;
 			case 'B':
 				max_bc = strtol(optarg, &r, 10);
+				break;
+			case 's':
+				min_id = atoi(optarg);
 				break;
 			case 'q':
 				min_mq = atoi(optarg);
@@ -472,6 +475,7 @@ help:
 				fprintf(stderr, "         -b    INT      minimum barcode number for each molecule [20]\n");	
 				fprintf(stderr, "         -B    INT      maximum barcode number for each molecule [100000]\n");
 				fprintf(stderr, "         -q    INT      minimum mapping quality [20]\n");
+				fprintf(stderr, "         -s    INT      minimum percent of identitical bases [98]\n");
 				fprintf(stderr, "         -w    INT      edge length [50000]\n");
 				fprintf(stderr, "         -L    INT      maximum insertion length [1000]\n");
 				fprintf(stderr, "         -a    INT      minimum barcode for contig [8]\n");
@@ -485,7 +489,7 @@ help:
 	char **bam_fn = argv+optind;
 	int n_bam = argc - optind;
 	fprintf(stderr, "Program starts\n");	
-	col_10x_lnks(bam_fn, n_bam, min_mq,  win_s,  max_is, min_bc, max_bc, min_inner_bcn, option);
+	col_10x_lnks(bam_fn, n_bam, min_mq, min_id, win_s,  max_is, min_bc, max_bc, min_inner_bcn, option);
 	fprintf(stderr, "Program ends\n");	
 	return 0;	
 }

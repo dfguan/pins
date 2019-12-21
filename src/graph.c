@@ -171,7 +171,7 @@ int out_paths(graph_t *g, FILE *fout)
 	for ( i = 0; i < n_p; ++i) {
 		uint32_t j;
 		if (!p[i].name) 
-			fprintf(fout, "P\t%c%06u\t%u\t", p[i].is_circ?'c':'u',i, p[i].len); //check before output use the same name?
+			fprintf(fout, "P\t%c%09u\t%u\t", p[i].is_circ?'c':'u',i, p[i].len); //check before output use the same name?
 		else 
 			fprintf(fout, "P\t%s\t%u\t", p[i].name, p[i].len);
 		uint32_t v;	
@@ -331,9 +331,9 @@ uint32_t add_path(graph_t *g, char *name,  uint32_t pl, uint32_t *nodes, uint32_
 	uint32_t pn = ps->n;
 	if (!pname) {
 		//this is a new path it's name hasn't been initiated yet
-		pname = malloc(sizeof(char) * 9); // path name length is 7;
+		pname = malloc(sizeof(char) * 12); // path name length is 7;
 		do {
-			sprintf(pname, "%c%06u%c", is_circ ? 'c':'u', pn, 0);	
+			sprintf(pname, "%c%09u%c", is_circ ? 'c':'u', pn, 0);	
 			++pn;	
 		} while (kh_get(str, h, pname) != kh_end(h)); 
 	} else {

@@ -25,7 +25,7 @@
 typedef struct {
 	char *name;
 	char *seq;
-	uint32_t len;
+	uint32_t len:31, is_circ:1; //be careful a contig/scaffold should not be larger than 2G
 }vertex_t;
 
 typedef struct {
@@ -91,10 +91,10 @@ extern "C" {
 	void graph_destroy(graph_t *g);
 	int add_udedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, float wt);
 	int add_dedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, float wt);
-	uint32_t add_node(graph_t *g, char* name, char *seq, uint32_t len);
+	uint32_t add_node(graph_t *g, char* name, char *seq, uint32_t len, uint32_t isc);
 	int srch_path(graph_t *g);
 	int out_graph(graph_t *g); // print path
-	int process_graph(graph_t *g);
+	int process_graph(graph_t *g, int use_df);
 	int merge_graph(graph_t *g, graph_t *c, int all);
 	int dump_sat(graph_t *g, char *fn);
 	uint32_t get_name2id(graph_t *g, char *nm);

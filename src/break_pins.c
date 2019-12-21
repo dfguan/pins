@@ -1058,7 +1058,7 @@ int mk_brks_10x(char *sat_fn, char *bam_fn[], int n_bam, char *gap_fn, int min_m
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] print average coverage for each 1024 base of the contigs\n", __func__);
 #endif
-	print_coverage_wig(ca, _sd, type, 1024, ".");
+	print_coverage_wig(ca, _sd, type, 1024, out_dir);
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] release coverage array\n", __func__);
 #endif

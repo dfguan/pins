@@ -24,7 +24,7 @@
 #include "kdq.h"
 #include "kseq.h"
 #include "kvec.h"
-
+#include "utls.h"
 
 
 KDQ_INIT(uint32_t)
@@ -219,7 +219,7 @@ uint32_t get_name2id(graph_t *g, char *nm)
 	return k == kh_end(h) ? -1 : kh_val(h, k);
 }
 //make mistakes when break the order S->P->L 
-uint32_t add_node(graph_t *g, char* name, char *seq, uint32_t len)
+uint32_t add_node(graph_t *g, char* name, char *seq, uint32_t len, uint32_t is_circ)
 {
 	shash_t *h = (shash_t *)g->h;
 	khint_t k;
@@ -235,6 +235,7 @@ uint32_t add_node(graph_t *g, char* name, char *seq, uint32_t len)
 		if (seq) n->seq = strdup(seq);
 		else n->seq = 0;
 		n->len = len;
+		n->is_circ = is_circ;
 		kh_key(h, k) =n->name = strdup(name);	
 		kh_val(h, k) = (ns->n<<1 | 0); //0 to identify vertices
 		++ns->n;	
@@ -248,6 +249,7 @@ uint32_t add_node(graph_t *g, char* name, char *seq, uint32_t len)
 		ind = ind >> 1;
 		if (seq && !g->vtx.vertices[ind].seq) g->vtx.vertices[ind].seq = strdup(seq);
 		if (len && !g->vtx.vertices[ind].len) g->vtx.vertices[ind].len = len; 	
+		g->vtx.vertices[ind].is_circ = is_circ;
 	}	
 	return kh_val(h, k);
 }
@@ -293,8 +295,8 @@ int add_edge1(graph_t *g, edge_t *e)
 
 int add_udedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, float wt)
 {
-	uint32_t sind = add_node(g, sname, 0, 0);
-	uint32_t eind = add_node(g, ename, 0, 0);
+	uint32_t sind = add_node(g, sname, 0, 0, 0);
+	uint32_t eind = add_node(g, ename, 0, 0, 0);
 	
 	edge_t e = (edge_t) {sind << 1 | sl, 0, eind << 1 | er, 0, wt};
 	edge_t re = (edge_t) {eind << 1 | er, 0, sind << 1 | sl, 0, wt}; //undirect graph
@@ -307,8 +309,8 @@ int add_udedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, f
 
 int add_dedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, float wt)
 {
-	uint32_t sind = add_node(g, sname, 0, 0);
-	uint32_t eind = add_node(g, ename, 0, 0);
+	uint32_t sind = add_node(g, sname, 0, 0, 0);
+	uint32_t eind = add_node(g, ename, 0, 0, 0);
 	edge_t e = (edge_t) {sind << 1 | sl, 0,  eind << 1 | er, 0, wt};
 	/*edge_t re = (edge_t) {eind << 1 | er, sind << 1 | sl, wt, 0, 0}; //undirect graph*/
 	/*fprintf(stderr, "%s %s\n", sname, ename);	*/
@@ -350,6 +352,7 @@ uint32_t add_path(graph_t *g, char *name,  uint32_t pl, uint32_t *nodes, uint32_
 		path_t *p = &ps->paths[ps->n];
 		p->ns = malloc(n*sizeof(uint32_t));
 		p->len = pl;
+		p->is_circ = is_circ;
 		memcpy(p->ns, nodes, sizeof(uint32_t) * n);
 		p->n = n;
 		kh_key(h, k) =p->name = strdup(pname);	
@@ -497,7 +500,7 @@ int del_r(graph_t *g, edge_t *a) // remove reverse edge
 }
 
 //only keeps maximum weighted edges
-int clean_edges(graph_t *g)
+int clean_edges(graph_t *g, int use_df)
 {	
 	uint32_t n_vtx = g->vtx.n; 
 	uint32_t i;
@@ -524,7 +527,7 @@ int clean_edges(graph_t *g)
 				++n_mwt;
 			} 	
 		} 
-		/*if (norm_cdf(mwt, 0.5, mwt + smwt) <= 0.95) n_mwt = 2; */
+		if (use_df && norm_cdf(mwt, 0.5, mwt + smwt) <= 0.95) n_mwt = 2; 
 		for (a = e; a < e + en; ++a) {
 			if (a->is_del) continue;
 			if (n_mwt > 1 || a->wt != mwt) {
@@ -616,7 +619,7 @@ int srch_path(graph_t *g)
 			if (mark[p]) break;
 			else {
 				mark[p] = 1;
-				/*fprintf(stderr, "%d %s %c\n", p, g->vtx.vertices[p>>1].name, p & 1 ? '+':'-');*/
+				fprintf(stderr, "%d %s %c %d\n", p, g->vtx.vertices[p>>1].name, p & 1 ? '+':'-', g->vtx.vertices[p>>1].is_circ);
 				kdq_push(uint32_t, q, p);				
 			}
 		 //traverse forwardly
@@ -659,8 +662,8 @@ int srch_path(graph_t *g)
 			}	
 		} else is_circ = 1;
 		//add path
-			/*fprintf(stderr, "ENTER %d %d\n", __LINE__, kdq_size(q));*/
-		if (kdq_size(q) >= 2) {
+		uint32_t qsz = kdq_size(q);
+		if (qsz >= 2) {
 			paths_t *pths = &g->pt;
 			if (pths->n == pths->m) {
 				pths->m = pths->m ? pths->m << 1 : 16;
@@ -668,17 +671,17 @@ int srch_path(graph_t *g)
 			}
 			path_t *pth = &pths->paths[pths->n++];
 			pth->name = 0;
-			pth->ns = malloc(sizeof(uint32_t) * (kdq_size(q) >> 1));	
+			pth->ns = malloc(sizeof(uint32_t) * (qsz >> 1));	
 			/*fprintf(stderr, "ENTER %d %d\n", __LINE__, kdq_size(q));*/
 			uint32_t k, m;
 			/*for ( k = 0; k < kdq_size(q); ++k) fprintf(stderr, "%u,",kdq_at(q, k));*/
 			/*for ( k = 0; k < kdq_size(q); ++k) fprintf(stderr, "\n");*/
 			uint32_t pl = 0;
-			for ( k = 0, m = 0; k < kdq_size(q); k += 2, ++m) pth->ns[m] = kdq_at(q, k), pl += vt[pth->ns[m]>>1].len;
+			for ( k = 0, m = 0; k < qsz; k += 2, ++m) pth->ns[m] = kdq_at(q, k), pl += vt[pth->ns[m]>>1].len;
 			pth->len = pl + (m - 1) * GAP_SZ;
 			/*for ( k = 0; k < m; ++k) fprintf(stderr, "PID: %d\t%d\n", k, pth->ns[k]);*/
 			pth->n = m;
-			pth->is_circ = is_circ;
+			pth->is_circ = qsz == 2 ? vt[pth->ns[0]>>1].is_circ : is_circ; // is there a better way
 		}
 		/*fprintf(stderr, "LEAVE %d\n", __LINE__);*/
 	}
@@ -694,7 +697,7 @@ int merge_graph(graph_t *g, graph_t *c, int all)
 	uint32_t i;
 	uint32_t *crspid = (uint32_t *)malloc(sizeof(uint32_t) * n_vs);
 	for ( i = 0; i < n_vs; ++i) 
-		crspid[i] = (add_node(g, vs[i].name, vs[i].seq, vs[i].len)); //could return a path id 
+		crspid[i] = (add_node(g, vs[i].name, vs[i].seq, vs[i].len, vs[i].is_circ)); //could return a path id 
 	edge_t *edg = c->eg.edges;
 	uint32_t n_edges = c->eg.n;		
 	if (all) n_edges += c->eg.n_del;	
@@ -731,11 +734,11 @@ int merge_graph(graph_t *g, graph_t *c, int all)
 
 
 
-int process_graph(graph_t *g)
+int process_graph(graph_t *g, int use_df)
 {
 	idx_edge(g);
 	/*out_edges(g,0, stderr);*/
-	clean_edges(g);
+	clean_edges(g, use_df);
 	join_ends(g);
 	update_graph(g);
 	/*fprintf(stderr, "after update ends\n");*/
@@ -771,7 +774,7 @@ int add_s(graph_t *g, char *s)
 	}	
 	if (!len)
 		   len = seq == 0 ? 0 : strlen(seq);
-	add_node(g, name, seq, len);
+	add_node(g, name, seq, len, 0);
 	/*fprintf(stderr, "leaves\n");*/
 	return 0;
 
@@ -830,7 +833,7 @@ int add_p(graph_t *g, char *s)
 			int c =*(p-1);
 			*(p-1) = 0;
 			/*q[ql-1] = 0;*/
-			uint32_t n_id = add_node(g, q, 0, 0);
+			uint32_t n_id = add_node(g, q, 0, 0, 0);
 			/*fprintf(stderr, "node: %s  %u\n",q, n_id);*/
 			n_id = n_id << 1 | (c == '+');
 			kv_push(uint32_t, ns, n_id);
@@ -916,7 +919,7 @@ int read_seq(graph_t *g, char *seqfn)
 	if (fp == 0) return 1;
 	kseq_t *seq = kseq_init(fp);
 	while (kseq_read(seq) >= 0) 
-		add_node(g, seq->name.s, seq->seq.s, seq->seq.l);
+		add_node(g, seq->name.s, seq->seq.s, seq->seq.l, 0);
 	kseq_destroy(seq);
 	gzclose(fp);
 	return 0;

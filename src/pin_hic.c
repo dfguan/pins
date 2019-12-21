@@ -22,6 +22,7 @@
 #include "build_graph.h"
 #include "get_seq.h"
 #include "break_pins.h"
+#include "version.h"
 
 int main(int argc, char *argv[])
 {
@@ -40,7 +41,7 @@ help:
 		else if (!strcmp(argv[1], "gets")) main_get_seq(argc, argv);
 		else if (!strcmp(argv[1], "break")) main_brks(argc, argv);
 	   	else if (!strcmp(argv[1], "-h")) goto help;	
-	   	else if (!strcmp(argv[1], "-v")) fprintf(stderr, "version: 0.0.0\n");	
+	   	else if (!strcmp(argv[1], "-v")) fprintf(stderr, "version: %d.%d.%d\n", MAJOR, MINOR, PATCH);	
 		else {
 			fprintf(stderr, "  [E::%s] unrecognized command %s\n", __func__, argv[1]);
 			goto help;	

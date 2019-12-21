@@ -433,7 +433,7 @@ int col_10x_lnks(char *bam_fn[], int n_bam, int min_mq, int min_id, uint32_t win
 int main_10x_lnks(int argc, char *argv[])
 {
 	int c;
-	int  min_mq = 20, min_id = 98;
+	int  min_mq = 20, min_id = 51;
 	uint32_t win_s = 50000, min_inner_bcn = 8; 
 	uint32_t min_bc = 20, max_bc = 30000, max_is=1000;
 	char *r;

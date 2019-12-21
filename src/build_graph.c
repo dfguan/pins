@@ -53,8 +53,9 @@ sdict_t *col_ctgs_from_graph(graph_t *g)
 		/*for (j = 0; j < pt[ca->pn[i]>>1].n; ++j) */
 			/*path_len += ctgs->seq[sd_get(ctgs, pt[ca->pn[i]>>1].name)].len;	*/
 		/*path_len += (pt[ca->pn[i]>>1].n - 1) * 200;	 //gap size = 200	*/
-		sd_put2(ctgs, pt[ca->pn[i]>>1].name, pt[ca->pn[i]>>1].len, 0, 0, 0, 0);
+		sd_put4(ctgs, pt[ca->pn[i]>>1].name, pt[ca->pn[i]>>1].len, 0, 0, 0, 0, pt[ca->pn[i]>>1].is_circ);
 	} 
+	for (uint32_t i = 0; i < ctgs->n_seq; ++i) fprintf(stderr, "ctgs: %s %d\n", ctgs->seq[i].name, ctgs->seq[i].is_circ);
 	return ctgs;
 }
 
@@ -185,7 +186,7 @@ graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)
 	uint32_t i, j;
 	//create nodes
 	for ( i = 0; i < ctgs->n_seq; ++i) 
-		add_node(g, ctgs->seq[i].name, 0, ctgs->seq[i].len);
+		add_node(g, ctgs->seq[i].name, 0, ctgs->seq[i].len, ctgs->seq[i].is_circ);
 	//create edges	
 	for ( i = 0; i < n; ++i) {
 		char *name1 = ctgs->seq[i>>1].name;
@@ -209,7 +210,7 @@ graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)
 					}
 			}	
 			/*if (hand_shaking) fprintf(stderr, "I hand shaking\n");*/
-			/*ocnt = 1;*/
+			ocnt = 1;
 			if (hand_shaking) add_dedge(g, name1, is_l, name2, c->cnts[j].is_l, ocnt * c->cnts[j].cnt);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.
 		}		
 	}	
@@ -271,8 +272,10 @@ graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs, int min_wt)
 	
 	uint32_t i, j;
 	//create nodes
-	for ( i = 0; i < ctgs->n_seq; ++i) 
-		add_node(g, ctgs->seq[i].name, 0, ctgs->seq[i].len);
+	for ( i = 0; i < ctgs->n_seq; ++i) {
+		fprintf(stderr, "add node %s %d\n", ctgs->seq[i].name, ctgs->seq[i].is_circ);
+		add_node(g, ctgs->seq[i].name, 0, ctgs->seq[i].len, ctgs->seq[i].is_circ);
+	}
 	//create edges
 		
 	for ( i = 0; i < ctgs->n_seq; ++i) {
@@ -319,7 +322,8 @@ graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs, int min_wt)
 			/*else */
 					/*continue;*/
 			//when min_wt == -1; don't normalize weight 
-			is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, ~min_wt?c->cnts[j].cnt[idx] / (len1 / 2 + len2 / 2) : c->cnts[j].cnt[idx]);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.
+			/*is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, ~min_wt?c->cnts[j].cnt[idx] / (len1 / 2 + len2 / 2) : c->cnts[j].cnt[idx]);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.*/
+			is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, ~min_wt?c->cnts[j].ncnt: c->cnts[j].cnt[idx]);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.
 		}		
 	}	
 	return g;
@@ -380,7 +384,7 @@ int buildg_hic(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] processing graph\n", __func__);
 #endif
-	process_graph(g);
+	process_graph(g, 0);
 			
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] merging graph\n", __func__);
@@ -463,7 +467,7 @@ int buildg(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] processing graph\n", __func__);
 #endif
-	process_graph(g);
+	process_graph(g, 1);
 			
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] merging graph\n", __func__);

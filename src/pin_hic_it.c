@@ -25,6 +25,7 @@
 #include "build_graph.h"
 #include "get_seq.h"
 #include "break_pins.h"
+#include "version.h"
 
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
@@ -44,7 +45,7 @@ int main(int argc, char *argv[])
 	uint32_t min_l  = 0;
 	float min_rat = 0.2;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
-	while (~(c=getopt(argc, argv, "O:q:nc:m:ds:br:a:w:i:l:x:h"))) {
+	while (~(c=getopt(argc, argv, "O:q:nc:m:ds:br:a:w:i:l:x:vh"))) {
 		switch (c) {
 			case 'q':
 				min_mq = atoi(optarg);
@@ -71,6 +72,9 @@ int main(int argc, char *argv[])
 				sat_fn = optarg;
 				use_sat = 1;
 				break;
+			case 'v':
+				fprintf(stderr, "Version: %d.%d.%d\n", MAJOR, MINOR, PATCH);
+				return 0;
 			case 'w': 
 				min_wt = atoi(optarg);
 				break;
@@ -108,6 +112,7 @@ help:
 				fprintf(stderr, "         -x    STR      reference fa index file [nul]\n");
 				fprintf(stderr, "         -r    STR      reference file [nul]\n");
 				fprintf(stderr, "         -l    INT      minimum scaffold length [0]\n");
+				fprintf(stderr, "         -v             print version\n");
 				fprintf(stderr, "         -h             help\n");
 				return 1;	
 		}		

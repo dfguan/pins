@@ -34,18 +34,18 @@ int main(int argc, char *argv[])
 	int c;
 	int  min_mq = 10;
 	int  iter = 3;
-	int norm = 1, brk = 1, limn = 2;
+	int norm = 1, brk = 1;
 	char *program;
 	char *sat_fn = 0, *faidx_fn = 0, *seq_fn = 0;
 	int use_sat = 0;
 	char *outdir = ".";
-	int use_min_dist = 1;
-	int cann = 5;
+	int use_min_dist = 0;
+	int cann = 3;
 	int min_wt = 100;
 	uint32_t min_l  = 0;
 	float min_rat = 0.2;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
-	while (~(c=getopt(argc, argv, "O:q:nc:m:ds:br:a:w:i:l:x:vh"))) {
+	while (~(c=getopt(argc, argv, "O:q:nc:m:ds:br:w:i:l:x:vh"))) {
 		switch (c) {
 			case 'q':
 				min_mq = atoi(optarg);
@@ -56,14 +56,11 @@ int main(int argc, char *argv[])
 			case 'b':
 				brk = 0;
 				break;
-			case 'a':
-				limn = atoi(optarg);
-				break;
 			case 'O':
 				outdir = optarg;
 				break;
 			case 'd':
-				use_min_dist = 0;
+				use_min_dist = 1;
 				break;
 			case 'c': 
 				cann = atoi(optarg);
@@ -98,16 +95,16 @@ int main(int argc, char *argv[])
 help:	
 				fprintf(stderr, "\nUsage: %s [options] <BAM_FILEs> ...\n", program);
 				fprintf(stderr, "Options:\n");
-				fprintf(stderr, "         -i    INT      iteration times\n");
-				fprintf(stderr, "         -a    INT      allowed top N candidates [2]\n");
+				fprintf(stderr, "         -i    INT      iteration times [3]\n");
+				/*fprintf(stderr, "         -a    INT      allowed top N candidates [2]\n");*/
 				fprintf(stderr, "         -O    STR      output directory [.]\n");
-				fprintf(stderr, "         -q    INT      minimum alignment quality [10]\n");
+				fprintf(stderr, "         -q    INT      minimum mapping quality [10]\n");
 				fprintf(stderr, "         -w    INT      minimum contact number [100]\n");
-				fprintf(stderr, "         -m    FLOAT    minimum coverage ratio between maximu coverage and the gap coverage [.1]\n");
-				fprintf(stderr, "         -n    BOOL     do not use normalized weight [TRUE]\n");
-				fprintf(stderr, "         -d    BOOL     do not use minimum distance to normalize weight [FALSE]\n");
-				fprintf(stderr, "         -b    BOOL     do not break at the final step [FALSE]\n");
-				fprintf(stderr, "         -c    INT      candidate number [5]\n");
+				fprintf(stderr, "         -m    FLOAT    minimum coverage ratio between maximu coverage and the gap coverage [.2]\n");
+				fprintf(stderr, "         -n    BOOL     use normalized weight [TRUE]\n");
+				fprintf(stderr, "         -d    BOOL     use minimum distance to normalize weight [FALSE]\n");
+				fprintf(stderr, "         -b    BOOL     break at the final step [TRUE]\n");
+				fprintf(stderr, "         -c    INT      candidate number [3]\n");
 				fprintf(stderr, "         -s    STR      sat file [nul]\n");
 				fprintf(stderr, "         -x    STR      reference fa index file [nul]\n");
 				fprintf(stderr, "         -r    STR      reference file [nul]\n");

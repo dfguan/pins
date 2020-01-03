@@ -4,7 +4,7 @@ CFLAGS  =  -O2 -Wall -D VERBOSE -D PRINT_COVERAGE #-O2
 LDFLAGS = -lz -lm
 
 #OBJS = gfa.o opt.o paf.o sdict.o eg.o 
-PROG = pin_10x  pin_hic  pin_hic_it  pin_ld pin_ld_it  stat_hic #pin_hic2
+PROG = pin_10x  pin_hic  pin_hic_it  pin_ld pin_ld_it # stat_hic #pin_hic2
 
 .SUFFIXS:.c .o
 
@@ -19,8 +19,8 @@ pin_hic: bamlite.o bed.o cdict.o graph.o pin_hic.o sdict.o col_hic_lnks.o build_
 #build_hig: bamlite.o cdict.o graph.o build_hig.o  asset.o sdict.o bed.o
 	#$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
-stat_hic: bamlite.o cdict.o graph.o stat.o  asset.o sdict.o bed.o
-	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+#stat_hic: bamlite.o cdict.o graph.o stat.o  asset.o sdict.o bed.o
+	#$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 #pin_hic2: bamlite.o bed.o cdict.o graph.o pin_hic.o sdict.o col_hic_lnks.o build_graph2.o get_seq.o
 	#$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)

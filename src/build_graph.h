@@ -23,7 +23,7 @@ extern "C" {
 #endif
 int main_bldg(int argc, char *argv[], int ishic);
 int buildg(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min_mdw, int mlc, char *out_fn);
-int buildg_hic(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min_mdw, int mlc, char *out_fn);
+int buildg_hic(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min_mdw, int mlc, char *out_fn, int amode);
 #ifdef __cplusplus
 }
 #endif

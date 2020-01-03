@@ -594,7 +594,7 @@ int main_hic_lnks(int argc, char *argv[])
 {
 	int c;
 	int min_mq = 10;
-	int use_min_dist = 1;
+	int use_min_dist = 0;
 	/*uint32_t max_ins_len = 10000;*/
 	/*int max_cov = 100, min_cov = 0, min_mq = 0;*/
 	/*int min_as = 0;*/
@@ -613,7 +613,7 @@ int main_hic_lnks(int argc, char *argv[])
 				win_s = strtol(optarg, NULL, 10);
 				break;
 			case 'd':
-				use_min_dist = 0;
+				use_min_dist = 1;
 				break;
 			case 's':
 				sat_fn  = optarg;
@@ -628,7 +628,7 @@ help:
 				fprintf(stderr, "Options:\n");
 				fprintf(stderr, "         -q    INT      minimum alignment quality [0]\n");
 				fprintf(stderr, "         -s    STR      sat file\n");
-				fprintf(stderr, "         -d    BOOL     do not use minimum dist to normalize weight [False]\n");
+				fprintf(stderr, "         -d    BOOL     use minimum dist to normalize weight [False]\n");
 				fprintf(stderr, "         -o    STR      output file\n");
 				fprintf(stderr, "         -h             help\n");
 				return 1;	

@@ -247,7 +247,7 @@ int norm_links(cdict2_t *cds, sdict_t *ctgs, int norm)
 	}
 	return 0;
 }
-int det_ori(float *ws)
+int det_ori(float *ws, int isf, int min_wt, float min_mdw, int amode)
 {
 	float l, sl;
 	l = ws[0];
@@ -257,16 +257,23 @@ int det_ori(float *ws)
 		if (ws[i] >= l) 
 				maxi = i, sl = l, l = ws[i];  
 		else if (ws[i] > sl) sl = ws[i];
-	if (sl != l)
-		return maxi;
-	else
-		return -1;
+	if (l <= min_wt) return -1;
+	if (amode) {
+		if (!isf) return -1;
+		else if (norm_cdf(l, 0.5, sl + l) <= min_mdw) return -1;
+		else return maxi;	
+	} else {
+		if (sl != l)
+			return maxi;
+		else
+			return -1;
+	}
 	/*if (norm_cdf(l, 0.5, sl + l) <= 0.95) */
 			/*return -1; */
 	/*else*/
 		   /*return maxi;	*/
 }
-graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs, int min_wt)
+graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs, int min_wt, float min_mdw, int amode)
 {
 	graph_t *g = graph_init();
 	
@@ -282,7 +289,7 @@ graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs, int min_wt)
 		char *name1 = ctgs->seq[i].name;
 		uint32_t len1 = ctgs->seq[i].len;
 		cdict2_t *c = cds + i;	
-
+		int isf = 1;
 		for (j = 0; j < c->lim; ++j) {
 			char *name2 = c->cnts[j].name;
 			if (strcmp(name1, name2) == 0) continue;
@@ -303,7 +310,8 @@ graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs, int min_wt)
 			//determine joint direction, here we use a very easy model
 			if (!hand_shaking) continue;
 			int idx;
-			if (~(idx = det_ori(c->cnts[j].cnt)) && c->cnts[j].cnt[idx] > min_wt)
+			if (~(idx = det_ori(c->cnts[j].cnt, isf, min_wt, min_mdw, amode))) 
+			// if build in accurate mode 
 			/*if (~(idx = det_ori(c->cnts[j].cnt)))*/
 			/*uint32_t hh = c->cnts[j].cnt[0];*/
 			/*uint32_t ht = c->cnts[j].cnt[1];*/
@@ -324,11 +332,12 @@ graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs, int min_wt)
 			//when min_wt == -1; don't normalize weight 
 			/*is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, ~min_wt?c->cnts[j].cnt[idx] / (len1 / 2 + len2 / 2) : c->cnts[j].cnt[idx]);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.*/
 			is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, ~min_wt?c->cnts[j].ncnt: c->cnts[j].cnt[idx]);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.
+			isf = 0;
 		}		
 	}	
 	return g;
 }
-int buildg_hic(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min_mdw, int mlc, char *out_fn)
+int buildg_hic(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min_mdw, int mlc, char *out_fn, int amode)
 {
 	/*fprintf(stderr, "%s %s\n", fn, edge_fn);*/
 	/*fprintf(stderr, "%d %d\n", min_wt, use_sat);*/
@@ -380,7 +389,7 @@ int buildg_hic(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] building graph\n", __func__);
 #endif
-	graph_t *g = build_graph_hic(cds, ctgs, min_wt);
+	graph_t *g = build_graph_hic(cds, ctgs, min_wt, min_mdw, amode);
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] processing graph\n", __func__);
 #endif
@@ -501,13 +510,16 @@ int main_bldg(int argc, char *argv[], int ishic)
 	uint32_t min_wt = 10; char *program = argv[0];
 	char *sat_fn = 0, *ctg_fn = 0, *out_fn = 0;
 	int use_sat = 0, mlc = 1;
-	int norm = 0;
+	int norm = 0, amode = 0;
 	float msn = .7, mdw = 0.95;
 	--argc, ++argv;
-	while (~(c=getopt(argc, argv, "w:o:s:c:nm:f:k:h"))) {
+	while (~(c=getopt(argc, argv, "w:ao:s:c:nm:f:k:h"))) {
 		switch (c) {
 			case 'w': 
 				min_wt = atoi(optarg);
+				break;
+			case 'a': 
+				amode = 1;
 				break;
 			case 's': 
 				sat_fn = optarg;
@@ -536,6 +548,7 @@ int main_bldg(int argc, char *argv[], int ishic)
 help:	
 				fprintf(stderr, "\nUsage: %s %s [<options>] <LINKS_MATRIX> \n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
+				fprintf(stderr, "         -a    BOOL     Hi-C scaffolding in accurate mode [FALSE]\n");
 				fprintf(stderr, "         -w    INT      minimum weight for links [10]\n");
 				fprintf(stderr, "         -k    INT      maximum linking candiates [1]\n");
 				fprintf(stderr, "         -c    FILE     reference index file [nul]\n");
@@ -558,7 +571,7 @@ help:
 	if (!ishic)
 		ret = buildg(sat_fn, lnk_fn, min_wt, use_sat, norm, mdw, mlc, out_fn);
 	else 
-		ret = buildg_hic(sat_fn, lnk_fn, min_wt, use_sat, norm, mdw, mlc, out_fn);
+		ret = buildg_hic(sat_fn, lnk_fn, min_wt, use_sat, norm, mdw, mlc, out_fn, amode);
 
 	fprintf(stderr, "Program ends\n");	
 	return ret;	

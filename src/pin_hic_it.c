@@ -39,13 +39,14 @@ int main(int argc, char *argv[])
 	char *sat_fn = 0, *faidx_fn = 0, *seq_fn = 0;
 	int use_sat = 0;
 	char *outdir = ".";
-	int use_min_dist = 0;
+	/*int use_min_dist = 0;*/
+	float min_mdw = 0.95;
 	int cann = 3;
-	int min_wt = 100;
+	int min_wt = 100, amode = 0;
 	uint32_t min_l  = 0;
 	float min_rat = 0.2;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
-	while (~(c=getopt(argc, argv, "O:q:nc:m:ds:br:w:i:l:x:vh"))) {
+	while (~(c=getopt(argc, argv, "O:aq:nc:m:ds:br:w:i:l:x:vh"))) {
 		switch (c) {
 			case 'q':
 				min_mq = atoi(optarg);
@@ -60,7 +61,7 @@ int main(int argc, char *argv[])
 				outdir = optarg;
 				break;
 			case 'd':
-				use_min_dist = 1;
+				min_mdw = atof(optarg);
 				break;
 			case 'c': 
 				cann = atoi(optarg);
@@ -68,6 +69,9 @@ int main(int argc, char *argv[])
 			case 's': 
 				sat_fn = optarg;
 				use_sat = 1;
+				break;
+			case 'a': 
+				amode = 1;
 				break;
 			case 'v':
 				fprintf(stderr, "Version: %d.%d.%d\n", MAJOR, MINOR, PATCH);
@@ -96,13 +100,13 @@ help:
 				fprintf(stderr, "\nUsage: %s [options] <BAM_FILEs> ...\n", program);
 				fprintf(stderr, "Options:\n");
 				fprintf(stderr, "         -i    INT      iteration times [3]\n");
-				/*fprintf(stderr, "         -a    INT      allowed top N candidates [2]\n");*/
+				fprintf(stderr, "         -a    BOOL     accurate mode [FALSE]\n");
 				fprintf(stderr, "         -O    STR      output directory [.]\n");
 				fprintf(stderr, "         -q    INT      minimum mapping quality [10]\n");
 				fprintf(stderr, "         -w    INT      minimum contact number [100]\n");
 				fprintf(stderr, "         -m    FLOAT    minimum coverage ratio between maximu coverage and the gap coverage [.2]\n");
 				fprintf(stderr, "         -n    BOOL     use normalized weight [TRUE]\n");
-				fprintf(stderr, "         -d    BOOL     use minimum distance to normalize weight [FALSE]\n");
+				fprintf(stderr, "         -d    FLOAT     minimum difference between best and secondary orientation [0.95]\n");
 				fprintf(stderr, "         -b    BOOL     break at the final step [TRUE]\n");
 				fprintf(stderr, "         -c    INT      candidate number [3]\n");
 				fprintf(stderr, "         -s    STR      sat file [nul]\n");
@@ -149,14 +153,14 @@ help:
 	//scaffs.01.fa
 	
 	int i;
-	if (use_min_dist) min_wt = -1, norm = 0;
+	/*if (use_min_dist) min_wt = -1, norm = 0;*/
 	for ( i = 1; i <= iter; ++i) {
 		//input sat_fn output mat_fn
 		sprintf(sat_nfn, "%s/scaffs.%02d.sat", outdir, i);
 		sprintf(mat_fn, "%s/links.%02d.mat", outdir, i);
-		col_hic_lnks(sat_ofn, bam_fn, n_bam, min_mq, 5000, use_min_dist, mat_fn);
+		col_hic_lnks(sat_ofn, bam_fn, n_bam, min_mq, 5000, 0, mat_fn);
 		/*fprintf(stderr, "%p\n", sat_nfn);*/
-		buildg_hic(use_sat ? sat_ofn : faidx_fn, mat_fn, min_wt, use_sat, norm, 0, cann, sat_nfn);
+		buildg_hic(use_sat ? sat_ofn : faidx_fn, mat_fn, min_wt, use_sat, norm, min_mdw, cann, sat_nfn, amode);
 		//get seq at the final round
 		
 		strcpy(sat_ofn, sat_nfn);

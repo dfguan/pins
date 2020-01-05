@@ -484,6 +484,17 @@ int add_asm(graph_t *g, char *name,  uint32_t *nodes, uint32_t n)
 	return kh_val(h, k);
 }
 
+int ext_r(graph_t *g, edge_t *a) // remove reverse edge
+{
+	uint32_t v_idx = vtx_idx(a->w);
+	edge_t *e = edges(g, v_idx);
+	uint32_t ne = edge_n(g, v_idx);
+	edge_t *i;
+	for ( i = e; i < e + ne; ++i) {
+		if (i->w == a->v) return 1;
+	}
+	return 0;
+}
 int del_r(graph_t *g, edge_t *a) // remove reverse edge
 {
 	uint32_t v_idx = vtx_idx(a->w);
@@ -534,7 +545,10 @@ int clean_edges(graph_t *g, int use_df)
 				++n_del;
 				a->is_del = 1;
 				del_r(g, a);			
-			} 		
+			} else if (!ext_r(g, a)){
+				++n_del;
+				a->is_del = 1;
+			}	
 		}
 	}	
 	g->eg.n_del = n_del;

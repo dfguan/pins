@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 	uint32_t min_l  = 0;
 	float min_rat = 0.2;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
-	while (~(c=getopt(argc, argv, "O:aq:nc:m:ds:br:w:i:l:x:vh"))) {
+	while (~(c=getopt(argc, argv, "O:aq:nc:m:d:s:br:w:i:l:x:vh"))) {
 		switch (c) {
 			case 'q':
 				min_mq = atoi(optarg);

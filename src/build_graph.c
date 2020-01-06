@@ -332,7 +332,7 @@ graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs, int min_wt, float min_mdw
 			//when min_wt == -1; don't normalize weight 
 			/*is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, ~min_wt?c->cnts[j].cnt[idx] / (len1 / 2 + len2 / 2) : c->cnts[j].cnt[idx]);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.*/
 			is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, ~min_wt?c->cnts[j].ncnt: c->cnts[j].cnt[idx]);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.
-			isf = 0;
+			/*isf = 0;*/
 		}		
 	}	
 	return g;

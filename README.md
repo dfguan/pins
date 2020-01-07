@@ -86,8 +86,12 @@ If the input is a SAT **sat** file:
 ./bin/pin_hic gets -c $asm scaffolds.sat > scaffolds.fa # this will generate scaffolding paths. 
 ```
 
-### Output format: SAT
-SAT format is extended from the [GFA 1.0 format] (https://github.com/GFA-spec/GFA-spec/blob/master/GFA1.md).
+### Scaffolding with linkage disequilibrium information
+shall be updated soon...
+
+
+### Output format: SAT (need to be updated)
+SAT format is extended from the [GFA 1.0 format](https://github.com/GFA-spec/GFA-spec/blob/master/GFA1.md).
 
 | Tag | Col 1 | Col 2 | Col 3 | Col 4 | Col 5 | Col 6 | Col 7 | Comment | 
 |---|---|---|---|---|---|---|---|---| 

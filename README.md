@@ -24,29 +24,79 @@ cd pins/src && make
 ```
 
 ## Usage
-
-### scaffolding with linked reads
-Given linked reads alignment ***bams*** and a draft assembly ***ref***, you can follow the instruction to build scaffolds from contigs.
-
-```
-./bin/pin_10x link $bam1 $bam2 $bam3 ... > lk.matrix  # this will calcuate linkage between any pairs of contigs.
-./bin/pin_10x build -c $ref.fai lk.matrix > lk.sat # this will generate scaffolding paths. 
-./bin/pin_10x getc -c $ref lk.sat > lk.fa # this will generate scaffolds by a given SAT file.
-```
-
-### scaffolding with Hi-C reads
-Given linked reads alignment ***bams*** and a draft assembly ***ref***, you can follow the instruction to build scaffolds from contigs.
+### Scaffolding with linked reads
+#### Linked-read preprocessing
+Given a list **10xlist** of 10x read files (suppose in fastq.gz format, paired files in a line) and the assembly **asm**, use the following code to get read files alignments. 
 
 ```
-./bin/pin_hic link $bam1 $bam2 $bam3 ... > hc.matrix  # this will calcuate linkage between any pairs of contigs.
-./bin/pin_hic build -c $ref.fai hc.matrix > hc.sat # this will generate scaffolding paths. 
-./bin/pin_hic getc -c $ref hc.sat > hc.fa # this will generate scaffolds by a given SAT file.
+bwa index $asm
+while read -r r1 r2
+do
+	prefix=`basename $r1 .fastq.gz`
+	10x_trim -c -p $prefix $r1 $r2 # generate trimmed read files $prefix_{1,2}.fq.gz
+	bwa mem -t12 $asm $prefix_1.fq.gz $prefix_2.fq.gz | samtools view -b - > $prefix.bam
+done < $10xlist
 ```
-If you want to build scaffols with Hi-C in *N* rounds, try to run the following command. The final assembly will be named as **scaffols_final.fa**.
+#### Linked-read scaffolding
+With linked-read alignment files **bams** and the draft assembly ***asm***, you can run the following code build scaffolds.
 
 ```
-./bin/pin_hic_it -i $N -c $ref.fai -x $ref $bam1 $bam2 $bam3 ... 
+samtools faidx $asm
+./bin/pin_10x link $bam1 $bam2 $bam3 ... > link.matrix  # this will calcuate the numbers of shared barcode between pairs of contigs.
+./bin/pin_10x build -c $asm.fai link.matrix > scaffolds.sat # this will generate scaffolding paths. 
+./bin/pin_10x gets -c $asm scaffolds.sat > scaffolds.fa # this will generate scaffolds by a given SAT file.
 ```
+
+
+### Scaffolding with Hi-C reads
+##### Hi-C Read preprocessing
+Given a list **hiclist** of Hi-C read files (suppose in fastq.gz format, paired files in a line) and the assembly **asm**, use the following code to generate Hi-C alignment files. 
+
+```
+bwa index $asm
+while read -r r1 r2
+do
+	prefix=`basename $r1 .fastq.gz`
+	bwa mem -SP -B10 -t12 $asm $prefix_1.fq.gz $prefix_2.fq.gz | samtools view -b - > $prefix.bam
+done < $hiclist
+```
+
+##### Hi-C scaffolding
+
+
+Given Hi-C reads alignment **bams**, a draft assembly **asm** and a output directory **outdir**, if you want to build scaffols with Hi-C in **N** (default: 3) rounds, please try the following commands. The final assembly will be named as **scaffols_final.fa**.
+
+```
+./bin/pin_hic_it -i $N -c $ref.fai -x $ref -O $outdir $bam1 $bam2 $bam3 ... 
+```
+
+Or you would rather try to build scaffolds step by step, if the input assembly is a fasta file, you can use the code as follows:
+
+```
+samtools faidx $asm
+./bin/pin_hic link $bam1 $bam2 $bam3 ... > link.matrix  # this will calcuate contact numbers between any pairs of contigs.
+./bin/pin_hic build -w100 -k3 -c $asm.fai link.matrix > scaffolds.sat # this will generate scaffolding paths. 
+./bin/pin_hic gets -c $asm  scaffolds.sat > scaffolds.fa # this will generate scaffolds by a given SAT file.
+```
+If the input is a SAT **sat** file:
+
+```
+./bin/pin_hic link -s $sat $bam1 $bam2 $bam3 ... > link.matrix  # this will calcuate contact numbers between any pairs of contigs.
+./bin/pin_hic build -w100 -k3 -s $sat link.matrix > scaffolds.sat # this will generate scaffolding paths. 
+./bin/pin_hic gets -c $asm scaffolds.sat > scaffolds.fa # this will generate scaffolding paths. 
+```
+
+### Output format: SAT
+SAT format is extended from the [GFA 1.0 format] (https://github.com/GFA-spec/GFA-spec/blob/master/GFA1.md).
+
+| Tag | Col 1 | Col 2 | Col 3 | Col 4 | Col 5 | Col 6 | Col 7 | Comment | 
+|---|---|---|---|---|---|---|---|---| 
+| Header | H | VN:Z:1.0 | 
+| Sequence | S | SID | LEN | SEQ | 
+| Link | L | SID1 | ORI1 | SID2 | ORI2 | CIGAR | wt:f:x | 
+| Path | P | PID | LEN | CONTIGS | 
+| Scaffold set | C | SCFID | PIDs | 
+| Current scaffold set | A | SCFID | 
 
 
 ## Limitation

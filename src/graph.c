@@ -121,7 +121,7 @@ int out_edges(graph_t *g, int all, FILE *fout)
 	uint32_t i;
 	for ( i = 0; i < n_edges; ++i) {
 		uint32_t v = edg[i].v, w = edg[i].w;
-		if (v>>2 > w >> 2) fprintf(fout, "L\t%s\t%c\t%s\t%c\t%s\twt:%.2f\n", v>>1 & 1 ? pt[v>>2].name : vs[v>>2].name, v&1?'+':'-', w>>1 & 1 ? pt[w>>2].name : vs[w>>2].name, w&1?'+':'-', "*", edg[i].wt); // + head of sequence - tail of sequqnce	
+		if (v>>2 > w >> 2) fprintf(fout, "L\t%s\t%c\t%s\t%c\t%s\twt:f:%.2f\n", v>>1 & 1 ? pt[v>>2].name : vs[v>>2].name, v&1?'+':'-', w>>1 & 1 ? pt[w>>2].name : vs[w>>2].name, w&1?'+':'-', "*", edg[i].wt); // + head of sequence - tail of sequqnce	
 	/*fprintf(fout, "L\t%s\t%c\t%s\t%c\t%s\twt:%.2f\n", v>>1 & 1 ? pt[v>>2].name : vs[v>>2].name, v&1?'+':'-', w>>1 & 1 ? pt[w>>2].name : vs[w>>2].name, w&1?'+':'-', "*", edg[i].wt); // + head of sequence - tail of sequqnce	*/
 	}
 	return 0;
@@ -809,7 +809,7 @@ int add_e(graph_t *g, char *s)
 			else if (i == 1) d1 = q[0];
 		   	else if (i == 2) n2 = q;
 			else if (i == 3) d2 = q[0];
-			else if (i == 5) wt = strtof(q+3, NULL);	
+			else if (i == 5) wt = strtof(q+5, NULL);	
 			++i, q = p + 1;	
 			if (c == 0) break;	
 		}

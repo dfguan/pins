@@ -273,7 +273,7 @@ int det_ori(float *ws, int isf, int min_wt, float min_mdw, int amode)
 	/*else*/
 		   /*return maxi;	*/
 }
-graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs, int min_wt, float min_mdw, int amode)
+graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs, int min_wt, float min_mdw, int use_nw, int amode)
 {
 	graph_t *g = graph_init();
 	
@@ -331,13 +331,13 @@ graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs, int min_wt, float min_mdw
 					/*continue;*/
 			//when min_wt == -1; don't normalize weight 
 			/*is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, ~min_wt?c->cnts[j].cnt[idx] / (len1 / 2 + len2 / 2) : c->cnts[j].cnt[idx]);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.*/
-			is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, ~min_wt?c->cnts[j].ncnt: c->cnts[j].cnt[idx]);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.
+			is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, use_nw?c->cnts[j].ncnt: c->cnts[j].cnt[idx] * 2/(len1 + len2));	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.
 			/*isf = 0;*/
 		}		
 	}	
 	return g;
 }
-int buildg_hic(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min_mdw, int mlc, char *out_fn, int amode)
+int buildg_hic(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min_mdw, int mlc, char *out_fn, int use_nw, int amode)
 {
 	/*fprintf(stderr, "%s %s\n", fn, edge_fn);*/
 	/*fprintf(stderr, "%d %d\n", min_wt, use_sat);*/
@@ -389,7 +389,7 @@ int buildg_hic(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] building graph\n", __func__);
 #endif
-	graph_t *g = build_graph_hic(cds, ctgs, min_wt, min_mdw, amode);
+	graph_t *g = build_graph_hic(cds, ctgs, min_wt, min_mdw, use_nw, amode);
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] processing graph\n", __func__);
 #endif
@@ -510,10 +510,10 @@ int main_bldg(int argc, char *argv[], int ishic)
 	uint32_t min_wt = 10; char *program = argv[0];
 	char *sat_fn = 0, *ctg_fn = 0, *out_fn = 0;
 	int use_sat = 0, mlc = 1;
-	int norm = 0, amode = 0;
+	int norm = 0, amode = 0, use_nw = 1;
 	float msn = .7, mdw = 0.95;
 	--argc, ++argv;
-	while (~(c=getopt(argc, argv, "w:ao:s:c:nm:f:k:h"))) {
+	while (~(c=getopt(argc, argv, "w:ao:s:c:nem:f:k:h"))) {
 		switch (c) {
 			case 'w': 
 				min_wt = atoi(optarg);
@@ -537,9 +537,9 @@ int main_bldg(int argc, char *argv[], int ishic)
 			case 'n': 
 				norm = 1;
 				break;
-			/*case 'm': */
-				/*msn = atof(optarg);*/
-				/*break;*/
+			case 'e': 
+				use_nw = 0;
+				break;
 			case 'o': 
 				out_fn = optarg;
 				break;
@@ -553,7 +553,7 @@ help:
 				fprintf(stderr, "         -k    INT      maximum linking candiates [1]\n");
 				fprintf(stderr, "         -c    FILE     reference index file [nul]\n");
 				fprintf(stderr, "         -n    BOOL     normalize weight [false]\n");
-				/*fprintf(stderr, "         -m    FLOAT    minimum barcode ratio [.7]\n");*/
+				fprintf(stderr, "         -e    BOOL     use normalized weight as edge weight [TRUE]\n");
 				fprintf(stderr, "         -f    FLOAT    minimum weight difference [0.95]\n");
 				fprintf(stderr, "         -s    FILE     sat file [nul]\n");
 				fprintf(stderr, "         -o    FILE     output file [stdout]\n");
@@ -571,7 +571,7 @@ help:
 	if (!ishic)
 		ret = buildg(sat_fn, lnk_fn, min_wt, use_sat, norm, mdw, mlc, out_fn);
 	else 
-		ret = buildg_hic(sat_fn, lnk_fn, min_wt, use_sat, norm, mdw, mlc, out_fn, amode);
+		ret = buildg_hic(sat_fn, lnk_fn, min_wt, use_sat, norm, mdw, mlc, out_fn, use_nw, amode);
 
 	fprintf(stderr, "Program ends\n");	
 	return ret;	

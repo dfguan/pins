@@ -24,7 +24,7 @@ extern "C" {
 #endif
 int main_brks(int argc, char *argv[]);
 int main_brks_10x(int argc, char *argv[]);
-int mk_brks(char *sat_fn, char *bam_fn[], int n_bams, int min_mq, float min_rat, char *out_fn);
+int mk_brks(char *sat_fn, char *bam_fn[], int n_bams, int min_mq, float min_rat, char *out_dir, char *prefix);
 #ifdef __cplusplus
 }
 #endif

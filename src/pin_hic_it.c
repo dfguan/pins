@@ -42,11 +42,11 @@ int main(int argc, char *argv[])
 	/*int use_min_dist = 0;*/
 	float min_mdw = 0.95;
 	int cann = 3;
-	int min_wt = 100, amode = 0;
+	int min_wt = 100, amode = 0, use_nw = 1;
 	uint32_t min_l  = 0;
 	float min_rat = 0.2;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
-	while (~(c=getopt(argc, argv, "O:aq:nc:m:d:s:br:w:i:l:x:vh"))) {
+	while (~(c=getopt(argc, argv, "O:aq:nec:m:d:s:br:w:i:l:x:vh"))) {
 		switch (c) {
 			case 'q':
 				min_mq = atoi(optarg);
@@ -72,6 +72,9 @@ int main(int argc, char *argv[])
 				break;
 			case 'a': 
 				amode = 1;
+				break;
+			case 'e': 
+				use_nw = 0;
 				break;
 			case 'v':
 				fprintf(stderr, "Version: %d.%d.%d\n", MAJOR, MINOR, PATCH);
@@ -109,6 +112,7 @@ help:
 				fprintf(stderr, "         -d    FLOAT     minimum difference between best and secondary orientation [0.95]\n");
 				fprintf(stderr, "         -b    BOOL     break at the final step [TRUE]\n");
 				fprintf(stderr, "         -c    INT      candidate number [3]\n");
+				fprintf(stderr, "         -e    BOOL     use normalized weight as edge weight [TRUE]\n");
 				fprintf(stderr, "         -s    STR      sat file [nul]\n");
 				fprintf(stderr, "         -x    STR      reference fa index file [nul]\n");
 				fprintf(stderr, "         -r    STR      reference file [nul]\n");
@@ -160,14 +164,14 @@ help:
 		sprintf(mat_fn, "%s/links.%02d.mat", outdir, i);
 		col_hic_lnks(sat_ofn, bam_fn, n_bam, min_mq, 5000, 0, mat_fn);
 		/*fprintf(stderr, "%p\n", sat_nfn);*/
-		buildg_hic(use_sat ? sat_ofn : faidx_fn, mat_fn, min_wt, use_sat, norm, min_mdw, cann, sat_nfn, amode);
+		buildg_hic(use_sat ? sat_ofn : faidx_fn, mat_fn, min_wt, use_sat, norm, min_mdw, cann, sat_nfn, use_nw, amode);
 		//get seq at the final round
 		
 		strcpy(sat_ofn, sat_nfn);
 		if (i == iter) {
 			sprintf(mat_fn, "%s/links.%02d.mat", outdir, 1);
 			sprintf(scf_fn, "%s/scaffolds_final.fa", outdir);
-			if (brk) sprintf(sat_nfn, "%s/scaffs.bk.sat", outdir), mk_brks(sat_ofn, bam_fn, n_bam, min_mq, min_rat, sat_nfn);
+			if (brk) sprintf(sat_nfn, "%s/scaffs.bk.sat", outdir), mk_brks(sat_ofn, bam_fn, n_bam, min_mq, min_rat, outdir, "scaffs.bk");
 			get_seq(sat_nfn, seq_fn, min_l, scf_fn);
 			
 		}

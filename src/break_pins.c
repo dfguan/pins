@@ -545,6 +545,7 @@ int detect_bks(cov_ary_t *ca, graph_t *g, sdict_t *ctgs, sdict_t *scfs, float mi
 	uint32_t n = as->n;
 	uint32_t i;	
 	uint32_t idx = 0;
+	fprintf(stderr, "BREAK LOG STARTS\n");
 	for ( i = 0; i < n; ++i) {
 		uint32_t m = pt[as->pn[i] >> 1].n;
 		cov_stat_t *ct = malloc(sizeof(cov_stat_t) * (2 * m - 1));
@@ -575,6 +576,7 @@ int detect_bks(cov_ary_t *ca, graph_t *g, sdict_t *ctgs, sdict_t *scfs, float mi
 		kv_destroy(pos);
 		free(ct);
 	}
+	fprintf(stderr, "BREAK LOG ENDS\n");
 	return 0;
 }
 
@@ -1071,7 +1073,7 @@ int mk_brks_10x(char *sat_fn, char *bam_fn[], int n_bam, char *gap_fn, int min_m
 
 }
 
-int mk_brks(char *sat_fn, char *bam_fn[], int n_bams, int min_mq, float min_rat, char *out_fn)
+int mk_brks(char *sat_fn, char *bam_fn[], int n_bams, int min_mq, float min_rat, char *out_dir, char *prefix)
 {
 	
 	sdict_t *ctgs = sd_init();	
@@ -1145,15 +1147,18 @@ int mk_brks(char *sat_fn, char *bam_fn[], int n_bams, int min_mq, float min_rat,
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] dump sat graph\n", __func__);
 #endif
+	char *out_fn = malloc(strlen(out_dir) + strlen(prefix) + 6);
+	sprintf(out_fn, "%s/%s.sat", out_dir, prefix);
 	dump_sat(og, out_fn);	
-	
+	free(out_fn);
+
 	char *type = "HIC";
 	char *desc = "hic data";
 	
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] print average coverage for each 1024 base of the contigs\n", __func__);
 #endif
-	print_coverage_wig(ca, _sd, type, 1024, ".");
+	print_coverage_wig(ca, _sd, type, 1024, out_dir);
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] release coverage array\n", __func__);
 #endif
@@ -1324,10 +1329,12 @@ int main_brks(int argc, char *argv[])
 	int min_mq = 10;
 	int limn = 2;
 	float min_rat = 0.1;
+	char *outdir = ".";
+	char *prefix = "scaffs.bk";	
 	char *program;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
 	--argc, ++argv;
-	while (~(c=getopt(argc, argv, "m:q:o:h"))) {
+	while (~(c=getopt(argc, argv, "m:q:O:p:h"))) {
 		switch (c) {
 			case 'q':
 				min_mq = atoi(optarg);
@@ -1335,8 +1342,11 @@ int main_brks(int argc, char *argv[])
 			case 'm':
 				min_rat = atof(optarg);
 				break;	
-			case 'o':
-				out_fn = (optarg);
+			case 'p':
+				prefix = optarg;
+				break;	
+			case 'O':
+				outdir = optarg;
 				break;	
 			default:
 				if (c != 'h') fprintf(stderr, "[E::%s] undefined option %c\n", __func__, c);
@@ -1346,7 +1356,8 @@ help:
 				/*fprintf(stderr, "         -n    INT      allow successor or predecessor be top N candidates [2]\n");*/
 				fprintf(stderr, "         -m    FLOAT    minimum coverage ratio between maximu coverage and the gap coverage [.1]\n");
 				fprintf(stderr, "         -q    INT      minimum mapping quality [10]\n");
-				fprintf(stderr, "         -o    FILE     output file [stdout]\n");
+				fprintf(stderr, "         -O    STR      output directory [.]\n");
+				fprintf(stderr, "         -p    STR      output file prefix [scaffs.bk]\n");
 				fprintf(stderr, "         -h             help\n");
 				return 1;	
 		}		
@@ -1360,7 +1371,7 @@ help:
 	int n_bams = argc - optind;	
 	/*fprintf(stderr, "%d\t%s\t%s\n", n_bams, bam_fn[0], bam_fn[1]);*/
 	fprintf(stderr, "Program starts\n");	
-	mk_brks(sat_fn, bam_fn, n_bams, min_mq, min_rat, out_fn);
+	mk_brks(sat_fn, bam_fn, n_bams, min_mq, min_rat, outdir, prefix);
 /*int mk_brks(char *sat_fn, char *links_fn, int limn, char *out_fn)*/
 	/*mk_brks(sat_fn, links_fn, limn, out_fn);*/
 	fprintf(stderr, "Program ends\n");	

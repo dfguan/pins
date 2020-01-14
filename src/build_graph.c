@@ -379,7 +379,7 @@ int buildg_hic(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float
 	/*print_cdict2(cds, ctgs);	*/
 	norm_links(cds, ctgs, norm);
 	for ( i = 0; i < n_ctg; ++i) cd2_sort(cds+i); 
-	print_cdict2(cds, ctgs);	
+	/*print_cdict2(cds, ctgs);	*/
 	cd2_set_lim(cds, n_ctg, mlc); 
 	/*if (norm) */
 	/*if (norm) cd_filt(cds, n_cds, min_rat); */
@@ -423,11 +423,11 @@ int buildg_hic(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float
 
 int buildg(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min_mdw, int mlc, char *out_fn)
 {
-	fprintf(stderr, "%s %s\n", fn, edge_fn);
-	fprintf(stderr, "%d %d\n", min_wt, use_sat);
-	fprintf(stderr, "%d %f\n", norm, min_mdw);
-	fprintf(stderr, "%d\n", mlc);
-	fprintf(stderr, "%p\n", out_fn);
+	/*fprintf(stderr, "%s %s\n", fn, edge_fn);*/
+	/*fprintf(stderr, "%d %d\n", min_wt, use_sat);*/
+	/*fprintf(stderr, "%d %f\n", norm, min_mdw);*/
+	/*fprintf(stderr, "%d\n", mlc);*/
+	/*fprintf(stderr, "%p\n", out_fn);*/
 	graph_t *og; 
 	sdict_t *ctgs = 0;
 	if (use_sat) {

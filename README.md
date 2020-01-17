@@ -1,4 +1,4 @@
-# Pins 
+# Pins (拼接)
 
 Scaffolding tool based on linked reads, Hi-C reads and linkage disequilibrium information. 
 
@@ -67,24 +67,66 @@ done < $hiclist
 Given Hi-C reads alignment **bams**, a draft assembly **asm** and a output directory **outdir**, if you want to build scaffols with Hi-C in **N** (default: 3) rounds, please try the following commands. The final assembly will be named as **scaffols_final.fa**.
 
 ```
-./bin/pin_hic_it -i $N -c $ref.fai -x $ref -O $outdir $bam1 $bam2 $bam3 ... 
+samtools faidx $asm 
+./bin/pin_hic_it -i $N -c $asm.fai -x $ref -O $outdir $bam1 $bam2 $bam3 ... 
 ```
 
-Or you would rather try to build scaffolds step by step, if the input assembly is a fasta file, you can use the code as follows:
+Or you want to build scaffolds step by step:
+##### Step 1. contact matrix calculation
+From a draft assembly：
 
 ```
 samtools faidx $asm
 ./bin/pin_hic link $bam1 $bam2 $bam3 ... > link.matrix  # this will calcuate contact numbers between any pairs of contigs.
-./bin/pin_hic build -w100 -k3 -c $asm.fai link.matrix > scaffolds.sat # this will generate scaffolding paths. 
-./bin/pin_hic gets -c $asm  scaffolds.sat > scaffolds.fa # this will generate scaffolds by a given SAT file.
 ```
-If the input is a SAT **sat** file:
+
+From a **sat** file：
 
 ```
 ./bin/pin_hic link -s $sat $bam1 $bam2 $bam3 ... > link.matrix  # this will calcuate contact numbers between any pairs of contigs.
-./bin/pin_hic build -w100 -k3 -s $sat link.matrix > scaffolds.sat # this will generate scaffolding paths. 
-./bin/pin_hic gets -c $asm scaffolds.sat > scaffolds.fa # this will generate scaffolding paths. 
 ```
+
+##### Step 2. Scaffolding graph construction
+From a draft assembly:
+
+```
+/bin/pin_hic build -w100 -k3 -c $asm.fai link.matrix > scaffolds.sat # this will generate scaffolding paths. 
+```
+
+From a **sat** file:
+
+```
+/bin/pin_hic build -w100 -k3 -s $sat link.matrix > scaffolds.sat # this will generate scaffolding paths. 
+```
+
+##### Step 3. Mis-join detection
+Given a **sat** file:
+
+```
+./bin/pin_hic break $sat $bam1 $bam2 $bam3 ... > scaffs.bk.sat
+./bin/pin_hic gets -c $asm scaffs.bk.sat > scaffols_final.fa # get scaffold sequences.
+```
+
+A scaffolding pipeline of 3 iterations:
+
+```
+samtools faidx $asm
+for i in `seq 1 3`
+do
+	if [ $i -eq 1 ]
+	then 
+		./bin/pin_hic link $bam1 $bam2 $bam3 ... > links_$i.matrix
+		./bin/pin_hic build -w100 -k3 -c $asm.fai links_$i.matrix > scaffolds_$i.sat
+	else
+		./bin/pin_hic link -s scaffolds_$pi.sat $bam1 $bam2 $bam3 ... > links_$i.matrix
+		./bin/pin_hic build -w100 -k3 -s scaffolds_$pi.sat links_$i.matrix > scaffolds_$i.sat 
+	fi
+	pi=i
+done
+./bin/pin_hic break -s scaffolds_$i.sat $bam1 $bam2 $bam3 ... > scaffolds_bk.sat 
+./bin/pin_hic gets -c $asm scaffs.bk.sat > scaffols_final.fa 
+```
+
 
 ### Scaffolding with linkage disequilibrium information
 shall be updated soon...

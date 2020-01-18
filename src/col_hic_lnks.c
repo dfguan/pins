@@ -214,7 +214,7 @@ int col_contacts(hit_ary_t *hit_ary, sdict_t *sd, cdict_t *cs, int use_min_dist)
 
 
 
-int col_hits(aln_inf_t *f, int f_cnt, sdict_t *ctgs, sdict_t *scfs, hit_ary_t *hit_ary, int min_mq)
+int col_hits(aln_inf_t *f, int f_cnt, sdict_t *ctgs, sdict_t *scfs, hit_ary_t *hit_ary, int min_mq, int ca)
 {
 	if (f[0].qual < min_mq || f[1].qual < min_mq) return 1;
 	if (scfs->n_seq) {
@@ -248,7 +248,7 @@ int col_hits(aln_inf_t *f, int f_cnt, sdict_t *ctgs, sdict_t *scfs, hit_ary_t *h
 			sd_seq_t *sq2 = &ctgs->seq[f[1].tid];
 			uint32_t ind1 = sq1->le; //maybe not well paired up
 			uint32_t ind2 = sq2->le;
-			if (ind1 == ind2) return 1;
+			if (!ca && ind1 == ind2) return 1;
 			/*fprintf(stderr, "%u\t%u\n", ind1, ind2);*/
 			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
 			/*uint32_t f0s = sq1->l_snp_n == f[0].rev ? sq1->rs + f[0].s : sq1->rs + sq1->len - f[0].s; */
@@ -296,7 +296,7 @@ int col_hits(aln_inf_t *f, int f_cnt, sdict_t *ctgs, sdict_t *scfs, hit_ary_t *h
 		/*} else if (f_cnt == 2){*/
 			uint32_t ind1 = f[0].tid;
 			uint32_t ind2 = f[1].tid;
-			if (ind1 == ind2) return 1;
+			if (!ca && ind1 == ind2) return 1;
 			/*fprintf(stderr, "%s\t%s\n", r->ctgn1, r->ctgn2)	;*/
 			if (ind1 < ind2) {
 				uint64_t c1ns = (uint64_t)ind1 << 32 | f[0].s; //don't think there will be 2G contig, if happends might be a bug 
@@ -315,7 +315,7 @@ int col_hits(aln_inf_t *f, int f_cnt, sdict_t *ctgs, sdict_t *scfs, hit_ary_t *h
 	return 1;
 }
 
-int proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, hit_ary_t *ha)
+int proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, hit_ary_t *ha, int ca)
 {
 	
 	bamFile fp;
@@ -377,7 +377,7 @@ int proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, hit_ary_t *
 		//segment were mapped 
 		if (bam_read1(fp, b) >= 0 ) {
 			if (!cur_qn || strcmp(cur_qn, bam1_qname(b)) != 0) {
-				if (rd1_cnt < 3 && rd2_cnt < 3 && rd1_5cnt == 1 && rd2_5cnt == 1 && !col_hits(five.a, five.n, ctgs, scfs, ha, min_mq)) ++used_rdp_counter;
+				if (rd1_cnt < 3 && rd2_cnt < 3 && rd1_5cnt == 1 && rd2_5cnt == 1 && !col_hits(five.a, five.n, ctgs, scfs, ha, min_mq, ca)) ++used_rdp_counter;
 				/*aln_cnt = 0;	*/
 				/*rev = 0;*/
 				/*is_set = 0;*/
@@ -408,7 +408,7 @@ int proc_bam(char *bam_fn, int min_mq, sdict_t *ctgs, sdict_t *scfs, hit_ary_t *
 			/*aln_cnt = (aln_cnt + 1 ) & 1;*/
 			/*if ((++bam_cnt % 1000000) == 0) fprintf(stderr, "[M::%s] processing %ld bams\n", __func__, bam_cnt); */
 		} else {
-			if (rd1_cnt < 3 && rd2_cnt < 3 && rd1_5cnt == 1 && rd2_5cnt == 1 && !col_hits(five.a, five.n, ctgs, scfs, ha, min_mq)) ++used_rdp_counter;
+			if (rd1_cnt < 3 && rd2_cnt < 3 && rd1_5cnt == 1 && rd2_5cnt == 1 && !col_hits(five.a, five.n, ctgs, scfs, ha, min_mq, ca)) ++used_rdp_counter;
 			if (cur_qn) ++rdp_counter, free(cur_qn); 
 			break;	
 		}
@@ -526,7 +526,7 @@ int init_seqs(char *fn, sdict_t *ctgs, sdict_t *scfs)
 
 /*int aa_10x_hic(char *bam_fn, int min_as, int min_mq, int min_cov, float min_cov_rat, int max_cov, float max_cov_rat)*/
 /*int aa_hic(char *bam_fn, int min_as, int min_mq, int min_cov, int max_cov, uint32_t max_ins_len)*/
-int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t win_s, int use_min_dist, char *out_fn)
+int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t win_s, int use_min_dist, int ca, char *out_fn)
 {
 
 	/*uint32_t n_cds = ctgs->n_seq<<1;*/
@@ -561,7 +561,7 @@ int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t wi
 	hit_ary_t *hit_ary = calloc(1, sizeof(hit_ary_t));
 	int i;	
 	for ( i = 0; i < n_bam; ++i) {
-		if (proc_bam(bam_fn[i], min_mq, ctgs, scfs, hit_ary)) {
+		if (proc_bam(bam_fn[i], min_mq, ctgs, scfs, hit_ary, ca)) {
 			return 1;	
 		}	
 	}
@@ -595,6 +595,7 @@ int main_hic_lnks(int argc, char *argv[])
 	int c;
 	int min_mq = 10;
 	int use_min_dist = 0;
+	int ca = 0;
 	/*uint32_t max_ins_len = 10000;*/
 	/*int max_cov = 100, min_cov = 0, min_mq = 0;*/
 	/*int min_as = 0;*/
@@ -626,9 +627,10 @@ int main_hic_lnks(int argc, char *argv[])
 help:	
 				fprintf(stderr, "\nUsage: %s %s [options] <BAM_FILE>\n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
+				fprintf(stderr, "         -a    BOOL     collect all contacts [FALSE]\n");
 				fprintf(stderr, "         -q    INT      minimum alignment quality [0]\n");
 				fprintf(stderr, "         -s    STR      sat file\n");
-				fprintf(stderr, "         -d    BOOL     use minimum dist to normalize weight [False]\n");
+				fprintf(stderr, "         -d    BOOL     use minimum dist to normalize weight [FALSE]\n");
 				fprintf(stderr, "         -o    STR      output file\n");
 				fprintf(stderr, "         -h             help\n");
 				return 1;	
@@ -640,7 +642,7 @@ help:
 	char **bam_fn = &argv[optind];
 	int n_bam = argc - optind;
 	fprintf(stderr, "Program starts\n");	
-	col_hic_lnks(sat_fn, bam_fn, n_bam, min_mq, win_s, use_min_dist, out_fn);
+	col_hic_lnks(sat_fn, bam_fn, n_bam, min_mq, win_s, use_min_dist, ca, out_fn);
 	fprintf(stderr, "Program ends\n");	
 	return 0;	
 }

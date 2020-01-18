@@ -10,8 +10,6 @@ Scaffolding tool based on linked reads, Hi-C reads and linkage disequilibrium in
 ## Dependencies
 
 1. zlib
-2. htslib 
-
 
 
 ## Installation
@@ -73,7 +71,7 @@ samtools faidx $asm
 
 Or you want to build scaffolds step by step:
 ##### Step 1. contact matrix calculation
-From a draft assembly：
+From a draft assembly **asm**：
 
 ```
 samtools faidx $asm
@@ -87,7 +85,7 @@ From a **sat** file：
 ```
 
 ##### Step 2. Scaffolding graph construction
-From a draft assembly:
+From a draft assembly **asm**:
 
 ```
 /bin/pin_hic build -w100 -k3 -c $asm.fai link.matrix > scaffolds.sat # this will generate scaffolding paths. 
@@ -107,7 +105,7 @@ Given a **sat** file:
 ./bin/pin_hic gets -c $asm scaffs.bk.sat > scaffols_final.fa # get scaffold sequences.
 ```
 
-A scaffolding pipeline of 3 iterations:
+A **scaffolding pipeline** of 3 iterations:
 
 ```
 samtools faidx $asm

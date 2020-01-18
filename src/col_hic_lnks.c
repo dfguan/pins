@@ -605,8 +605,11 @@ int main_hic_lnks(int argc, char *argv[])
 	char *sat_fn = 0, *out_fn = 0;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
 	--argc, ++argv;
-	while (~(c=getopt(argc, argv, "q:w:ds:h"))) {
+	while (~(c=getopt(argc, argv, "q:w:ads:h"))) {
 		switch (c) {
+			case 'a':
+				ca = 1;
+				break;
 			case 'q':
 				min_mq = atoi(optarg);
 				break;

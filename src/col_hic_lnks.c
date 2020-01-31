@@ -631,10 +631,10 @@ help:
 				fprintf(stderr, "\nUsage: %s %s [options] <BAM_FILE>\n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
 				fprintf(stderr, "         -a    BOOL     collect all contacts [FALSE]\n");
-				fprintf(stderr, "         -q    INT      minimum alignment quality [0]\n");
+				fprintf(stderr, "         -q    INT      minimum alignment quality [10]\n");
 				fprintf(stderr, "         -s    STR      sat file\n");
 				fprintf(stderr, "         -d    BOOL     use minimum dist to normalize weight [FALSE]\n");
-				fprintf(stderr, "         -o    STR      output file\n");
+				fprintf(stderr, "         -o    STR      output file [stdout]\n");
 				fprintf(stderr, "         -h             help\n");
 				return 1;	
 		}		

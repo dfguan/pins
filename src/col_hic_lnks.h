@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 int main_hic_lnks(int argc, char *argv[]);
-int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t win_s, int use_min_dist, char *out_fn);
+int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t win_s, int use_min_dist, int ca, char *out_fn);
 #ifdef __cplusplus
 }
 #endif

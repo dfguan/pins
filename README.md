@@ -130,26 +130,85 @@ done
 shall be updated soon...
 
 
-### Output format: SAT (need to be updated)
+### Output format: SAT (V 0.1)
 SAT format is extended from the [GFA 1.0 format](https://github.com/GFA-spec/GFA-spec/blob/master/GFA1.md).
 
-| Tag | Col 1 | Col 2 | Col 3 | Col 4 | Col 5 | Col 6 | Col 7 | Comment | 
-|---|---|---|---|---|---|---|---|---| 
-| Header | H | VN:Z:1.0 | 
-| Sequence | S | SID | LEN | SEQ | 
-| Link | L | SID1 | ORI1 | SID2 | ORI2 | CIGAR | wt:f:x | 
-| Path | P | PID | LEN | CONTIGS | 
-| Scaffold set | C | SCFID | PIDs | 
-| Current scaffold set | A | SCFID | 
+#### Record types
+| Tag | Description | Comment | 
+| --- | --- | --- | 
+| H   | Header | optional |
+| S   | Sequence |  required | 
+| L   | Link |  optional | 
+| P   | Path |  optional | 
+| A   | Scaffold set |  optional | 
+| C   | Current scaffold set | optional | 
 
 
-## Limitation
+#### `H` Header
+| Col | Field | Regexp | Description | Comment | 
+| --- | --- | --- | --- | --- | 
+| 1 | TAG | `H` | Tag | Required | 
+| 2 | VER | `VN:Z:[0-9]\.[0-9]` | Version |  Required | 
+
+#### `S` Sequence 
+| Col | Field | Regexp | Description | Comment | 
+| --- | --- | --- | --- | --- | 
+| 1 | TAG | `S` | Tag | Required | 
+| 2 | SNAME | `.+` | Sequence name | Required, primary key | 
+| 3 | SLEN | `[0-9]+` | Sequence length | Required | 
+| 4 | SEQ | `\*|[A-Za-z]+` | Sequence | Required | 
+
+#### `L` Link
+| Col | Field | Regexp | Description | Comment | 
+| --- | --- | --- | --- | --- | 
+| 1 | TAG | `P` | Tag | Required | 
+| 2 | SRCS | `.+` | Source sequence name | Required, foregin key S:SNAME | 
+| 3 | SRCE | `[-+]` | Source end | Required, `+` for 5' end and `-` for 3' |
+| 4 | TGTS | `.+` | Target sequence name | Required, foregin key S:SNAME | 
+| 5 | TGTE |  `[-+]` | Target end | Required, `+` for 5' end and `-` for 3' |
+| 6 | WGT | `wt:f:[0-9]*\.?[0-9]+` | Link weight | Optional |
+
+#### `P` Path
+| Col | Field | Regexp | Description | Comment | 
+| --- | --- |  --- | --- | --- | 
+| 1 | TAG | `P` | Tag | Required | 
+| 2 | PNAME | `[cu][0-9]{9}` | Path name | Required, primary key | 
+| 3 | PLEN | `[0-9]+` | Path length | Required | 
+| 4 | NAMEL | `((.+[-+],)*(.+[-+]))|((u[0-9]{9}[-+],)*u[0-9]{9}[-+])` | List of sequence names or path names | Required, foregin keys S:SNAME | 
+
+#### `A` Scaffold set (or assembly set ?)
+| Col | Field | Regexp | Description | Comment | 
+| --- | --- |  --- | --- | --- | 
+| 1 | TAG | `A` | Tag | Required | 
+| 2 | ANAME | `a[0-9]{5}` | Scaffold set name | Required | 
+| 3 | PNAMEL | `([cu][0-9]{9},)*[cu][0-9]{9}` | List of path names | Required, foregin keys P:PNAME| 
+
+##### `C` Current scaffold set
+| Col | Field | Regexp | Description | Comment | 
+| --- | --- |  --- | --- | --- | 
+| 1 | TAG | `C` | Tag | Required | 
+| 2 | CNAME | `a[0-9]{5}` | Current scaffold set name | Required, foregin key A:ANAME
+
+#### Example 
+
+```
+H	VN:Z:0.1
+S	LR132056.1.4	138023	*
+S	LR132056.1.5	1128790	*
+S	LR132056.1.6	4496575	*
+P	u000000004	662215	LR132053.1.4+,LR132053.1.5+,LR132053.1.6+
+L	LR132051.1.5	+	LR132051.1.4	-	wt:f:0.028248
+L	LR132051.1.6	+	LR132051.1.5	-	wt:f:0.009367
+A	a00000	1	u000000004
+C	a00000
+```
+
+## Limitation 
 
 
 ## FAQ
 
 
-
 ## Contact
 
-Wellcome to use and distribute the package. Please use the github webpage to report an issue or email dfguan9@gmail.com with any advice. 
+Every one is Wellcomed to use and distribute the package. Bug report or any other suggestions, please use the github webpage or email me dfguan9@gmail.com. 

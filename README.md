@@ -156,7 +156,7 @@ SAT format is extended from the [GFA 1.0 format](https://github.com/GFA-spec/GFA
 | 1 | TAG | `S` | Tag | Required | 
 | 2 | SNAME | `.+` | Sequence name | Required, primary key | 
 | 3 | SLEN | `[0-9]+` | Sequence length | Required | 
-| 4 | SEQ | `\*|[A-Za-z]+` | Sequence | Required | 
+| 4 | SEQ | `\*\|[A-Za-z]+` | Sequence | Required | 
 
 #### `L` Link
 | Col | Field | Regexp | Description | Comment | 
@@ -174,7 +174,7 @@ SAT format is extended from the [GFA 1.0 format](https://github.com/GFA-spec/GFA
 | 1 | TAG | `P` | Tag | Required | 
 | 2 | PNAME | `[cu][0-9]{9}` | Path name | Required, primary key | 
 | 3 | PLEN | `[0-9]+` | Path length | Required | 
-| 4 | NAMEL | `((.+[-+],)*(.+[-+]))|((u[0-9]{9}[-+],)*u[0-9]{9}[-+])` | List of sequence names or path names | Required, foregin keys S:SNAME | 
+| 4 | NAMEL | `((.+[-+],)*(.+[-+]))\|((u[0-9]{9}[-+],)*u[0-9]{9}[-+])` | List of sequence names or path names | Required, foregin keys S:SNAME | 
 
 #### `A` Scaffold set (or assembly set ?)
 | Col | Field | Regexp | Description | Comment | 

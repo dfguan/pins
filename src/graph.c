@@ -1091,7 +1091,7 @@ int dump_sat(graph_t *g, char *fn)
 	/*fprintf(stderr, "output paths\n");*/
 	out_paths(g, fout);
 	/*fprintf(stderr, "output asms\n");*/
-	out_edges(g, 1, fout);
+	out_edges(g, 0, fout);
 	out_asms(g, fout);
 	if (fn) fclose(fout);
 	return 0;

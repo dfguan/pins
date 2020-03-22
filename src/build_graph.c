@@ -546,12 +546,12 @@ graph_t *nns_mst(cdict2_t *cds, sdict_t *ctgs)
 			idx[j++] = z-1;
 			/*fprintf(stderr, "%s%c\t", ctgs->seq[(z-1)>>1].name, (z-1) & 1 ? '+':'-');	*/
 		}
-		/*fprintf(stderr, "P\t");*/
+		fprintf(stderr, "P\t");
 		for (z = j - 1; z > 0; --z) {
-		   add_udedge(g, ctgs->seq[idx[z]>>1].name, !(idx[z] & 1), ctgs->seq[idx[z-1]>>1].name, (idx[z-1] & 1), vts[idx[z-1]].sc - vts[idx[z]].sc*1000000);
-			/*fprintf(stderr, "%s%c,",ctgs->seq[idx[z]>>1].name, idx[z] & 1 ? '+':'-');*/
+		   add_udedge(g, ctgs->seq[idx[z]>>1].name, !(idx[z] & 1), ctgs->seq[idx[z-1]>>1].name, (idx[z-1] & 1), (vts[idx[z-1]].sc - vts[idx[z]].sc)*1000000);
+			fprintf(stderr, "%s%c,",ctgs->seq[idx[z]>>1].name, idx[z] & 1 ? '+':'-');
 		}
-			/*fprintf(stderr, "%s%c\n",ctgs->seq[idx[z]>>1].name, idx[z] & 1 ? '+':'-');*/
+			fprintf(stderr, "%s%c\n",ctgs->seq[idx[z]>>1].name, idx[z] & 1 ? '+':'-');
 			/*fprintf(stderr, "\n");	*/
 			/*is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, use_nw?c->cnts[j].ncnt: c->cnts[j].cnt[idx] * 2/(len1 + len2));	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.*/
 	}	

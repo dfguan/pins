@@ -750,7 +750,7 @@ int merge_graph(graph_t *g, graph_t *c, int all)
 
 int process_graph(graph_t *g, int use_df)
 {
-	out_edges(g,0, stderr);
+	/*out_edges(g,0, stderr);*/
 	idx_edge(g);
 	clean_edges(g, use_df);
 	join_ends(g);

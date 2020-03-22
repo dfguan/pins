@@ -314,7 +314,7 @@ int det_ori(float *ws, int isf, int min_wt, float min_mdw, int amode)
 		if (ws[i] >= l) 
 				maxi = i, sl = l, l = ws[i];  
 		else if (ws[i] > sl) sl = ws[i];
-	if (l <= min_wt) return -1;
+	/*if (l <= min_wt) return -1;*/
 	if (amode) {
 		if (!isf) return -1;
 		else if (norm_cdf(l, 0.5, sl + l) <= min_mdw) return -1;

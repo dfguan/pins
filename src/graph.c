@@ -313,7 +313,7 @@ int add_dedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, fl
 	uint32_t eind = add_node(g, ename, 0, 0, 0);
 	edge_t e = (edge_t) {sind << 1 | sl, 0,  eind << 1 | er, 0, wt};
 	/*edge_t re = (edge_t) {eind << 1 | er, sind << 1 | sl, wt, 0, 0}; //undirect graph*/
-	/*fprintf(stderr, "%s %s\n", sname, ename);	*/
+	fprintf(stderr, "%s %u %s %u\n", sname, sl, ename, er);	
 	/*fprintf(stderr, "EDGE %u\t%u\n",sind<<1|sl, eind << 1 | er);	*/
 	add_edge1(g, &e);
 	/*add_edge1(g, &re);*/
@@ -750,8 +750,8 @@ int merge_graph(graph_t *g, graph_t *c, int all)
 
 int process_graph(graph_t *g, int use_df)
 {
+	out_edges(g,0, stderr);
 	idx_edge(g);
-	/*out_edges(g,0, stderr);*/
 	clean_edges(g, use_df);
 	join_ends(g);
 	update_graph(g);
@@ -1091,7 +1091,7 @@ int dump_sat(graph_t *g, char *fn)
 	/*fprintf(stderr, "output paths\n");*/
 	out_paths(g, fout);
 	/*fprintf(stderr, "output asms\n");*/
-	out_edges(g, 0, fout);
+	out_edges(g, 1, fout);
 	out_asms(g, fout);
 	if (fn) fclose(fout);
 	return 0;

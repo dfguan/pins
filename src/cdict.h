@@ -68,6 +68,7 @@ void cd_filt(cdict_t *c, uint32_t n, float min_rat);
     void cd2_add(cdict2_t *c, uint32_t is_l1, const char *name, uint32_t is_l2, float cnt);
 	void cd2_sort(cdict2_t *c);
 	void cd2_set_lim(cdict2_t *c, uint32_t n, int cann);
+	int32_t cd2_get(cdict2_t *c, char *name);
 #ifdef __cplusplus
 }
 #endif

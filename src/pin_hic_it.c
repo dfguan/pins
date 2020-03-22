@@ -37,17 +37,20 @@ int main(int argc, char *argv[])
 	int norm = 1, brk = 1;
 	char *program;
 	char *sat_fn = 0, *faidx_fn = 0, *seq_fn = 0;
-	int use_sat = 0;
+	int use_sat = 0, use_mst = 0;
 	char *outdir = ".";
 	/*int use_min_dist = 0;*/
 	float min_mdw = 0.95;
 	int cann = 3;
-	int min_wt = 100, amode = 0, use_nw = 1;
+	int min_wt = 100, amode = 0, use_nw = 1, usep = 0, igm = 0;
 	uint32_t min_l  = 0;
 	float min_rat = 0.2;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
-	while (~(c=getopt(argc, argv, "O:aq:nec:m:d:s:br:w:i:l:x:vh"))) {
+	while (~(c=getopt(argc, argv, "O:aq:nec:m:d:s:br:w:i:l:x:vhgp1"))) {
 		switch (c) {
+			case '1':
+				use_mst = 1;
+				break;
 			case 'q':
 				min_mq = atoi(optarg);
 				break;
@@ -56,6 +59,12 @@ int main(int argc, char *argv[])
 				break;
 			case 'b':
 				brk = 0;
+				break;
+			case 'g':
+				igm = 1;
+				break;
+			case 'p':
+				usep = 1;
 				break;
 			case 'O':
 				outdir = optarg;
@@ -102,8 +111,11 @@ int main(int argc, char *argv[])
 help:	
 				fprintf(stderr, "\nUsage: %s [options] <BAM_FILEs> ...\n", program);
 				fprintf(stderr, "Options:\n");
+				fprintf(stderr, "         -1    BOOL     use MST for scaffolding [FALSE]\n");
 				fprintf(stderr, "         -i    INT      iteration times [3]\n");
 				fprintf(stderr, "         -a    BOOL     accurate mode [FALSE]\n");
+				fprintf(stderr, "         -g    BOOL     ignore middle part of contigs [FALSE]\n");
+				fprintf(stderr, "         -p    BOOL     use product [FALSE]\n");
 				fprintf(stderr, "         -O    STR      output directory [.]\n");
 				fprintf(stderr, "         -q    INT      minimum mapping quality [10]\n");
 				fprintf(stderr, "         -w    INT      minimum contact number [100]\n");
@@ -162,9 +174,9 @@ help:
 		//input sat_fn output mat_fn
 		sprintf(sat_nfn, "%s/scaffs.%02d.sat", outdir, i);
 		sprintf(mat_fn, "%s/links.%02d.mat", outdir, i);
-		col_hic_lnks(sat_ofn, bam_fn, n_bam, min_mq, 5000, 0, 0, mat_fn);
+		col_hic_lnks(sat_ofn, bam_fn, n_bam, min_mq, 5000, 0, 0, igm, mat_fn);
 		/*fprintf(stderr, "%p\n", sat_nfn);*/
-		buildg_hic(use_sat ? sat_ofn : faidx_fn, mat_fn, min_wt, use_sat, norm, min_mdw, cann, sat_nfn, use_nw, amode);
+		buildg_hic(use_sat ? sat_ofn : faidx_fn, mat_fn, min_wt, use_sat, norm, min_mdw, cann, sat_nfn, use_nw, amode, igm, usep);
 		//get seq at the final round
 		
 		strcpy(sat_ofn, sat_nfn);

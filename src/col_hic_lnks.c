@@ -191,21 +191,25 @@ int col_contacts(hit_ary_t *hit_ary, sdict_t *sd, cdict_t *cs, int use_min_dist)
 	sdict_t *use_sd = sd;
 	hit_t *hs = hit_ary->ary;
 	size_t n = hit_ary->n;
+       /*for (i = 0; i < n; ++i) {*/
+		/*fprintf(stderr, "%u\t%u\t%u\t%u\n", hit_ary->ary[i].c1ns >> 32,(uint32_t) hit_ary->ary[i].c1ns, hit_ary->ary[i].c2ns >> 32, (uint32_t) hit_ary->ary[i].c2ns);*/
+	/*}	*/
 	for (i = 0, j = 1; j <= n; ++j) {
 		if (j == n || hs[i].c1ns != hs[j].c1ns || hs[i].c2ns != hs[j].c2ns || hs[i].qrev != hs[j].qrev || hs[i].trev != hs[j].trev) {
-			
 			uint32_t ind1 = hs[i].c1ns >> 32; 
 			uint32_t ind2 = hs[i].c2ns >> 32; 
 			uint32_t a0s = (uint32_t) hs[i].c1ns; 
 			uint32_t a1s = (uint32_t) hs[i].c2ns; 
 			uint32_t is_l1 = check_left_half(use_sd->seq[ind1].le, use_sd->seq[ind1].rs, a0s);
-			if (is_l1 > 1) continue; //middle won't be added
-			uint32_t is_l2 = check_left_half(use_sd->seq[ind2].le, use_sd->seq[ind2].rs, a1s);
-			if (is_l2 > 1) continue; //middle won't be added
-			uint32_t min_dist = is_l1 ? a0s : use_sd->seq[ind1].len - a0s; 
-			min_dist += is_l2 ? a1s : use_sd->seq[ind2].len - a1s;	
-			cd_add(&cs[ind1<<1|is_l1], use_sd->seq[ind2].name, is_l2, is_l2?use_sd->seq[ind2].l_snp_n:use_sd->seq[ind2].r_snp_n, use_min_dist ? 1.0 / min_dist : 1.0);		
-			cd_add(&cs[ind2<<1|is_l2], use_sd->seq[ind1].name, is_l1, is_l1?use_sd->seq[ind1].l_snp_n:use_sd->seq[ind1].r_snp_n, use_min_dist ? 1.0 /min_dist : 1.0);	//use min_dist here	
+			if (is_l1 < 2) { //middle won't be added
+				uint32_t is_l2 = check_left_half(use_sd->seq[ind2].le, use_sd->seq[ind2].rs, a1s);
+				if (is_l2 < 2) { //middle won't be added
+					uint32_t min_dist = is_l1 ? a0s : use_sd->seq[ind1].len - a0s; 
+					min_dist += is_l2 ? a1s : use_sd->seq[ind2].len - a1s;	
+					cd_add(&cs[ind1<<1|is_l1], use_sd->seq[ind2].name, is_l2, is_l2?use_sd->seq[ind2].l_snp_n:use_sd->seq[ind2].r_snp_n, use_min_dist ? 1.0 / min_dist : 1.0);		
+					cd_add(&cs[ind2<<1|is_l2], use_sd->seq[ind1].name, is_l1, is_l1?use_sd->seq[ind1].l_snp_n:use_sd->seq[ind1].r_snp_n, use_min_dist ? 1.0 /min_dist : 1.0);	//use min_dist here	
+				}
+			}
 			i = j;	
 		}
 	}
@@ -301,11 +305,13 @@ int col_hits(aln_inf_t *f, int f_cnt, sdict_t *ctgs, sdict_t *scfs, hit_ary_t *h
 			if (ind1 < ind2) {
 				uint64_t c1ns = (uint64_t)ind1 << 32 | f[0].s; //don't think there will be 2G contig, if happends might be a bug 
 				uint64_t c2ns = (uint64_t)ind2 << 32 | f[1].s; //don't think there will be 2G contig, if happends might be a bug 
+				/*fprintf(stderr, "%u\t%u\t%u\t%u\n", ind1, f[0].s, ind2, f[1].s);*/
 				hit_t h = (hit_t) {c1ns, f[0].rev, c2ns, f[1].rev}; 
 				hit_ary_push(hit_ary, &h);	
 			} else {
 				uint64_t c1ns = (uint64_t)ind2 << 32 | f[1].s; //don't think there will be 2G contig, if happends might be a bug 
 				uint64_t c2ns = (uint64_t)ind1 << 32 | f[0].s; //don't think there will be 2G contig, if happends might be a bug 
+				/*fprintf(stderr, "%u\t%u\t%u\t%u\n", ind1, f[0].s, ind2, f[1].s);*/
 				hit_t h = (hit_t) {c1ns, f[1].rev, c2ns, f[0].rev}; 
 				hit_ary_push(hit_ary, &h);	
 			}
@@ -433,7 +439,7 @@ int init_ctgs(graph_t *g, sdict_t* ctgs)
 }
 
 
-int init_scaffs(graph_t *g, sdict_t *ctgs, sdict_t *scfs)
+int init_scaffs(graph_t *g, sdict_t *ctgs, sdict_t *scfs, int igm)
 {
 	/*dump_sat(g);*/
 	asm_t *as = &g->as.asms[g->as.casm];
@@ -462,13 +468,16 @@ int init_scaffs(graph_t *g, sdict_t *ctgs, sdict_t *scfs)
 				len += len_ctg + 200;
 		}
 		//reset scaffold length le rs l_snp_n, r_snp_n
-		sd_put4(scfs, pt[as->pn[i]>>1].name, len, len >> 1, (len >>1) + 1, len >> 1, len >> 1, pt[as->pn[i]>>1].is_circ);
+		if (igm) 
+			sd_put4(scfs, pt[as->pn[i]>>1].name, len, (uint32_t)(1.0/3 * len), (uint32_t)(2.0/3 * len) + 1, (uint32_t)(1.0/3 * len), (uint32_t)(1.0/3 * len), pt[as->pn[i]>>1].is_circ);
+		else 
+			sd_put4(scfs, pt[as->pn[i]>>1].name, len, len >> 1, (len >>1) + 1, len >> 1, len >> 1, pt[as->pn[i]>>1].is_circ);
 		free(p);
 	}
 	return 0;
 }
 
-int chl_col_ctgs(char *bam_fn, sdict_t *ctgs, uint32_t ws)
+int chl_col_ctgs(char *bam_fn, sdict_t *ctgs, int  igm)
 {
 	bamFile fp;
 	bam_header_t *h;
@@ -507,6 +516,7 @@ int chl_col_ctgs(char *bam_fn, sdict_t *ctgs, uint32_t ws)
 		uint32_t rs = (len >> 1) + 1;
 		uint32_t lenl, lenr;
 		lenl = lenr = len >> 1;
+		if (igm) le = (uint32_t)(1.0/3 * len), rs = (uint32_t)(2.0/3*len) + 1, lenl = lenr = le;
 		sd_put4(ctgs, name, len, le, rs, lenl, lenr, 0);
 	}
 	bam_destroy1(b);
@@ -515,10 +525,10 @@ int chl_col_ctgs(char *bam_fn, sdict_t *ctgs, uint32_t ws)
 	return 0;
 }
 
-int init_seqs(char *fn, sdict_t *ctgs, sdict_t *scfs)
+int init_seqs(char *fn, sdict_t *ctgs, sdict_t *scfs, int igm)
 {
 	graph_t *g = load_sat(fn);
-	init_scaffs(g, ctgs, scfs);
+	init_scaffs(g, ctgs, scfs, igm);
 	graph_destroy(g);
 	return 0;
 }
@@ -526,7 +536,7 @@ int init_seqs(char *fn, sdict_t *ctgs, sdict_t *scfs)
 
 /*int aa_10x_hic(char *bam_fn, int min_as, int min_mq, int min_cov, float min_cov_rat, int max_cov, float max_cov_rat)*/
 /*int aa_hic(char *bam_fn, int min_as, int min_mq, int min_cov, int max_cov, uint32_t max_ins_len)*/
-int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t win_s, int use_min_dist, int ca, char *out_fn)
+int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t win_s, int use_min_dist, int ca, int igm, char *out_fn)
 {
 
 	/*uint32_t n_cds = ctgs->n_seq<<1;*/
@@ -538,7 +548,7 @@ int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t wi
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] initiate contigs\n", __func__);
 #endif
-	chl_col_ctgs(bam_fn[0], ctgs, win_s);	
+	chl_col_ctgs(bam_fn[0], ctgs, igm);	
 	if (!ctgs) {
 		fprintf(stderr, "[E::%s] fail to collect contigs\n", __func__);	
 		return 1;
@@ -547,7 +557,7 @@ int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t wi
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] collect scaffolds\n", __func__);
 #endif
-		init_seqs(sat_fn, ctgs, scfs);	
+		init_seqs(sat_fn, ctgs, scfs, igm);	
 		if (!scfs->n_seq) {
 			fprintf(stderr, "[E::%s] fail to collect scaffolds\n", __func__);	
 			return 1;
@@ -569,7 +579,7 @@ int col_hic_lnks(char *sat_fn, char **bam_fn, int n_bam, int min_mq, uint32_t wi
 	if (!hit_ary->ary) {
 		fprintf(stderr, "[W::%s] no qualified hits found in the alignments\n", __func__);
 		return 1;
-	} 
+	}
 	qsort(hit_ary->ary, hit_ary->n, sizeof(hit_t), cmp_hits);	
 	//col joints
 	sdict_t *_sd = scfs->n_seq ? scfs : ctgs;
@@ -601,14 +611,18 @@ int main_hic_lnks(int argc, char *argv[])
 	/*int min_as = 0;*/
 	/*uint32_t max_ins_len = 10000;*/
 	uint32_t win_s = 50000;
+	int igm = 0;
 	char *program;
 	char *sat_fn = 0, *out_fn = 0;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
 	--argc, ++argv;
-	while (~(c=getopt(argc, argv, "q:w:ads:h"))) {
+	while (~(c=getopt(argc, argv, "q:w:ads:hg"))) {
 		switch (c) {
 			case 'a':
 				ca = 1;
+				break;
+			case 'g':
+				igm = 1;
 				break;
 			case 'q':
 				min_mq = atoi(optarg);
@@ -631,6 +645,7 @@ help:
 				fprintf(stderr, "\nUsage: %s %s [options] <BAM_FILE>\n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
 				fprintf(stderr, "         -a    BOOL     collect all contacts [FALSE]\n");
+				fprintf(stderr, "         -g    BOOL     ignore middle [FALSE]\n");
 				fprintf(stderr, "         -q    INT      minimum alignment quality [10]\n");
 				fprintf(stderr, "         -s    STR      sat file\n");
 				fprintf(stderr, "         -d    BOOL     use minimum dist to normalize weight [FALSE]\n");
@@ -645,7 +660,7 @@ help:
 	char **bam_fn = &argv[optind];
 	int n_bam = argc - optind;
 	fprintf(stderr, "Program starts\n");	
-	col_hic_lnks(sat_fn, bam_fn, n_bam, min_mq, win_s, use_min_dist, ca, out_fn);
+	col_hic_lnks(sat_fn, bam_fn, n_bam, min_mq, win_s, use_min_dist, ca, igm, out_fn);
 	fprintf(stderr, "Program ends\n");	
 	return 0;	
 }

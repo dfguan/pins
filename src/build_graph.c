@@ -27,6 +27,10 @@
 #include "sdict.h"
 #include "cdict.h"
 #include "utls.h"
+#include "mst.h"
+#include "kvec.h"
+
+
 
 sdict_t *col_ctgs(char *fn)
 {
@@ -217,7 +221,19 @@ graph_t *build_graph(cdict_t *cds, sdict_t *ctgs)
 	return g;
 }
 
-int norm_links(cdict2_t *cds, sdict_t *ctgs, int norm)
+float dif(float *a, int n)
+{
+	int i;
+	int maxi = 0; float maxv = a[0];
+	for (i = 1; i < n; ++i) if (a[i] > maxv) maxv = a[i], maxi=i;
+	float parv = a[n-1-maxi];//only works for 4 
+	++maxv, ++parv; //in case parv is zero
+	return 2.0;
+	/*fprintf(stderr, "DIF\t%f\t%f\t%f\n", maxv, parv, maxv/parv);*/
+	return maxv/parv;
+}
+
+int norm_links(cdict2_t *cds, sdict_t *ctgs, int norm, int igm, int usep, int min_wt)
 {
 	uint32_t n_cds = ctgs->n_seq;
 	uint32_t i;
@@ -225,7 +241,7 @@ int norm_links(cdict2_t *cds, sdict_t *ctgs, int norm)
 	for ( i = 0; i < n_cds; ++i) {
 		/*char *name1 = ctgs->seq[i>>1].name;*/
 		/*uint32_t snpn = i&1 ? ctgs->seq[i>>1].l_snp_n:ctgs->seq[i>>1].r_snp_n;*/
-		uint32_t len1 = ctgs->seq[i].len;
+		float len1 = ctgs->seq[i].len;
 		uint32_t j;
 		c = cds + i;
 		float icnt;
@@ -234,10 +250,51 @@ int norm_links(cdict2_t *cds, sdict_t *ctgs, int norm)
             /*fprintf(stderr, "%s\n", c->cnts[j].name);*/
 			char *name2 = c->cnts[j].name; 
             uint32_t ctg2_idx = sd_get(ctgs, name2);
-			uint32_t len2 = ctgs->seq[ctg2_idx].len; 
+			float len2 = ctgs->seq[ctg2_idx].len; 
 			icnt = c->cnts[j].cnt[0] + c->cnts[j].cnt[1] + c->cnts[j].cnt[2] + c->cnts[j].cnt[3]; 
             /*c->cnts[j].ncnt = norm ? (float) icnt / ctgs->seq[ctg2_idx].len : (float) icnt;*/
-            c->cnts[j].ncnt = norm ? icnt / (len1/2 + len2/2) : icnt;
+            /*c->cnts[j].ncnt = norm ? icnt / (len1/2 + len2/2) : icnt;*/
+			float mul = 2.0;
+			if (igm) mul = 3;
+			float div = len1 + len2; //float range 3.4E+38
+			if (usep) mul *= mul, div = len1 * len2; 
+			c->cnts[j].ncnt = 0.0;
+			if (icnt > min_wt)  c->cnts[j].ncnt = icnt * mul / div;
+			uint32_t k;
+			for (k = 0; k < 4; ++k) 
+				if (icnt > min_wt) c->cnts[j].cnt[k] = c->cnts[j].cnt[k] * mul / div;
+				else c->cnts[j].cnt[k] = 0;
+			
+			/*int sel = igm << 1 | usep;*/
+			/*if (sel == 0) {*/
+					/*c->cnts[j].ncnt = icnt * 2 / (len1 + len2);*/
+			
+			/*} else if (sel == 1) {*/
+					/*c->cnts[j].ncnt = icnt * 4 / len1 / len2;*/
+			/*} else if (sel == 2) {*/
+					/*c->cnts[j].ncnt = icnt * 3 / len1 + len2;*/
+
+			/*} else if (sel == 3) {*/
+					/*c->cnts[j].ncnt = icnt * 9 / len1 / len2;*/
+			
+			
+			/*}*/
+			/*switch ((igm << 1)|usep) */
+			/*{*/
+				/*case 0:*/
+					/*break;*/
+				/*case 1:*/
+					/*break;*/
+				/*case 2:*/
+					/*break;*/
+				/*case 3:*/
+					/*break;*/
+			/*}*/
+			/*else*/
+				/*c->cnts[j].ncnt *= (dif(c->cnts[j].cnt, 4) - 1);*/
+
+				/*c->cnts[j].ncnt = icnt / (len1/3 + len2/3);*/
+
             /*c->cnts[j].ncnt = (float) icnt / (ctgs->seq[ctg2_idx].l_snp_n + ctgs->seq[ctg2_idx].r_snp_n);*/
             /*uint32_t z;*/
             /*for ( z = 0; z < 4; ++z) c->cnts[j].fcnt[z] = (float) c->cnts[j].cnt[z]/(z >> 1 ? ctgs->seq[i].l_snp_n : ctgs->seq[i].r_snp_n) / ( z & 0x1 ? ctgs->seq[ctg2_idx].l_snp_n : ctgs->seq[ctg2_idx].r_snp_n);  */
@@ -273,14 +330,246 @@ int det_ori(float *ws, int isf, int min_wt, float min_mdw, int amode)
 	/*else*/
 		   /*return maxi;	*/
 }
-graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs, int min_wt, float min_mdw, int use_nw, int amode)
+
+
+int cmp_v(const void *a, const void *b)
+{
+	mst_edge_t *p = (mst_edge_t *)a;
+	mst_edge_t *q = (mst_edge_t *)b;
+	if (p->s < q->s) return -1;
+	else if (p->s > q->s) return 1;
+	else return 0;	
+}
+
+graph_t *nns_mst(cdict2_t *cds, sdict_t *ctgs)
 {
 	graph_t *g = graph_init();
 	
 	uint32_t i, j;
 	//create nodes
 	for ( i = 0; i < ctgs->n_seq; ++i) {
-		fprintf(stderr, "add node %s %d\n", ctgs->seq[i].name, ctgs->seq[i].is_circ);
+		add_node(g, ctgs->seq[i].name, 0, ctgs->seq[i].len, ctgs->seq[i].is_circ);
+	}
+	//create edges
+	kvec_t(mst_edge_t) mets;
+	kv_init(mets);
+	mst_edge_t tmp;
+	for ( i = 0; i < ctgs->n_seq; ++i) {
+		char *name1 = ctgs->seq[i].name;
+		uint32_t len1 = ctgs->seq[i].len;
+		cdict2_t *c = cds + i;	
+		int isf = 1;
+		for (j = 0; j < c->lim; ++j) {
+			char *name2 = c->cnts[j].name;
+			if (strcmp(name1, name2) == 0) continue;
+			//hsortand shaking
+			/*fprintf(stderr, "try hand shaking\n");*/
+			uint32_t ind = sd_get(ctgs, name2);
+			uint32_t k;
+			uint8_t hand_shaking = 0;
+			uint32_t is_l, is_l2;
+			uint32_t len2 = ctgs->seq[ind].len;
+			for ( k = 0; k < cds[ind].lim; ++k) {
+					if (strcmp(name1, cds[ind].cnts[k].name) == 0) {
+						hand_shaking = 1;
+						break;
+					}
+			}	
+			if (!hand_shaking) continue;
+			if (i < ind) {
+				tmp = (mst_edge_t){i, ind, j, 0, c->cnts[j].ncnt};
+				kv_push(mst_edge_t, mets, tmp);
+			}
+			//vertex degrees
+
+				/*fprintf(stderr, "E\t%s\t%s\t%f\n",name1, name2, c->cnts[j].ncnt);*/
+			/*int idx;*/
+			/*if (~(idx = det_ori(c->cnts[j].cnt, isf, min_wt, min_mdw, amode))) */
+			
+				// if build in accurate mode 
+			/*if (~(idx = det_ori(c->cnts[j].cnt)))*/
+			/*uint32_t hh = c->cnts[j].cnt[0];*/
+			/*uint32_t ht = c->cnts[j].cnt[1];*/
+			/*uint32_t th = c->cnts[j].cnt[2];*/
+			/*uint32_t tt = c->cnts[j].cnt[3];*/
+			/*uint32_t tl = c->cnts[j].cnt[2] + c->cnts[j].cnt[3];*/
+			/*uint32_t hd = c->cnts[j].cnt[0] + c->cnts[j].cnt[1];	*/
+			/*uint32_t hd2 = c->cnts[j].cnt[0] + c->cnts[j].cnt[2];*/
+			/*uint32_t tl2 = c->cnts[j].cnt[1] + c->cnts[j].cnt[3];*/
+			/*if (tl != hd) */
+					/*is_l = tl > hd ? 0 : 1; */
+			/*else */
+					/*continue;*/
+			/*if (hd2 != tl2) */
+					/*is_l2 = tl2 > hd ? 0 : 1; 	*/
+			/*else */
+					/*continue;*/
+			//when min_wt == -1; don't normalize weight 
+			/*is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, ~min_wt?c->cnts[j].cnt[idx] / (len1 / 2 + len2 / 2) : c->cnts[j].cnt[idx]);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.*/
+			/*is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, use_nw?c->cnts[j].ncnt: c->cnts[j].cnt[idx] * 2/(len1 + len2));	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.*/
+			/*isf = 0;*/
+		}		
+	}	
+	mst_edge_t *in_mst = mets.a;
+	_kmst(mets.a, mets.n, ctgs->n_seq);	
+	for (i = 0; i < ctgs->n_seq; ++i) ctgs->seq[i].snp_n = 0;
+	for (i = 0; i < mets.n; ++i) {
+		if (in_mst[i].in_mst) {
+			uint32_t v = in_mst[i].s;
+			uint32_t w = in_mst[i].d;
+			++ctgs->seq[v].snp_n, ++ctgs->seq[w].snp_n;
+		}
+	}
+	// filter out the vertices with more than 2 degrees			
+	uint64_t *idx = (uint64_t *)calloc(ctgs->n_seq, sizeof(uint64_t));
+	for (i = 0, j = 0; i < mets.n; ++i) {
+		if (in_mst[i].in_mst) {
+			uint32_t v = in_mst[i].s;
+			uint32_t w = in_mst[i].d;
+			if (ctgs->seq[v].snp_n > 2 || ctgs->seq[w].snp_n > 2) 
+				in_mst[i].in_mst = 0, ++idx[v], ++idx[w];
+			else
+				in_mst[j++] = in_mst[i]; 
+		} 	
+	}
+	for (i = 0; i < ctgs->n_seq; ++i) ctgs->seq[i].snp_n -= idx[i];
+	mets.n = j;
+	for (i = 0; i < mets.n; ++i)  fprintf(stderr, "E\t%s\t%s\t%u\t%u\t%f\n", ctgs->seq[in_mst[i].s].name, ctgs->seq[in_mst[i].d].name, ctgs->seq[in_mst[i].s].len, ctgs->seq[in_mst[i].d].len, in_mst[i].wt*10000);
+	// double the edges and index
+	for (i = 0; i < j; ++i) {
+		uint32_t v = mets.a[i].s;
+		uint32_t w = mets.a[i].d;
+		uint32_t aux = mets.a[i].aux;
+		tmp = (mst_edge_t){w, v, aux, 0, 0};
+		kv_push(mst_edge_t, mets, tmp);
+	}	
+	qsort(mets.a, mets.n, sizeof(mst_edge_t), cmp_v);	
+	//index 
+	memset(idx, 0, ctgs->n_seq * sizeof(uint64_t));
+	in_mst = mets.a; // mets.a may have been changed
+	for (i = 1, j = 0; i <= mets.n; ++i) {
+		if (i==mets.n || in_mst[i].s != in_mst[j].s) {
+			/*fprintf(stderr, "s: %u d: %u\n", in_mst[j].s, in_mst[j].d);*/
+			idx[in_mst[j].s] = ((uint64_t)j << 32 | (i -j)) << 1 | 0;
+			j = i;	
+		}
+	}
+		
+	// search for 1 degree node and use dynamic programming to find paths
+	typedef struct {
+		float	sc;
+		int		bt;
+	} vsc_t;
+	vsc_t *vts = (vsc_t *)calloc(ctgs->n_seq<<1, sizeof(vsc_t)); //0 h 1 t
+	kvec_t(uint32_t) endv;
+	kv_init(endv);
+
+	for (i = 0; i < ctgs->n_seq; ++i) {
+		if (idx[i] & 0x1) continue; //visited before
+		if (ctgs->seq[i].snp_n == 1) {
+			//start node	
+			// looking for next node
+			uint32_t zprev = -1, z = i, pos;
+			/*fprintf(stderr, "S: %s zprev:%d z:%d\n", ctgs->seq[z].name, zprev, z);*/
+			while (1) {
+				for (pos = idx[z]>>33; pos < (idx[z]>>33) + (uint32_t)(idx[z]>>1); ++pos) 
+					if (in_mst[pos].d != zprev) break;
+				uint32_t znext = in_mst[pos].d;
+				/*fprintf(stderr, "M: %s zprev:%d z:%d pos: %d %d znext: %d\n", ctgs->seq[z].name, zprev, z,idx[z]>>1, idx[z+1]>>1, znext);*/
+				uint32_t aux = in_mst[pos].aux;
+				uint32_t lenz = ctgs->seq[z].len;
+				uint32_t lenznext = ctgs->seq[znext].len;
+				float hh, ht, th, tt, ort_cnt[4];
+				if (in_mst[pos].in_mst) { // 
+					float *_cnts = cds[z].cnts[aux].cnt;		
+					/*fprintf(stderr, "%s\t%s\t%f\t%f\t%f\t%f\n", ctgs->seq[z].name, ctgs->seq[znext].name, _cnts[0], _cnts[1], _cnts[2], _cnts[3]);*/
+					ort_cnt[0] = _cnts[0], ort_cnt[1] = _cnts[1], ort_cnt[2] = _cnts[2], ort_cnt[3] = _cnts[3];
+					/*hh = _cnts[0]*2/(lenz + lenznext);*/
+					/*ht = _cnts[1]*2/(lenz + lenznext);*/
+					/*th = _cnts[2]*2/(lenz + lenznext);*/
+					/*tt = _cnts[3]*2/(lenz + lenznext);*/
+					/*hh = _cnts[0]*4/lenz / lenznext;*/
+					/*ht = _cnts[1]*4/lenz / lenznext;*/
+					/*th = _cnts[2]*4/lenz / lenznext;*/
+					/*tt = _cnts[3]*4/lenz / lenznext;*/
+				} else {
+					float *_cnts = cds[znext].cnts[aux].cnt;		
+					/*fprintf(stderr, "%s\t%s\t%f\t%f\t%f\t%f\n", ctgs->seq[z].name, ctgs->seq[znext].name, _cnts[0], _cnts[2], _cnts[1], _cnts[3]);*/
+					ort_cnt[0] = _cnts[0], ort_cnt[1] = _cnts[2], ort_cnt[2] = _cnts[1], ort_cnt[3] = _cnts[3];
+					/*hh = _cnts[0]*2/(lenz + lenznext);*/
+					/*ht = _cnts[2]*2/(lenz + lenznext);*/
+					/*th = _cnts[1]*2/(lenz + lenznext);*/
+					/*tt = _cnts[3]*2/(lenz + lenznext);*/
+					/*hh = _cnts[0]*2/(lenz * lenznext);*/
+					/*ht = _cnts[2]*2/(lenz * lenznext);*/
+					/*th = _cnts[1]*2/(lenz * lenznext);*/
+					/*tt = _cnts[3]*2/(lenz * lenznext);*/
+				}	
+				
+				if (vts[z<<1].sc + ort_cnt[2] > vts[z << 1 | 1].sc + ort_cnt[0]) {
+					// -> ->  th                     <- -> hh
+					vts[znext << 1].sc = vts[i<<1].sc + ort_cnt[2];
+					vts[znext << 1].bt = ( z << 1 ) + 1;//plus 1 here to use 0 indicate an end
+				} else {
+					vts[znext << 1].sc = vts[i<<1|1].sc + ort_cnt[0];
+					vts[znext << 1].bt = (z << 1 | 1 ) + 1;
+				}
+
+				if (vts[z<<1].sc + ort_cnt[3] > vts[z << 1 | 1].sc + ort_cnt[1]) {
+					// -> <-  tt                <- <- ht
+					vts[znext << 1 | 1].sc = vts[z<<1].sc + ort_cnt[3];
+					vts[znext << 1 | 1].bt = (z << 1 ) + 1;
+				} else {
+					vts[znext << 1 | 1].sc = vts[z<<1|1].sc + ort_cnt[1];
+					vts[znext << 1 | 1].bt = (z << 1 | 1) + 1;
+				}
+				zprev = z, z = znext;	
+				idx[znext] |= 1; //set visited
+				if (ctgs->seq[znext].snp_n == 1) {
+				
+					/*fprintf(stderr, "D: %s zprev:%d z:%d znext: %d\n", ctgs->seq[z].name, zprev, z, znext);*/
+					if (vts[znext << 1 | 1].sc > vts[znext << 1].sc) 
+						kv_push(uint32_t, endv, (znext<<1 | 1)+1);
+					else
+						kv_push(uint32_t, endv, (znext<<1) + 1);
+					break;
+				}	
+			}
+		} 
+	}
+	// traverse up the path 
+	for (i = 0; i < endv.n; ++i) {
+		uint32_t z;
+		j = 0;
+		for (z = endv.a[i]; z; z = vts[z - 1].bt) {
+			/*fprintf(stderr, "z: %d\n", z >> 1);*/
+			idx[j++] = z-1;
+			/*fprintf(stderr, "%s%c\t", ctgs->seq[(z-1)>>1].name, (z-1) & 1 ? '+':'-');	*/
+		}
+		/*fprintf(stderr, "P\t");*/
+		for (z = j - 1; z > 0; --z) {
+		   add_udedge(g, ctgs->seq[idx[z]>>1].name, !(idx[z] & 1), ctgs->seq[idx[z-1]>>1].name, (idx[z-1] & 1), vts[idx[z-1]].sc - vts[idx[z]].sc*1000000);
+			/*fprintf(stderr, "%s%c,",ctgs->seq[idx[z]>>1].name, idx[z] & 1 ? '+':'-');*/
+		}
+			/*fprintf(stderr, "%s%c\n",ctgs->seq[idx[z]>>1].name, idx[z] & 1 ? '+':'-');*/
+			/*fprintf(stderr, "\n");	*/
+			/*is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, use_nw?c->cnts[j].ncnt: c->cnts[j].cnt[idx] * 2/(len1 + len2));	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.*/
+	}	
+	kv_destroy(endv);	
+	free(vts);
+	free(idx);
+	kv_destroy(mets);
+	return g;
+}
+
+graph_t *nns_straight(cdict2_t *cds, sdict_t *ctgs, int min_wt, float min_mdw, int use_nw, int amode)
+{
+	graph_t *g = graph_init();
+	
+	uint32_t i, j;
+	//create nodes
+	for ( i = 0; i < ctgs->n_seq; ++i) {
+		/*fprintf(stderr, "add node %s %d\n", ctgs->seq[i].name, ctgs->seq[i].is_circ);*/
 		add_node(g, ctgs->seq[i].name, 0, ctgs->seq[i].len, ctgs->seq[i].is_circ);
 	}
 	//create edges
@@ -331,13 +620,14 @@ graph_t *build_graph_hic(cdict2_t *cds, sdict_t *ctgs, int min_wt, float min_mdw
 					/*continue;*/
 			//when min_wt == -1; don't normalize weight 
 			/*is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, ~min_wt?c->cnts[j].cnt[idx] / (len1 / 2 + len2 / 2) : c->cnts[j].cnt[idx]);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.*/
-			is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, use_nw?c->cnts[j].ncnt: c->cnts[j].cnt[idx] * 2/(len1 + len2));	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.
+			is_l = idx >> 1, is_l2 = idx & 1, add_dedge(g, name1, is_l, name2, is_l2, c->cnts[j].cnt[idx]);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.
 			/*isf = 0;*/
 		}		
 	}	
 	return g;
 }
-int buildg_hic(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min_mdw, int mlc, char *out_fn, int use_nw, int amode)
+
+int buildg_hic(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min_mdw, int mlc, char *out_fn, int use_nw, int amode, int igm, int usep, int use_mst)
 {
 	/*fprintf(stderr, "%s %s\n", fn, edge_fn);*/
 	/*fprintf(stderr, "%d %d\n", min_wt, use_sat);*/
@@ -377,7 +667,7 @@ int buildg_hic(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float
 	/*return 0;*/
 	/*if (norm) for (i = 0; i < n_cds; ++i) cd_norm(cds + i);*/
 	/*print_cdict2(cds, ctgs);	*/
-	norm_links(cds, ctgs, norm);
+	norm_links(cds, ctgs, norm, igm, usep, min_wt);
 	for ( i = 0; i < n_ctg; ++i) cd2_sort(cds+i); 
 	/*print_cdict2(cds, ctgs);	*/
 	cd2_set_lim(cds, n_ctg, mlc); 
@@ -389,7 +679,11 @@ int buildg_hic(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] building graph\n", __func__);
 #endif
-	graph_t *g = build_graph_hic(cds, ctgs, min_wt, min_mdw, use_nw, amode);
+	graph_t *g = 0;
+	if (use_mst) 
+		g = nns_mst(cds, ctgs);
+	else
+		g = nns_straight(cds, ctgs, min_wt, min_mdw, use_nw, amode);
 #ifdef VERBOSE
 	fprintf(stderr, "[M::%s] processing graph\n", __func__);
 #endif
@@ -510,16 +804,26 @@ int main_bldg(int argc, char *argv[], int ishic)
 	uint32_t min_wt = 10; char *program = argv[0];
 	char *sat_fn = 0, *ctg_fn = 0, *out_fn = 0;
 	int use_sat = 0, mlc = 1;
-	int norm = 0, amode = 0, use_nw = 1;
+	int norm = 0, amode = 0, use_nw = 1, use_mst = 0;
 	float msn = .7, mdw = 0.95;
+	int igm = 0, usep = 0;
 	--argc, ++argv;
-	while (~(c=getopt(argc, argv, "w:ao:s:c:nem:f:k:h"))) {
+	while (~(c=getopt(argc, argv, "w:ao:s:c:nem:f:k:hpg1"))) {
 		switch (c) {
+			case '1': 
+				use_mst = 1;
+				break;
 			case 'w': 
 				min_wt = atoi(optarg);
 				break;
 			case 'a': 
 				amode = 1;
+				break;
+			case 'p': 
+				usep = 1;
+				break;
+			case 'g': 
+				igm = 1;
 				break;
 			case 's': 
 				sat_fn = optarg;
@@ -548,11 +852,14 @@ int main_bldg(int argc, char *argv[], int ishic)
 help:	
 				fprintf(stderr, "\nUsage: %s %s [<options>] <LINKS_MATRIX> \n", program, argv[0]);
 				fprintf(stderr, "Options:\n");
+				fprintf(stderr, "         -1    BOOL     use MST to construct scaffolding graph [FALSE, only for pin_hic]\n");
 				fprintf(stderr, "         -a    BOOL     Hi-C scaffolding in accurate mode [FALSE]\n");
 				fprintf(stderr, "         -w    INT      minimum weight for links [10]\n");
 				fprintf(stderr, "         -k    INT      maximum linking candiates [1]\n");
 				fprintf(stderr, "         -c    FILE     reference index file [nul]\n");
 				fprintf(stderr, "         -n    BOOL     normalize weight [false]\n");
+				fprintf(stderr, "         -p    BOOL     use product of length [False]\n");
+				fprintf(stderr, "         -g    BOOL     ignore middle part of contigs [false]\n");
 				fprintf(stderr, "         -e    BOOL     use normalized weight as edge weight [TRUE]\n");
 				fprintf(stderr, "         -f    FLOAT    minimum weight difference [0.95]\n");
 				fprintf(stderr, "         -s    FILE     sat file [nul]\n");
@@ -571,7 +878,7 @@ help:
 	if (!ishic)
 		ret = buildg(sat_fn, lnk_fn, min_wt, use_sat, norm, mdw, mlc, out_fn);
 	else 
-		ret = buildg_hic(sat_fn, lnk_fn, min_wt, use_sat, norm, mdw, mlc, out_fn, use_nw, amode);
+		ret = buildg_hic(sat_fn, lnk_fn, min_wt, use_sat, norm, mdw, mlc, out_fn, use_nw, amode, igm, usep, use_mst);
 
 	fprintf(stderr, "Program ends\n");	
 	return ret;	

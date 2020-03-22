@@ -176,7 +176,7 @@ help:
 		sprintf(mat_fn, "%s/links.%02d.mat", outdir, i);
 		col_hic_lnks(sat_ofn, bam_fn, n_bam, min_mq, 5000, 0, 0, igm, mat_fn);
 		/*fprintf(stderr, "%p\n", sat_nfn);*/
-		buildg_hic(use_sat ? sat_ofn : faidx_fn, mat_fn, min_wt, use_sat, norm, min_mdw, cann, sat_nfn, use_nw, amode, igm, usep);
+		buildg_hic(use_sat ? sat_ofn : faidx_fn, mat_fn, min_wt, use_sat, norm, min_mdw, cann, sat_nfn, use_nw, amode, igm, usep, use_mst);
 		//get seq at the final round
 		
 		strcpy(sat_ofn, sat_nfn);

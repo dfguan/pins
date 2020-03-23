@@ -258,12 +258,13 @@ int norm_links(cdict2_t *cds, sdict_t *ctgs, int norm, int igm, int usep, int mi
 			if (igm) mul = 3;
 			float div = len1 + len2; //float range 3.4E+38
 			if (usep) mul *= mul, div = len1 * len2; 
-			c->cnts[j].ncnt = 0.0;
-			if (icnt > min_wt)  c->cnts[j].ncnt = icnt * mul / div;
-			uint32_t k;
+			uint32_t k, ltmin = 0;
 			for (k = 0; k < 4; ++k) 
-				if (icnt > min_wt) c->cnts[j].cnt[k] = c->cnts[j].cnt[k] * mul / div;
+				if (c->cnts[j].cnt[k] > min_wt) ltmin=1, c->cnts[j].cnt[k] = c->cnts[j].cnt[k] * mul / div;
 				else c->cnts[j].cnt[k] = 0;
+			
+			c->cnts[j].ncnt = 0.0;
+			if (ltmin)  c->cnts[j].ncnt = icnt * mul / div; //require maximum larger than min_wt
 			
 			/*int sel = igm << 1 | usep;*/
 			/*if (sel == 0) {*/

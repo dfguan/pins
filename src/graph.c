@@ -313,7 +313,7 @@ int add_dedge(graph_t *g, char *sname, uint32_t sl, char *ename, uint32_t er, fl
 	uint32_t eind = add_node(g, ename, 0, 0, 0);
 	edge_t e = (edge_t) {sind << 1 | sl, 0,  eind << 1 | er, 0, wt};
 	/*edge_t re = (edge_t) {eind << 1 | er, sind << 1 | sl, wt, 0, 0}; //undirect graph*/
-	fprintf(stderr, "%s %u %s %u\n", sname, sl, ename, er);	
+	/*fprintf(stderr, "%s %u %s %u\n", sname, sl, ename, er);	*/
 	/*fprintf(stderr, "EDGE %u\t%u\n",sind<<1|sl, eind << 1 | er);	*/
 	add_edge1(g, &e);
 	/*add_edge1(g, &re);*/
@@ -531,11 +531,10 @@ int clean_edges(graph_t *g, int use_df)
 				smwt = mwt;
 				mwt = a->wt;
 				n_mwt = 1;	
-			} else if (a->wt > smwt) {
-				smwt = a->wt;
-			/*}*/
 			} else if (a->wt == mwt) {
 				++n_mwt;
+			} else if (a->wt > smwt) {
+				smwt = a->wt;
 			} 	
 		} 
 		if (use_df && norm_cdf(mwt, 0.5, mwt + smwt) <= 0.95) n_mwt = 2; 

@@ -239,7 +239,7 @@ int norm_links(cdict2_t *cds, sdict_t *ctgs, int norm, int igm, int usep, int mi
 	uint32_t i;
 	cdict2_t *c ;
 	for ( i = 0; i < n_cds; ++i) {
-		/*char *name1 = ctgs->seq[i>>1].name;*/
+		/*char *name1 = ctgs->seq[i].name;*/
 		/*uint32_t snpn = i&1 ? ctgs->seq[i>>1].l_snp_n:ctgs->seq[i>>1].r_snp_n;*/
 		float len1 = ctgs->seq[i].len;
 		uint32_t j;
@@ -262,9 +262,16 @@ int norm_links(cdict2_t *cds, sdict_t *ctgs, int norm, int igm, int usep, int mi
 			for (k = 0; k < 4; ++k) 
 				if (c->cnts[j].cnt[k] > min_wt) ltmin=1, c->cnts[j].cnt[k] = c->cnts[j].cnt[k] * mul / div;
 				else c->cnts[j].cnt[k] = 0;
-			
+
 			c->cnts[j].ncnt = 0.0;
-			if (ltmin)  c->cnts[j].ncnt = icnt * mul / div; //require maximum larger than min_wt
+			if (ltmin) {
+				for (k = 0; k < 4; ++k) {
+					if (c->cnts[j].ncnt < c->cnts[j].cnt[k])
+						c->cnts[j].ncnt = c->cnts[j].cnt[k];
+				}
+			}
+			/*c->cnts[j].ncnt = 0.0;*/
+			/*if (ltmin)  c->cnts[j].ncnt = icnt * mul / div; //require maximum larger than min_wt*/
 			
 			/*int sel = igm << 1 | usep;*/
 			/*if (sel == 0) {*/
@@ -301,6 +308,37 @@ int norm_links(cdict2_t *cds, sdict_t *ctgs, int norm, int igm, int usep, int mi
             /*for ( z = 0; z < 4; ++z) c->cnts[j].fcnt[z] = (float) c->cnts[j].cnt[z]/(z >> 1 ? ctgs->seq[i].l_snp_n : ctgs->seq[i].r_snp_n) / ( z & 0x1 ? ctgs->seq[ctg2_idx].l_snp_n : ctgs->seq[ctg2_idx].r_snp_n);  */
 			/*uint32_t snp2 = c->cnts[j].is_l ? ctgs->seq[sd_get(ctgs, name2)].l_snp_n:ctgs->seq[sd_get(ctgs,name2)].r_snp_n;*/
 			/*fprintf(stderr, "%s\t%c\t%s\t%c\t%u\t%u\t%u\t%lf\n", name1, i&1?'+':'-', name2, c->cnts[j].is_l?'+':'-', icnt, snpn, snp2, 100000.0*(double)icnt/(snp2*snpn));*/
+		}
+	}
+	return 0;
+}
+
+int norm_links2(cdict_t *cds, sdict_t *ctgs, int norm, int igm, int usep, int min_wt)
+{
+	uint32_t n_cds = ctgs->n_seq << 1;
+	uint32_t i;
+	cdict_t *c ;
+	for ( i = 0; i < n_cds; ++i) {
+		/*char *name1 = ctgs->seq[i].name;*/
+		/*uint32_t snpn = i&1 ? ctgs->seq[i>>1].l_snp_n:ctgs->seq[i>>1].r_snp_n;*/
+		float len1 = ctgs->seq[i>>1].len;
+		uint32_t j;
+		c = cds + i;
+		float icnt;
+        
+		for (j = 0; j < c->n_cnt; ++j) {
+            /*fprintf(stderr, "%s\n", c->cnts[j].name);*/
+			char *name2 = c->cnts[j].name; 
+            uint32_t ctg2_idx = sd_get(ctgs, name2);
+			float len2 = ctgs->seq[ctg2_idx].len; 
+			icnt = c->cnts[j].cnt;
+			float mul = 2.0;
+			if (igm) mul = 3;
+			float div = len1 + len2; //float range 3.4E+38
+			if (usep) mul *= mul, div = len1 * len2; 
+			
+			c->cnts[j].cnt = 0.0;
+			if (icnt > min_wt)  c->cnts[j].cnt = icnt * mul / div; //require maximum larger than min_wt
 		}
 	}
 	return 0;
@@ -599,6 +637,7 @@ graph_t *nns_straight(cdict2_t *cds, sdict_t *ctgs, int min_wt, float min_mdw, i
 			/*if (hand_shaking) fprintf(stderr, "I hand shaking\n");*/
 			//determine joint direction, here we use a very easy model
 			if (!hand_shaking) continue;
+			fprintf(stderr, "L\t%s\t%s\n", name1, name2);
 			int idx;
 			if (~(idx = det_ori(c->cnts[j].cnt, isf, min_wt, min_mdw, amode))) 
 			// if build in accurate mode 
@@ -626,6 +665,227 @@ graph_t *nns_straight(cdict2_t *cds, sdict_t *ctgs, int min_wt, float min_mdw, i
 		}		
 	}	
 	return g;
+}
+
+graph_t *nns_straight2(cdict_t *cds, sdict_t *ctgs, int min_wt, float min_mdw, int use_nw, int amode)
+{
+	graph_t *g = graph_init();
+	
+	uint32_t n = ctgs->n_seq << 1;
+	uint32_t i, j;
+	//create nodes
+	for ( i = 0; i < ctgs->n_seq; ++i) 
+		add_node(g, ctgs->seq[i].name, 0, ctgs->seq[i].len, ctgs->seq[i].is_circ);
+	//create edges	
+	for ( i = 0; i < n; ++i) {
+		char *name1 = ctgs->seq[i>>1].name;
+		uint8_t is_l = i & 1;	
+		cdict_t *c = cds + i;	
+		if (!c->n_cnt) continue;	
+		for (j = 0; j < c->lim; ++j) {
+			char *name2 = c->cnts[j].name;
+			if (strcmp(name1, name2) == 0) continue;
+			//hsortand shaking
+			/*fprintf(stderr, "try hand shaking\n");*/
+			uint32_t ind = sd_get(ctgs, name2) << 1 | c->cnts[j].is_l;
+			uint32_t k;
+			uint8_t hand_shaking = 0;
+			float ocnt = 0;
+			for ( k = 0; k < cds[ind].lim; ++k) {
+					if (strcmp(name1, cds[ind].cnts[k].name) == 0 && cds[ind].cnts[k].is_l == is_l) {
+						hand_shaking = 1;
+						ocnt = cds[ind].cnts[k].cnt;
+						break;
+					}
+			}	
+			/*if (hand_shaking) fprintf(stderr, "I hand shaking\n");*/
+			ocnt = 1;
+			if (hand_shaking) add_dedge(g, name1, is_l, name2, c->cnts[j].is_l, ocnt * c->cnts[j].cnt);	 //kinda residule cause index of name1 is the same as its index in ctgs but user doesn't know how the node is organized so better keep this.
+		}		
+	}	
+	return g;
+}
+
+graph_t *nns_mst2(cdict_t *cds, sdict_t *ctgs)
+{
+	graph_t *g = graph_init();
+	
+	uint32_t i, j;
+	//create nodes
+	for ( i = 0; i < ctgs->n_seq; ++i) {
+		add_node(g, ctgs->seq[i].name, 0, ctgs->seq[i].len, ctgs->seq[i].is_circ);
+	}
+	//create edges
+	kvec_t(mst_edge_t) mets;
+	kv_init(mets);
+	mst_edge_t tmp;
+	float max_edge = 0;
+	for ( i = 0; i < ctgs->n_seq << 1; ++i) {
+		char *name1 = ctgs->seq[i>>1].name;
+		uint8_t is_l = i & 1;	
+		cdict_t *c = cds + i;	
+		if (!c->n_cnt) continue;	
+		for (j = 0; j < c->lim; ++j) {
+			char *name2 = c->cnts[j].name;
+			if (strcmp(name1, name2) == 0) continue;
+			//hsortand shaking
+			/*fprintf(stderr, "try hand shaking\n");*/
+			uint32_t ind = sd_get(ctgs, name2) << 1 | c->cnts[j].is_l;
+			uint32_t k;
+			uint8_t hand_shaking = 0;
+			float ocnt = 0;
+			for ( k = 0; k < cds[ind].lim; ++k) {
+					if (strcmp(name1, cds[ind].cnts[k].name) == 0 && cds[ind].cnts[k].is_l == is_l) {
+						hand_shaking = 1;
+						ocnt = cds[ind].cnts[k].cnt;
+						break;
+					}
+			}	
+			if (!hand_shaking) continue;
+			if (i < ind) {
+				if (c->cnts[j].cnt > max_edge) max_edge = c->cnts[j].cnt + 1;
+				tmp = (mst_edge_t){i, ind, j, 0, c->cnts[j].cnt};
+				kv_push(mst_edge_t, mets, tmp);
+			}
+		}		
+	}	
+		
+	//add edges
+	for (i = 0; i < ctgs->n_seq; ++i) {
+		tmp = (mst_edge_t) {i << 1, (i << 1) | 1, 0, 0, max_edge};
+		kv_push(mst_edge_t, mets, tmp);
+	}
+	mst_edge_t *in_mst = mets.a;
+	_kmst(mets.a, mets.n, ctgs->n_seq << 1);	
+	for (i = 0; i < ctgs->n_seq; ++i) ctgs->seq[i].l_snp_n = 0, ctgs->seq[i].r_snp_n = 0;
+	for (i = 0; i < mets.n; ++i) {
+		if (in_mst[i].in_mst) {
+			uint32_t v = in_mst[i].s;
+			uint32_t w = in_mst[i].d;
+			if (v&1) ++ctgs->seq[v>>1].r_snp_n;
+			else ++ctgs->seq[v>>1].l_snp_n; 
+			if (w&1) ++ctgs->seq[w>>1].r_snp_n;
+			else ++ctgs->seq[w>>1].l_snp_n;
+		}
+	}
+	// filter out the vertices with more than 2 degrees, then break			0:left 1:right 
+	uint64_t *idx = (uint64_t *)calloc(ctgs->n_seq << 1, sizeof(uint64_t));
+	for (i = 0, j = 0; i < mets.n; ++i) {
+		if (in_mst[i].in_mst) {
+			uint32_t v = in_mst[i].s;
+			uint32_t w = in_mst[i].d;
+			uint32_t dv = v & 1 ? ctgs->seq[v>>1].r_snp_n: ctgs->seq[v>>1].l_snp_n;	
+			uint32_t dw = w & 1 ? ctgs->seq[w>>1].r_snp_n: ctgs->seq[w>>1].l_snp_n;	
+			
+			if (dv > 2 || dw > 2) 
+				in_mst[i].in_mst = 0, ++idx[v], ++idx[w];
+			else
+				in_mst[j++] = in_mst[i]; 
+		} 	
+	}
+	for (i = 0; i < ctgs->n_seq << 1; i += 2) ctgs->seq[i>>1].l_snp_n -= idx[i];
+	for (i = 1; i < ctgs->n_seq << 1; i += 2) ctgs->seq[i>>1].r_snp_n -= idx[i];
+
+	mets.n = j;
+	/*for (i = 0; i < mets.n; ++i)  fprintf(stderr, "E\t%s\t%s\t%u\t%u\t%f\n", ctgs->seq[in_mst[i].s>>1].name, ctgs->seq[in_mst[i].d>>1].name, ctgs->seq[in_mst[i].s>>1].len, ctgs->seq[in_mst[i].d>>1].len, in_mst[i].wt*10000);*/
+	
+	for (i = 0; i < mets.n; ++i) if ((in_mst[i].s | 1) != in_mst[i].d)add_udedge(g, ctgs->seq[in_mst[i].s>>1].name, in_mst[i].s & 1, ctgs->seq[in_mst[i].d>>1].name, in_mst[i].d & 1, in_mst[i].wt * 1000000); 
+	// double the edges and index
+	/*for (i = 0; i < j; ++i) {*/
+		/*uint32_t v = mets.a[i].s;*/
+		/*uint32_t w = mets.a[i].d;*/
+		/*uint32_t aux = mets.a[i].aux;*/
+		/*tmp = (mst_edge_t){w, v, aux, 0, 0};*/
+		/*kv_push(mst_edge_t, mets, tmp);*/
+	/*}	*/
+	/*qsort(mets.a, mets.n, sizeof(mst_edge_t), cmp_v);	*/
+	//index 
+	/*memset(idx, 0, ctgs->n_seq * sizeof(uint64_t));*/
+	/*in_mst = mets.a; // mets.a may have been changed*/
+	/*for (i = 1, j = 0; i <= mets.n; ++i) {*/
+		/*if (i==mets.n || in_mst[i].s != in_mst[j].s) {*/
+			/*fprintf(stderr, "s: %u d: %u\n", in_mst[j].s, in_mst[j].d);*/
+			/*idx[in_mst[j].s] = ((uint64_t)j << 32 | (i -j)) << 1 | 0;*/
+			/*j = i;	*/
+		/*}*/
+	/*}*/
+		
+	free(idx);
+	kv_destroy(mets);
+	return g;
+}
+//single hic link
+int buildg_hic2(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min_mdw, int mlc, char *out_fn, int use_nw, int amode, int igm, int usep, int use_mst)
+{
+	graph_t *og; 
+	sdict_t *ctgs = 0;
+	if (use_sat) {
+#ifdef VERBOSE
+		fprintf(stderr, "[M::%s] collecting contigs from sat file\n", __func__);
+#endif
+		og = load_sat(fn);
+		ctgs = col_ctgs_from_graph(og);
+	} else {
+		if (!fn) {
+			fprintf(stderr, "[E::%s] please set reference index file with -c\n", __func__);
+			return 1;
+		}
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] collecting contigs from faidx file\n", __func__);
+#endif
+		ctgs = col_ctgs(fn);	
+		og = graph_init();	
+	}
+	if (!ctgs) return 1;
+	uint32_t n_ctg = ctgs->n_seq;	
+	/*fprintf(stderr, "%u\n", ctgs->n_seq);*/
+	cdict_t* cds = (cdict_t*) calloc(n_ctg<<1, sizeof(cdict_t));
+	uint32_t n_cds = n_ctg<<1;
+	uint32_t i;
+	for ( i = 0; i < n_cds; ++i) cd_init(cds+i);
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] collecting links\n", __func__);
+#endif
+	get_links(edge_fn, cds, ctgs);
+	/*anothernorm(cds, ctgs);*/
+	/*return 0;*/
+	norm_links2(cds, ctgs, norm, igm, usep, min_wt);
+	for ( i = 0; i < n_cds; ++i) cd_sort(cds+i);
+	cd_set_lim(cds, n_cds, min_wt, min_mdw, mlc, norm);
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] building graph\n", __func__);
+#endif
+	graph_t *g = 0;
+	if (use_mst) 
+		g = nns_mst2(cds, ctgs);
+	else
+		g = nns_straight2(cds, ctgs, min_wt, min_mdw, use_nw, amode);
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] processing graph\n", __func__);
+#endif
+	process_graph(g, 0);
+			
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] merging graph\n", __func__);
+#endif
+	merge_graph(og, g, 1);
+
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] output graph\n", __func__);
+#endif
+
+	dump_sat(og, out_fn);
+		/*fprintf(stderr, "%s\n", ctgs->seq[i>>1].name);*/
+	for (i = 0; i < n_cds; ++i) {
+		/*fprintf(stderr, "%s\n", ctgs->seq[i>>1].name);*/
+		cd_destroy(cds +i);	
+	} 
+	if (cds) free(cds);
+#ifdef VERBOSE
+	fprintf(stderr, "[M::%s] releasing memory\n", __func__);
+#endif
+	graph_destroy(og);
+	return 0;
 }
 
 int buildg_hic(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min_mdw, int mlc, char *out_fn, int use_nw, int amode, int igm, int usep, int use_mst)
@@ -799,6 +1059,17 @@ int buildg(char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min
 
 }
 
+int buildg_hic_cont(int which, char *fn, char *edge_fn, int min_wt, int use_sat, int norm, float min_mdw, int mlc, char *out_fn, int use_nw, int amode, int igm, int usep, int use_mst)
+{
+	int ret;
+	if (which == 1) 
+		ret = buildg_hic(fn, edge_fn, min_wt, use_sat, norm, min_mdw, mlc, out_fn, use_nw, amode, igm, usep, use_mst);
+	else
+		ret = buildg_hic2(fn, edge_fn, min_wt, use_sat, norm, min_mdw, mlc, out_fn, use_nw, amode, igm, usep, use_mst);
+		
+	return ret;
+}
+
 int main_bldg(int argc, char *argv[], int ishic)
 {
 	int c;
@@ -808,8 +1079,9 @@ int main_bldg(int argc, char *argv[], int ishic)
 	int norm = 0, amode = 0, use_nw = 1, use_mst = 0;
 	float msn = .7, mdw = 0.95;
 	int igm = 0, usep = 0;
+	int md = 2; //new method
 	--argc, ++argv;
-	while (~(c=getopt(argc, argv, "w:ao:s:c:nem:f:k:hpg1"))) {
+	while (~(c=getopt(argc, argv, "w:ao:s:c:nem:f:k:hpg1B:"))) {
 		switch (c) {
 			case '1': 
 				use_mst = 1;
@@ -819,6 +1091,9 @@ int main_bldg(int argc, char *argv[], int ishic)
 				break;
 			case 'a': 
 				amode = 1;
+				break;
+			case 'B': 
+				md = atoi(optarg);
 				break;
 			case 'p': 
 				usep = 1;
@@ -879,8 +1154,8 @@ help:
 	if (!ishic)
 		ret = buildg(sat_fn, lnk_fn, min_wt, use_sat, norm, mdw, mlc, out_fn);
 	else 
-		ret = buildg_hic(sat_fn, lnk_fn, min_wt, use_sat, norm, mdw, mlc, out_fn, use_nw, amode, igm, usep, use_mst);
-
+		ret = buildg_hic_cont(md, sat_fn, lnk_fn, min_wt, use_sat, norm, mdw, mlc, out_fn, use_nw, amode, igm, usep, use_mst);
+	
 	fprintf(stderr, "Program ends\n");	
 	return ret;	
 

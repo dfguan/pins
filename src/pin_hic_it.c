@@ -42,17 +42,20 @@ int main(int argc, char *argv[])
 	/*int use_min_dist = 0;*/
 	float min_mdw = 0.95;
 	int cann = 3;
-	int min_wt = 100, amode = 0, use_nw = 1, usep = 0, igm = 0;
+	int min_wt = 100, amode = 0, use_nw = 1, usep = 0, igm = 0, md = 2;
 	uint32_t min_l  = 0;
 	float min_rat = 0.2;
    	(program = strrchr(argv[0], '/')) ? ++program : (program = argv[0]);
-	while (~(c=getopt(argc, argv, "O:aq:nec:m:d:s:br:w:i:l:x:vhgp1"))) {
+	while (~(c=getopt(argc, argv, "O:aq:nec:m:d:s:br:w:i:l:x:vhgp1B:"))) {
 		switch (c) {
 			case '1':
 				use_mst = 1;
 				break;
 			case 'q':
 				min_mq = atoi(optarg);
+				break;
+			case 'B':
+				md = atoi(optarg);
 				break;
 			case 'm':
 				min_rat = atof(optarg);
@@ -176,7 +179,8 @@ help:
 		sprintf(mat_fn, "%s/links.%02d.mat", outdir, i);
 		col_hic_lnks(sat_ofn, bam_fn, n_bam, min_mq, 5000, 0, 0, igm, mat_fn);
 		/*fprintf(stderr, "%p\n", sat_nfn);*/
-		buildg_hic(use_sat ? sat_ofn : faidx_fn, mat_fn, min_wt, use_sat, norm, min_mdw, cann, sat_nfn, use_nw, amode, igm, usep, use_mst);
+		/*buildg_hic(use_sat ? sat_ofn : faidx_fn, mat_fn, min_wt, use_sat, norm, min_mdw, cann, sat_nfn, use_nw, amode, igm, usep, use_mst);*/
+		buildg_hic_cont(md, use_sat ? sat_ofn : faidx_fn, mat_fn, min_wt, use_sat, norm, min_mdw, cann, sat_nfn, use_nw, amode, igm, usep, use_mst);
 		//get seq at the final round
 		
 		strcpy(sat_ofn, sat_nfn);

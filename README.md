@@ -4,7 +4,7 @@ Scaffolding tool based on linked reads, Hi-C reads and linkage disequilibrium in
 
 ## Overview
 
-**pins** is a scaffolding toolkit, it contains three basic programs, namely, pin\_ld a scaffolder based on linkage disequalibrium inforamtion, pin\_hic a scaffolder using Hi-C data, and pin\_10x a scaffolder based on linked reads. It applies a dual selection and local optimal strategy to bridge two contigs and output a SAT file for each iteration, the SAT format is the extension of GFA format which is able to record the scaffolding process, and can also be useful for furthure genomic analysis. **please change the text**
+**pins** is a scaffolding toolkit, it contains three basic programs, namely, pin\_ld a scaffolder based on linkage disequilibrium information, pin\_hic a scaffolder using Hi-C data, and pin\_10x a scaffolder based on linked reads. It applies a dual selection and local optimal strategy to bridge two contigs and output a SAT file for each iteration, the SAT format is the extension of GFA format which is able to record the scaffolding process, and can also be useful for further genomic analysis. **please change the text**
 
 
 ## Dependencies
@@ -13,7 +13,7 @@ Scaffolding tool based on linked reads, Hi-C reads and linkage disequilibrium in
 
 
 ## Installation
-Run the following commands to intall pins:
+Run the following commands to install pins:
 
 ```
 git clone https://github.com/dfguan/pins.git
